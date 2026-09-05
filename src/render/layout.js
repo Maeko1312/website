@@ -35,7 +35,7 @@ module.exports = function (ctx) {
       <div class="strip-scroll">${stripSlugs.map(s => {
         const inst = instruments.bySlug[s], qq = q(s); if (!inst || !qq) return '';
         const d = dir(qq.changePct);
-        const w = util.wkn(qq.isin || inst.isin); return html`<a class="strip-item" href="/kurs/${inst.slug}"><span class="strip-name">${inst.short || inst.name}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
+        const w = util.wkn(qq.isin || inst.isin); return html`<a class="strip-item" href="/kurs/${inst.slug}"><span class="strip-name notranslate" translate="no">${inst.short || inst.name}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
       })}</div>
       <div class="strip-meta"><a href="/methodik" title="Kursdaten: Herkunft und Verzögerung">${asOfLabel} · Xetra 15 Min. verzögert</a></div>
     </div></div>`;
@@ -106,9 +106,9 @@ module.exports = function (ctx) {
     return html`<header class="site-header">
       <div class="container masthead">
         <button class="burger" type="button" data-nav-toggle aria-expanded="false" aria-controls="nav-panel">${raw(icons.burger)}<span class="burger-label">Menü</span></button>
-        <a class="brand" href="/" aria-label="${config.brand} – Startseite">Börsen<em>blick</em></a>
+        <a class="brand notranslate" translate="no" href="/" aria-label="${config.brand} – Startseite">Börsen<em>blick</em></a>
         ${searchForm('is-head')}
-        <div class="head-meta"><strong data-clock>${dateFull(ctx.now)}</strong><span class="market-status" data-market-status data-holidays="${holidays}">Xetra</span></div>
+        <div class="head-meta"><strong data-clock>${util.DAYS_SHORT[ctx.now.getDay()]} ${dateShort(ctx.now)} · ${time(ctx.now)} Uhr</strong><span class="market-status" data-market-status data-holidays="${holidays}">Xetra</span></div>
         <div class="head-actions"><a class="btn btn-teal head-nl" href="/newsletter">${raw(icons.mail)}Newsletter</a><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a></div>
       </div>
       ${mainNav(current)}
@@ -147,7 +147,7 @@ module.exports = function (ctx) {
   function footer() {
     return html`<footer class="site-footer"><div class="container">
       <div class="footer-top">
-        <div class="footer-brand"><a class="brand" href="/">Börsen<em>blick</em></a><p>${config.claim} Nachrichten, Kurse, Termine und Wissen für Anlegerinnen und Anleger im deutschsprachigen Raum.</p>
+        <div class="footer-brand"><a class="brand notranslate" translate="no" href="/">Börsen<em>blick</em></a><p>${config.claim} Nachrichten, Kurse, Termine und Wissen für Anlegerinnen und Anleger im deutschsprachigen Raum.</p>
           <div class="social"><a href="/feed.xml" title="RSS-Feed" aria-label="RSS-Feed">${raw(icons.rss)}</a><a href="/newsletter" title="Newsletter" aria-label="Newsletter">${raw(icons.mail)}</a></div></div>
         ${nav.footer.map(col => html`<div class="footer-col"><h3>${col.title}</h3><ul>${col.links.map(([l, h]) => html`<li><a href="${h}">${l}</a></li>`)}</ul></div>`)}
       </div>
@@ -171,6 +171,7 @@ module.exports = function (ctx) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-language" content="de">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}">

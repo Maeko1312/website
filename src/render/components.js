@@ -68,7 +68,7 @@ module.exports = function (ctx) {
       watch: html`<td class="right">${c.watchButton(inst.slug, true)}</td>`,
     };
     const dv = { price: qq.price, change: qq.changePct, abs: qq.changeAbs, ytd: qq.perf && qq.perf.ytd, y1: qq.perf && qq.perf.y1, w: qq.perf && qq.perf.w, m1: qq.perf && qq.perf.m1 };
-    const w = util.wkn(qq.isin || inst.isin); return html`<tr><td><a href="${c.url(inst)}">${inst.name}</a>${inst.type === 'stock' ? html`<span class="sub">${w ? html`<span class="wkn">${w}</span>` : ''}${inst.sector} · ${inst.index}</span>` : inst.type !== 'index' && inst.short ? html`<span class="sub">${inst.short}</span>` : ''}</td>${cols.map(k => {
+    const w = util.wkn(qq.isin || inst.isin); return html`<tr><td><a href="${c.url(inst)}">${inst.name}</a>${inst.type === 'stock' ? html`<span class="sub">${w ? html`<span class="wkn" translate="no">${w}</span>` : ''}${inst.sector} · ${inst.index}</span>` : inst.type !== 'index' && inst.short ? html`<span class="sub">${inst.short}</span>` : ''}</td>${cols.map(k => {
       const td = cell[k]; if (!td) return '';
       if (dv[k] !== undefined) return raw(String(td).replace('<td', `<td data-v="${dv[k] == null ? '' : dv[k]}"`));
       return td;
@@ -78,8 +78,8 @@ module.exports = function (ctx) {
   const numeric = new Set(['price', 'change', 'abs', 'ytd', 'y1', 'w', 'm1', 'mcap', 'pe', 'dy']);
   c.quoteTable = (insts, { cols = ['price', 'change', 'ytd', 'spark'], compact = false, sortable = true, nameHead = 'Name' } = {}) =>
     html`<div class="table-wrap"><table class="quote-table ${compact ? 'is-compact' : ''}"${sortable ? raw(' data-sortable') : ''}><thead><tr><th>${nameHead}</th>${cols.map(k => html`<th class="${numeric.has(k) ? 'num' : ''} ${['ytd', 'y1', 'w', 'm1', 'mcap', 'pe', 'dy', 'range', 'sector', 'index', 'isin'].includes(k) ? 'hide-m' : ''} ${k === 'spark' ? 'spark-cell' : ''}"${['spark', 'range', 'watch'].includes(k) ? raw(' data-nosort') : ''}>${colHead[k]}</th>`)}</tr></thead><tbody>${insts.map(i => c.instrumentRow(i, cols))}</tbody></table></div>`;
-  c.miniQuotes = (insts) => html`<div>${insts.map(i => { const qq = q(i.slug) || {}; const w = util.wkn(qq.isin || i.isin); return html`<div class="mini-quote"><span class="name"><a href="${c.url(i)}">${i.short || i.name}</a>${w ? html`<span class="wkn">${w}</span>` : ''}</span><span class="vals"><strong>${c.priceCell(i, qq)}</strong>${c.delta(qq.changePct)}</span></div>`; })}</div>`;
-  c.board = (slugs) => html`<div class="board">${slugs.map(s => { const i = instruments.bySlug[s], qq = q(s) || {}, h = history[s]; const w = util.wkn((qq && qq.isin) || i.isin); return html`<a class="board-item" href="${c.url(i)}"><span class="strip-name">${i.short || i.name}</span><span class="wkn">${w || ''}</span><span class="price">${c.priceCell(i, qq)}</span>${c.delta(qq.changePct)}${h ? charts.sparkline(h.points, { days: 22, w: 200, h: 30 }) : ''}</a>`; })}</div>`;
+  c.miniQuotes = (insts) => html`<div>${insts.map(i => { const qq = q(i.slug) || {}; const w = util.wkn(qq.isin || i.isin); return html`<div class="mini-quote"><span class="name"><a href="${c.url(i)}">${i.short || i.name}</a>${w ? html`<span class="wkn" translate="no">${w}</span>` : ''}</span><span class="vals"><strong>${c.priceCell(i, qq)}</strong>${c.delta(qq.changePct)}</span></div>`; })}</div>`;
+  c.board = (slugs) => html`<div class="board">${slugs.map(s => { const i = instruments.bySlug[s], qq = q(s) || {}, h = history[s]; const w = util.wkn((qq && qq.isin) || i.isin); return html`<a class="board-item" href="${c.url(i)}"><span class="strip-name">${i.short || i.name}</span><span class="wkn" translate="no">${w || ''}</span><span class="price">${c.priceCell(i, qq)}</span>${c.delta(qq.changePct)}${h ? charts.sparkline(h.points, { days: 22, w: 200, h: 30 }) : ''}</a>`; })}</div>`;
   c.watchButton = (slug, small = false) => html`<button type="button" class="btn btn-ghost ${small ? 'btn-sm' : ''} watch" data-watch="${slug}" aria-pressed="false" title="Auf die Merkliste setzen">${raw(ctx.layout.icons.star)}${small ? '' : html`<span class="watch-label">Auf Merkliste</span>`}</button>`;
   c.movers = (n = 5) => {
     const stocks = instruments.stocks.filter(s => q(s.slug) && q(s.slug).changePct != null).sort((a, b) => q(b.slug).changePct - q(a.slug).changePct);
@@ -141,6 +141,22 @@ module.exports = function (ctx) {
     if (idx < 0) return bodyHtml + String(block);
     return bodyHtml.slice(0, idx) + String(block) + bodyHtml.slice(idx);
   };
+
+  /* ---------- Rechner ---------- */
+  c.calcForm = (t, { id = 'x' } = {}) => {
+    const fid = (n) => `f-${id}-${t.calc}-${n}`;
+    const field = (fl) => fl.type === 'select'
+      ? html`<div class="field"><label for="${fid(fl.name)}">${fl.label}</label><div class="control"><select id="${fid(fl.name)}" name="${fl.name}">${fl.options.map(([v, l]) => html`<option value="${v}">${l}</option>`)}</select></div></div>`
+      : html`<div class="field"><label for="${fid(fl.name)}">${fl.label}</label><div class="control"><input id="${fid(fl.name)}" name="${fl.name}" type="text" inputmode="decimal" value="${fl.value}">${fl.suffix ? html`<span class="suffix">${fl.suffix}</span>` : ''}</div>${fl.hint ? html`<span class="hint">${fl.hint}</span>` : ''}</div>`;
+    return html`<form class="calc card" data-calc="${t.calc}" novalidate><div class="calc-form">${t.fields.map(field)}<button class="btn btn-dark" type="submit">Berechnen</button></div><div class="calc-out" data-calc-out aria-live="polite"></div></form>`;
+  };
+  c.calcTabs = (tools, { id = 'calc' } = {}) => html`<div class="tabs" data-tabs="${id}-panels" role="tablist" aria-label="Rechner wählen">${tools.map((t, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${t.calc}">${t.tab}</button>`)}</div><div id="${id}-panels">${tools.map((t, i) => html`<div data-panel="${t.calc}"${i ? raw(' hidden') : ''}><p class="section-sub" style="margin-top:0">${t.lead} <a href="/werkzeuge/${t.slug}">Erklärung und Formel ›</a></p>${c.calcForm(t, { id })}</div>`)}</div>`;
+
+  /* ---------- Quiz ---------- */
+  c.quizBox = () => { const z = ctx.content.quiz; return html`<section class="card quiz" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">${c.sectionTitle('Börsen-Quiz')}<p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p><div data-quiz-body><p class="quiz-q">${z.today[0].q}</p><div class="quiz-options">${z.today[0].o.map((o, i) => html`<button type="button" class="quiz-option" data-quiz-option="${i}"><span>${o}</span></button>`)}</div></div><p class="small muted" style="margin-top:12px">Fünf Fragen, täglich neu. Ihr Ergebnis bleibt nur in Ihrem Browser.</p></section>`; };
+
+  /* ---------- Börsengänge (Liste) ---------- */
+  c.ipoList = (list) => html`<ul class="upcoming">${list.map(i => { const d = new Date(i.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what"><a href="/ipo/${i.slug}">${i.name}</a></div><div class="who">${i.sector} · ${i.market}${i.status === 'geplant' && i.priceRange && i.priceRange !== 'noch nicht festgelegt' ? html` · ${i.priceRange}` : ''}</div></div></li>`; })}</ul>`;
 
   /* ---------- Sidebar-Bausteine ---------- */
   c.sideCard = (title, body, { href, more } = {}) => html`<section class="card">${c.sectionTitle(title, { href, more, tag: 'h2' })}${body}</section>`;

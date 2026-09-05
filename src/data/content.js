@@ -9,9 +9,11 @@ module.exports = function (ctx) {
   const guides = require('./guides')(ctx);
   const articles = require('./articles')(ctx);
   const blog = require('./blog')(ctx);
+  const tools = require('./tools')(ctx);
+  const quiz = require('./quiz')(ctx);
 
   const content = {
-    categories, authors, glossary: glossary.list, glossaryBySlug: glossary.bySlug, blog,
+    categories, authors, glossary: glossary.list, glossaryBySlug: glossary.bySlug, blog, tools, quiz,
     holidays: calendar.holidays, events: calendar.events, companyEvents: calendar.company, countries: calendar.countries, calendarRange: calendar.range,
     ipos, guides, articles,
     searchablePages: [],

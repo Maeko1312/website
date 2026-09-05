@@ -16,12 +16,11 @@
   /* ---------- Kopfzeile: Datum & Uhr ---------- */
   function clock() {
     var el = $('[data-clock]'); if (!el) return;
-    var days = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-    var months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+    var days = ['So.', 'Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.'];
     function tick() {
       var n = new Date();
       var p = function (x) { return (x < 10 ? '0' : '') + x; };
-      el.textContent = days[n.getDay()] + ', ' + n.getDate() + '. ' + months[n.getMonth()] + ' ' + n.getFullYear() + ' · ' + p(n.getHours()) + ':' + p(n.getMinutes()) + ' Uhr';
+      el.textContent = days[n.getDay()] + ' ' + p(n.getDate()) + '.' + p(n.getMonth() + 1) + '.' + n.getFullYear() + ' · ' + p(n.getHours()) + ':' + p(n.getMinutes()) + ' Uhr';
     }
     tick(); setInterval(tick, 15000);
     // Börsenstatus Xetra (9:00–17:30 Uhr, Mo–Fr, Feiertage aus data-Attribut)
@@ -507,6 +506,39 @@
     });
   }
 
+  /* ---------- Quiz ---------- */
+  function quiz() {
+    $$('[data-quiz]').forEach(function (host) {
+      var qs; try { qs = JSON.parse(host.getAttribute('data-quiz-questions')); } catch (e) { return; }
+      var key = 'bb.quiz.' + host.getAttribute('data-quiz');
+      var body = $('[data-quiz-body]', host), prog = $('[data-quiz-progress]', host);
+      var i = 0, score = 0, done = store.get(key, null);
+      function esc(s) { return escapeHtml(s); }
+      function render() {
+        var q = qs[i];
+        prog.textContent = 'Frage ' + (i + 1) + ' von ' + qs.length;
+        body.innerHTML = '<p class="quiz-q">' + esc(q.q) + '</p><div class="quiz-options">' + q.o.map(function (o, k) { return '<button type="button" class="quiz-option" data-quiz-option="' + k + '"><span>' + esc(o) + '</span></button>'; }).join('') + '</div>';
+        $$('[data-quiz-option]', body).forEach(function (b) { b.addEventListener('click', function () { answer(parseInt(b.getAttribute('data-quiz-option'), 10)); }); });
+      }
+      function answer(k) {
+        var q = qs[i]; var right = k === q.a; if (right) score++;
+        $$('[data-quiz-option]', body).forEach(function (b, idx) { b.disabled = true; if (idx === q.a) b.classList.add('is-right'); else if (idx === k) b.classList.add('is-wrong'); });
+        var box = d.createElement('div'); box.className = 'quiz-expl ' + (right ? 'is-right' : 'is-wrong');
+        box.innerHTML = '<strong>' + (right ? 'Richtig.' : 'Leider nein.') + '</strong> ' + esc(q.e) + '<button type="button" class="btn btn-dark btn-sm" data-quiz-next>' + (i < qs.length - 1 ? 'Nächste Frage' : 'Ergebnis anzeigen') + '</button>';
+        body.appendChild(box);
+        $('[data-quiz-next]', box).addEventListener('click', function () { i++; if (i < qs.length) render(); else finish(); });
+      }
+      function finish() {
+        store.set(key, score);
+        prog.textContent = 'Ergebnis';
+        var msg = score === qs.length ? 'Alle richtig – Sie kennen die Börse.' : score >= 3 ? 'Solide. Die Lücken schließt das Börsenlexikon.' : 'Ein guter Anlass für die Einsteiger-Ratgeber.';
+        body.innerHTML = '<p class="quiz-result"><strong>' + score + ' von ' + qs.length + '</strong> richtig</p><p class="quiz-msg">' + msg + '</p><div class="quiz-actions"><a class="btn btn-teal btn-sm" href="/newsletter">Jeden Morgen dazulernen</a><button type="button" class="btn btn-ghost btn-sm" data-quiz-restart>Nochmal</button><a class="btn btn-ghost btn-sm" href="/wissen/boersenlexikon">Lexikon</a></div>';
+        $('[data-quiz-restart]', body).addEventListener('click', function () { i = 0; score = 0; render(); });
+      }
+      if (done !== null) { score = done; finish(); } else { render(); }
+    });
+  }
+
   /* ---------- Cookie-Hinweis (nur technisch notwendige) ---------- */
   function cookieNote() {
     var el = $('[data-cookie-note]'); if (!el) return;
@@ -546,6 +578,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); cookieNote(); share(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); headerShadow(); progress();
   });
 })();

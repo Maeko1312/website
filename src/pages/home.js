@@ -107,6 +107,10 @@ module.exports = function (ctx) {
         <div class="card">${c.sectionTitle('Devisen', { href: '/devisen', more: 'Alle' })}${c.miniQuotes(instruments.fx.slice(0, 5))}</div>
         <div class="card">${c.sectionTitle('Krypto & Zinsen', { href: '/krypto', more: 'Alle' })}${c.miniQuotes([...instruments.crypto.slice(0, 2), ...instruments.bonds])}</div>
       </section>
+      <section aria-labelledby="h-calc">
+        ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
+        ${c.calcTabs(content.tools, { id: 'home' })}
+      </section>
       <section aria-labelledby="h-wissen">
         ${c.sectionTitle('Börsenwissen', { href: '/wissen', more: 'Alle Ratgeber', id: 'h-wissen' })}
         <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
@@ -115,11 +119,11 @@ module.exports = function (ctx) {
     <aside>
       <section class="card">
         ${c.sectionTitle('Börsengänge', { href: '/termine/ipos', more: 'Alle IPOs' })}
-        <p class="small" style="margin-bottom:8px">${c.placeholder()}</p>
-        ${content.ipos.upcoming.slice(0, 3).map(i => html`<div class="ipo-row"><span class="when">${util.dateDM(new Date(i.date + 'T00:00:00'))}</span><div><div class="name"><a href="/ipo/${i.slug}">${i.name}</a></div><div class="meta">${i.sector} · ${i.market}</div></div></div>`)}
+        ${c.ipoList(content.ipos.upcoming.slice(0, 3))}
+        <p class="small muted" style="margin-top:12px">${c.placeholder()} Firmennamen sind Beispiele, bis der IPO-Datenfeed angebunden ist.</p>
       </section>
+      ${c.quizBox()}
       ${c.pollBox()}
-      ${c.sideTools()}
     </aside>
   </div>
 </div>`;
