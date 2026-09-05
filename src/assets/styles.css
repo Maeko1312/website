@@ -667,12 +667,12 @@ aside .perf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .term dd { margin: 4px 0 0; font-size: 15px; line-height: 22px; color: var(--body); }
 .term dd a { font-weight: 500; }
 .guide-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.guide-card { display: grid; gap: 10px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); color: var(--ink); align-content: start; transition: border-color .15s; }
+.guide-card { display: grid; gap: 12px; padding: 22px 22px 20px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); color: var(--ink); align-content: start; transition: border-color .15s; }
 .guide-card:hover { border-color: var(--line-strong); border-top-color: var(--surface-2); text-decoration: none; color: var(--ink); }
-.guide-card .num { text-align: left; font-family: var(--font-display); font-stretch: 75%; font-size: 28px; font-weight: 600; color: var(--muted); line-height: 1; }
-.guide-card h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 20px; line-height: 24px; }
-.guide-card p { font-size: 14px; line-height: 20px; color: var(--body); }
-.guide-card .meta { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .02em; color: var(--muted); }
+.guide-card .num { text-align: left; font-family: var(--font-mono); font-size: 13px; letter-spacing: .06em; color: var(--muted); line-height: 1; }
+.guide-card h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 22px; line-height: 27px; letter-spacing: .005em; text-wrap: balance; }
+.guide-card p { font-size: 14.5px; line-height: 22px; color: var(--body); }
+.guide-card .meta { padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .toc { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
 .toc strong { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .toc ol { list-style: none; display: grid; gap: 4px; }
@@ -698,12 +698,12 @@ aside .perf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
 /* ---------- Werkzeuge ---------- */
 .tool-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.tool-card { display: grid; gap: 10px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); color: var(--ink); align-content: start; transition: border-color .15s; }
+.tool-card { display: grid; gap: 12px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); color: var(--ink); align-content: start; transition: border-color .15s; }
 .tool-card:hover { border-color: var(--line-strong); border-top-color: var(--surface-2); text-decoration: none; color: var(--ink); }
 .tool-card .icon { width: 44px; height: 44px; background: var(--surface-2); color: var(--ink); display: grid; place-items: center; }
 .tool-card .icon svg { width: 24px; height: 24px; }
-.tool-card h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 20px; line-height: 24px; }
-.tool-card p { font-size: 14px; line-height: 20px; color: var(--body); }
+.tool-card h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 22px; line-height: 27px; letter-spacing: .005em; text-wrap: balance; }
+.tool-card p { font-size: 14.5px; line-height: 22px; color: var(--body); }
 .calc { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
 .calc-form { display: grid; gap: 14px; }
 .field { display: grid; gap: 6px; }
