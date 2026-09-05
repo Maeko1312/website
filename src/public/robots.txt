@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /suche
+Disallow: /merkliste
+
+Sitemap: https://boersenblick.vercel.app/sitemap.xml

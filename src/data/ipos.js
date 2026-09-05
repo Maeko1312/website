@@ -1,0 +1,17 @@
+'use strict';
+// Börsengänge – PLATZHALTER. Firmennamen sind erfunden und als Beispiel gekennzeichnet,
+// bis ein IPO-Datenfeed angebunden ist.
+const { addDays, isoDate } = require('../lib/util');
+module.exports = function (ctx) {
+  const n = ctx.now;
+  const list = [
+    { slug: 'beispiel-nordlicht-energie', name: 'Nordlicht Energie AG', sector: 'Erneuerbare Energien', market: 'Prime Standard, Frankfurt', status: 'geplant', date: isoDate(addDays(n, 18)), priceRange: '24,00–29,00 €', volume: 'rund 650 Mio. €', shares: '22,4 Mio. Aktien (davon 8 Mio. aus Kapitalerhöhung)', desc: 'Betreiber von Onshore-Windparks in Norddeutschland und Skandinavien. Der Emissionserlös soll in den Ausbau von Speicherkapazitäten fließen.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+    { slug: 'beispiel-medtec-rhein', name: 'MedTec Rhein SE', sector: 'Medizintechnik', market: 'Prime Standard, Frankfurt', status: 'geplant', date: isoDate(addDays(n, 32)), priceRange: 'noch nicht festgelegt', volume: 'bis zu 400 Mio. €', shares: 'noch nicht festgelegt', desc: 'Hersteller von Bildgebungssystemen für die Zahnmedizin mit Sitz in Köln.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+    { slug: 'beispiel-quantum-software', name: 'Quantum Software Holding', sector: 'Software', market: 'Scale, Frankfurt', status: 'geplant', date: isoDate(addDays(n, 47)), priceRange: '11,50–14,00 €', volume: 'rund 90 Mio. €', shares: '7,2 Mio. Aktien', desc: 'Anbieter von Optimierungssoftware für Logistiknetzwerke.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+    { slug: 'beispiel-alpenbrau', name: 'Alpenbräu Getränke AG', sector: 'Konsumgüter', market: 'General Standard, Frankfurt', status: 'geplant', date: isoDate(addDays(n, 61)), priceRange: 'noch nicht festgelegt', volume: 'rund 150 Mio. €', shares: 'noch nicht festgelegt', desc: 'Familiengeführte Brauereigruppe aus Bayern.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+    { slug: 'beispiel-solaris-grid', name: 'Solaris Grid Technologies', sector: 'Energietechnik', market: 'Prime Standard, Frankfurt', status: 'erfolgt', date: isoDate(addDays(n, -12)), priceRange: 'Ausgabepreis 31,00 €', firstPrice: '34,20 €', volume: '820 Mio. €', shares: '26,5 Mio. Aktien', desc: 'Netztechnik und Wechselrichter für Solarparks.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+    { slug: 'beispiel-hansa-logistik', name: 'Hansa Logistik Gruppe', sector: 'Logistik', market: 'Prime Standard, Frankfurt', status: 'erfolgt', date: isoDate(addDays(n, -34)), priceRange: 'Ausgabepreis 18,50 €', firstPrice: '18,10 €', volume: '310 Mio. €', shares: '16,8 Mio. Aktien', desc: 'Kontraktlogistik für Automobil- und Chemieindustrie.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+    { slug: 'beispiel-bio-nova', name: 'BioNova Therapeutics', sector: 'Biotechnologie', market: 'Nasdaq, New York', status: 'erfolgt', date: isoDate(addDays(n, -55)), priceRange: 'Ausgabepreis 16,00 US-$', firstPrice: '21,40 US-$', volume: '240 Mio. US-$', shares: '15 Mio. Aktien', desc: 'Entwickler von Antikörpertherapien gegen Autoimmunerkrankungen.', lead: 'Beispielhafter Börsengang zur Darstellung des Layouts.' },
+  ].map(i => ({ ...i, placeholder: true }));
+  return { list, upcoming: list.filter(i => i.status === 'geplant'), recent: list.filter(i => i.status === 'erfolgt'), bySlug: Object.fromEntries(list.map(i => [i.slug, i])) };
+};

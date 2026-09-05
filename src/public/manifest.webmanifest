@@ -1,0 +1,11 @@
+{
+  "name": "Börsenblick",
+  "short_name": "Börsenblick",
+  "description": "Börsennachrichten, Kurse, Termine und Börsenwissen.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0b1e3a",
+  "theme_color": "#0b1e3a",
+  "lang": "de",
+  "icons": [{ "src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
