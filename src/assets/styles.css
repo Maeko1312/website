@@ -49,7 +49,7 @@
   --up-dark: #62d48b;
   --down-dark: #f2756f;
   --dark-text: #ecebf4;
-  --dark-muted: #a9a5c2;
+  --dark-muted: #bdb9d3;
   --dark-line: #35304d;
   --accent-dark: #b5aae6;
   --cta-dark: #f4f3f8;
@@ -777,6 +777,8 @@ html.nlbar-open .toast { bottom: 100px; }
 .section-dark .board-item .strip-name { color: var(--dark-text); }
 .section-dark .board-item:hover { border-color: var(--accent-dark); }
 .section-dark a.more { color: var(--accent-dark); }
+.section-dark .muted, .section-dark .small { color: var(--dark-text); }
+.section-dark .small a { color: var(--accent-dark); }
 .number-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .number-tile { padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); }
 .number-tile span { display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
