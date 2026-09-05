@@ -12,6 +12,11 @@ module.exports = {
   timezone: 'Europe/Berlin',
   tzLabel: 'MESZ',
   newsroom: 'Redaktion',
+  // Newsletter-Formulare: POST-Ziel des Versanddienstes (Brevo, Mailchimp, Buttondown, ConvertKit …).
+  // Leer = noch nicht angebunden → das Formular zeigt einen ehrlichen Hinweis statt zu senden.
+  newsletterAction: '',
+  newsletterEmailField: 'email',   // Feldname, den der Anbieter erwartet (z. B. EMAIL bei Mailchimp)
+  newsletterThanks: '/newsletter/danke',
   legal: {
     company: '[Firmenname und Rechtsform]',
     street: '[Straße und Hausnummer]',

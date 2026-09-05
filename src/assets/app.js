@@ -111,7 +111,7 @@
     scored.sort(function (a, b) { return b.s - a.s; });
     return scored.slice(0, limit || 8).map(function (x) { return x.it; });
   }
-  var typeLabel = { article: 'Nachricht', stock: 'Aktie', index: 'Index', commodity: 'Rohstoff', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihe', term: 'Lexikon', page: 'Seite', guide: 'Wissen' };
+  var typeLabel = { article: 'Nachricht', blog: 'Blog', stock: 'Aktie', index: 'Index', commodity: 'Rohstoff', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihe', term: 'Lexikon', page: 'Seite', guide: 'Wissen' };
   function closeSearch() { $$('[data-search-results]').forEach(function (r) { r.hidden = true; r.innerHTML = ''; }); }
   function headerSearch() {
     $$('[data-search]').forEach(function (form) {
@@ -158,9 +158,10 @@
         }
         var groups = {};
         hits.forEach(function (h) { (groups[h.y] = groups[h.y] || []).push(h); });
-        var order = ['stock', 'index', 'commodity', 'fx', 'crypto', 'bond', 'article', 'guide', 'term', 'page'];
+        var order = ['stock', 'index', 'commodity', 'fx', 'crypto', 'bond', 'article', 'blog', 'guide', 'term', 'page'];
+        var plural = { stock: 'Aktien', index: 'Indizes', commodity: 'Rohstoffe', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihen', article: 'Nachrichten', blog: 'Blog', guide: 'Wissen', term: 'Lexikon', page: 'Seiten' };
         out.innerHTML = order.filter(function (k) { return groups[k]; }).map(function (k) {
-          return '<section class="search-group"><h2 class="section-title"><span>' + typeLabel[k] + (groups[k].length > 1 && k !== 'fx' && k !== 'crypto' ? (k === 'article' ? 'en' : k === 'term' ? '-Einträge' : k === 'index' ? 'e' : k === 'stock' ? 'n' : k === 'page' ? 'n' : '') : '') + '</span></h2><ul class="result-list">' +
+          return '<section class="search-group"><h2 class="section-title"><span>' + (groups[k].length > 1 ? plural[k] : typeLabel[k]) + '</span></h2><ul class="result-list">' +
             groups[k].map(function (h) { return '<li><a href="' + h.u + '"><strong>' + escapeHtml(h.t) + '</strong>' + (h.k ? ' <span class="muted">· ' + escapeHtml(h.k) + '</span>' : '') + (h.d ? '<span class="result-desc">' + escapeHtml(h.d) + '</span>' : '') + '</a></li>'; }).join('') + '</ul></section>';
         }).join('');
       });
@@ -350,22 +351,63 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('is-visible'); }, 2200);
   }
 
-  /* ---------- Newsletter (ohne Backend) ---------- */
+  /* ---------- Newsletter ---------- */
+  var SUB_KEY = 'bb.subscribed', BAR_KEY = 'bb.nlbar', MODAL_KEY = 'bb.nlmodal';
+  var WEEK = 7 * 86400000;
   function newsletter() {
     $$('form[data-newsletter]').forEach(function (form) {
       form.addEventListener('submit', function (e) {
-        e.preventDefault();
         var email = $('input[type="email"]', form);
-        if (!email || !email.checkValidity()) { email && email.reportValidity(); return; }
+        if (!email || !email.checkValidity()) { e.preventDefault(); email && email.reportValidity(); return; }
         var consent = $('input[type="checkbox"][required]', form);
-        if (consent && !consent.checked) { consent.reportValidity(); return; }
+        if (consent && !consent.checked) { e.preventDefault(); consent.reportValidity(); return; }
         var action = form.getAttribute('action');
-        if (action && action !== '#') { form.submit(); return; }
+        if (action && action !== '#') { store.set(SUB_KEY, Date.now()); return; /* normaler POST an den Versanddienst */ }
+        e.preventDefault();
         // Kein Versanddienst verbunden: ehrlich sagen, Alternative anbieten
         var note = $('[data-newsletter-note]', form);
         if (note) { note.hidden = false; note.focus(); }
+        else { toast('Die Newsletter-Anmeldung wird gerade eingerichtet.'); }
       });
     });
+  }
+  /* Slide-in-Leiste auf Lese-Seiten (nach 45 % Scrolltiefe), einmal pro Woche nach Schließen */
+  function nlBar() {
+    var bar = $('[data-nl-bar]'); if (!bar || !d.body.hasAttribute('data-reading')) return;
+    if (store.get(SUB_KEY, 0)) return;
+    var dismissed = store.get(BAR_KEY, 0); if (dismissed && Date.now() - dismissed < WEEK) return;
+    var shown = false;
+    function chk() {
+      if (shown) return;
+      var art = $('[data-article]'); if (!art) return;
+      var r = art.getBoundingClientRect(); var total = r.height - window.innerHeight;
+      var p = total > 0 ? -r.top / total : 1;
+      if (p > 0.45) { shown = true; bar.hidden = false; setTimeout(function () { bar.classList.add('is-visible'); d.documentElement.classList.add('nlbar-open'); }, 30); window.removeEventListener('scroll', chk); }
+    }
+    window.addEventListener('scroll', chk, { passive: true });
+    $$('[data-nl-bar-close]', bar).forEach(function (b) { b.addEventListener('click', function () { bar.classList.remove('is-visible'); d.documentElement.classList.remove('nlbar-open'); store.set(BAR_KEY, Date.now()); setTimeout(function () { bar.hidden = true; }, 400); }); });
+  }
+  /* Exit-Intent-Dialog: Mauszeiger verlässt das Fenster nach oben (Desktop), einmal pro Woche */
+  function nlModal() {
+    var modal = $('[data-nl-modal]'); if (!modal) return;
+    if (store.get(SUB_KEY, 0)) return;
+    var last = store.get(MODAL_KEY, 0); if (last && Date.now() - last < WEEK) return;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    var armed = false; setTimeout(function () { armed = true; }, 8000);
+    function open() {
+      if (!armed || modal.classList.contains('is-open')) return;
+      if ($('[data-nav-panel].is-open') || $('[data-search-results]:not([hidden])')) return;
+      modal.hidden = false; modal.classList.add('is-open'); d.documentElement.classList.add('modal-open');
+      store.set(MODAL_KEY, Date.now());
+      var inp = $('input[type="email"]', modal); if (inp) setTimeout(function () { inp.focus(); }, 50);
+      d.removeEventListener('mouseout', onOut);
+    }
+    function close() { modal.classList.remove('is-open'); d.documentElement.classList.remove('modal-open'); setTimeout(function () { modal.hidden = true; }, 50); }
+    function onOut(e) { if (!e.relatedTarget && e.clientY <= 0) open(); }
+    d.addEventListener('mouseout', onOut);
+    $$('[data-nl-modal-close]', modal).forEach(function (b) { b.addEventListener('click', close); });
+    modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+    d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) close(); });
   }
 
   /* ---------- Rechner ---------- */
@@ -502,6 +544,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); calculators(); weeks(); poll(); cookieNote(); share(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); cookieNote(); share(); headerShadow(); progress();
   });
 })();

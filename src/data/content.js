@@ -8,9 +8,10 @@ module.exports = function (ctx) {
   const ipos = require('./ipos')(ctx);
   const guides = require('./guides')(ctx);
   const articles = require('./articles')(ctx);
+  const blog = require('./blog')(ctx);
 
   const content = {
-    categories, authors, glossary: glossary.list, glossaryBySlug: glossary.bySlug,
+    categories, authors, glossary: glossary.list, glossaryBySlug: glossary.bySlug, blog,
     holidays: calendar.holidays, events: calendar.events, companyEvents: calendar.company, countries: calendar.countries, calendarRange: calendar.range,
     ipos, guides, articles,
     searchablePages: [],

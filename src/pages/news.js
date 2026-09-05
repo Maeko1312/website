@@ -15,7 +15,7 @@ module.exports = function (ctx) {
       ${c.subnav(subnav, path)}
       <div class="layout">
         <div class="stack">
-          ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.storyLead(first)}
+          ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.heroStory(first)}
           <section>${c.sectionTitle(section === 'analysen' ? 'Alle Analysen' : 'Weitere Meldungen', { tag: 'h2' })}${c.storyList(section === 'analysen' ? arts : others, { thumb: true, excerpt: true })}</section>` : html`<div class="empty">In diesem Ressort gibt es noch keine Beiträge.</div>`}
           ${cat ? html`<p class="small muted">Ressort „${cat.name}“: ${arts.length} ${arts.length === 1 ? 'Beitrag' : 'Beiträge'}. Neue Meldungen erscheinen oben; der <a href="/feed.xml">RSS-Feed</a> liefert alle Ressorts.</p>` : ''}
         </div>
@@ -63,8 +63,9 @@ module.exports = function (ctx) {
           </header>
           <figure class="article-hero">${c.thumb(a.slug, { label: main ? main.short || main.name : cat.name })}<figcaption>${main ? html`${main.name} – Kursverlauf schematisch. Echte Charts auf der <a href="${c.url(main)}">Kursseite</a>.` : 'Symbolbild.'}</figcaption></figure>
           ${main ? html`<div class="instrument-box"><div><a href="${c.url(main)}">${main.name}</a><span class="muted small block">${c.typeLabel(main)}${main.isin ? ' · ' + main.isin : ''} · ${layout.asOfLabel}</span></div><div class="vals"><strong>${c.priceCell(main, ctx.quote(main.slug) || {})}</strong>${c.delta((ctx.quote(main.slug) || {}).changePct, { pill: true })}${c.watchButton(main.slug, true)}</div></div>` : ''}
-          <div class="prose">${raw(a.body)}</div>
+          <div class="prose">${raw(c.injectAfterParagraph(c.wrapTables(a.body), c.nlInline(a.kind === 'analysis' ? 'Jeden Morgen die wichtigsten Marken – kostenlos' : undefined), 2))}</div>
           <footer class="article-foot">
+            ${c.newsletterBox({ dark: true })}
             ${insts.length ? html`<div class="related-tags"><span class="kicker" style="align-self:center">Werte in diesem Beitrag:</span>${insts.map(i => html`<a class="chip" href="${c.url(i)}">${i.name} ${c.delta((ctx.quote(i.slug) || {}).changePct)}</a>`)}</div>` : ''}
             <div class="author-box">${c.avatar(author, true)}<div><strong>${author.name}</strong><span class="small muted">${author.role} · Schwerpunkt: ${author.focus}</span><p>${author.bio}</p></div></div>
             ${c.disclaimer()}
@@ -79,7 +80,7 @@ module.exports = function (ctx) {
       </div>
     </div>`;
     const jsonLd = { '@context': 'https://schema.org', '@type': a.kind === 'analysis' ? 'AnalysisNewsArticle' : 'NewsArticle', headline: a.title, description: a.deck, datePublished: a.date.toISOString(), dateModified: a.date.toISOString(), author: { '@type': author.slug === 'redaktion' ? 'Organization' : 'Person', name: author.name }, publisher: { '@type': 'Organization', name: config.brand }, mainEntityOfPage: `${config.domain}${c.articleUrl(a)}`, articleSection: cat.name, inLanguage: 'de' };
-    pages.push({ path: c.articleUrl(a), html: layout.page({ title: a.title, description: a.deck, path: c.articleUrl(a), body, section: cat.kind === 'analysis' ? 'analysen' : 'nachrichten', ogType: 'article', jsonLd }) });
+    pages.push({ path: c.articleUrl(a), html: layout.page({ title: a.title, description: a.deck, path: c.articleUrl(a), body, section: cat.kind === 'analysis' ? 'analysen' : 'nachrichten', ogType: 'article', jsonLd, reading: true }) });
   }
   return pages;
 };

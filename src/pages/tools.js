@@ -54,7 +54,7 @@ module.exports = function (ctx) {
       ${c.breadcrumb([['Werkzeuge', '/werkzeuge'], [t.title, `/werkzeuge/${t.slug}`]])}
       ${c.pageHead({ kicker: 'Rechner', title: t.title, lead: t.lead })}
       <form class="calc card" data-calc="${t.slug.replace('rechner', '').replace('positionsgroessen', 'position').replace('waehrungs', 'waehrung').replace('inflations', 'inflation').replace('dividenden', 'dividende').replace('zinseszins', 'zinseszins').replace('sparplan', 'sparplan').replace('rendite', 'rendite')}" novalidate><div class="calc-form">${t.form}<button class="btn btn-dark" type="submit">Berechnen</button></div><div class="calc-out" data-calc-out aria-live="polite"></div></form>
-      <div class="layout no-sticky" style="margin-top:28px"><div class="prose card">${raw(t.text)}</div><aside>${c.sideCard('Weitere Rechner', html`<ul class="side-links">${tools.filter(x => x !== t).map(x => html`<li><a href="/werkzeuge/${x.slug}">${x.icon}${x.title}</a></li>`)}</ul>`)}${c.newsletterBox({ compact: true })}</aside></div>
+      <div class="layout no-sticky" style="margin-top:28px"><div class="prose card">${raw(c.wrapTables(t.text))}</div><aside>${c.sideCard('Weitere Rechner', html`<ul class="side-links">${tools.filter(x => x !== t).map(x => html`<li><a href="/werkzeuge/${x.slug}">${x.icon}${x.title}</a></li>`)}</ul>`)}${c.newsletterBox({ compact: true })}</aside></div>
     </div>`;
     add(`/werkzeuge/${t.slug}`, t.title, t.lead, body);
   }

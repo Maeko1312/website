@@ -1,5 +1,6 @@
 'use strict';
-// Seiten-Hülle: <head>, Kopfzeile (Marke, Suche, Navigation, Marktleiste), Mobilmenü, Fußzeile.
+// Seiten-Hülle: <head>, Kopfzeile (Marke, Suche, Navigation, Marktleiste), Mobilmenü, Fußzeile,
+// Newsletter-Leiste (Slide-in) und Newsletter-Dialog (Exit-Intent).
 module.exports = function (ctx) {
   const { config, util, nav, instruments, snapshot } = ctx;
   const { html, raw, esc, num, pct, dateShort, time, dateFull } = util;
@@ -41,20 +42,25 @@ module.exports = function (ctx) {
   }
 
   function megaFeature(kind) {
+    const c = ctx.content;
     if (kind === 'quotes') {
-      return html`<div class="mega-feature"><span class="kicker">Deutsche Indizes</span>${['dax', 'mdax', 'sdax', 'tecdax'].map(s => { const i = instruments.bySlug[s], qq = q(s); return html`<div class="mega-quote"><a href="/kurs/${s}">${i.name}</a><span><strong>${fmtPrice(i, qq)}</strong> <span class="${dir(qq.changePct)} delta">${pct(qq.changePct)}</span></span></div>`; })}<p style="margin-top:8px">${asOfLabel}</p></div>`;
+      return html`<div class="mega-feature"><span class="kicker">Deutsche Indizes</span>${['dax', 'mdax', 'sdax', 'tecdax'].map(s => { const i = instruments.bySlug[s], qq = q(s); return html`<div class="mega-quote"><a href="/kurs/${s}">${i.name}</a><span><strong>${fmtPrice(i, qq)}</strong> <span class="${dir(qq.changePct)} delta">${pct(qq.changePct)}</span></span></div>`; })}<p style="margin-top:10px">${asOfLabel}</p></div>`;
     }
-    if (kind === 'latest' && ctx.content) {
-      const a = ctx.content.articles.filter(x => x.kind === 'news')[0];
+    if (kind === 'latest' && c) {
+      const a = c.articles.filter(x => x.kind === 'news')[0];
       return html`<div class="mega-feature"><span class="kicker">Aktuell</span><strong><a href="/artikel/${a.slug}">${a.title}</a></strong><p>${a.deck}</p></div>`;
     }
-    if (kind === 'analysis' && ctx.content) {
-      const a = ctx.content.articles.filter(x => x.kind === 'analysis')[0];
+    if (kind === 'analysis' && c) {
+      const a = c.articles.filter(x => x.kind === 'analysis')[0];
       return html`<div class="mega-feature"><span class="kicker">Neueste Analyse</span><strong><a href="/artikel/${a.slug}">${a.title}</a></strong><p>${a.deck}</p></div>`;
     }
-    if (kind === 'events' && ctx.content) {
-      const next = ctx.content.upcomingEvents(3);
-      return html`<div class="mega-feature"><span class="kicker">Nächste Termine</span>${next.map(e => html`<div class="mega-quote"><span><strong>${e.title}</strong><br><small class="muted">${util.dateWeekday(e.date)} · ${e.time} Uhr</small></span></div>`)}</div>`;
+    if (kind === 'events' && c) {
+      const next = c.upcomingEvents(3);
+      return html`<div class="mega-feature"><span class="kicker">Nächste Termine</span>${next.map(e => html`<div class="mega-quote"><span><strong>${e.title}</strong><small class="muted">${util.dateWeekday(new Date(e.date + 'T00:00:00'))} · ${e.time} Uhr</small></span></div>`)}</div>`;
+    }
+    if (kind === 'blog' && c) {
+      const p = c.blog.posts[0];
+      return html`<div class="mega-feature"><span class="kicker">Neu im Blog</span><strong><a href="/blog/${p.slug}">${p.title}</a></strong><p>${p.lead}</p></div>`;
     }
     return '';
   }
@@ -66,9 +72,9 @@ module.exports = function (ctx) {
         if (!item.groups) return html`<li class="mainnav-item${raw(cur)}"><a class="mainnav-link" href="${item.href}">${item.label}</a></li>`;
         return html`<li class="mainnav-item${raw(cur)}" data-menu>
           <button class="mainnav-link" type="button" data-menu-btn aria-expanded="false" aria-haspopup="true">${item.label}${raw(icons.chevron)}</button>
-          <div class="mega" style="--cols:${item.cols + (item.feature ? 1 : 0)}">
-            ${item.groups.map(g => html`<div class="mega-col"><h3>${g.title}</h3><ul>${g.links.map(([l, h]) => html`<li><a href="${h}">${l}</a></li>`)}</ul></div>`)}
+          <div class="mega ${item.feature ? 'has-feature' : ''}" style="--cols:${item.cols}">
             ${item.feature ? megaFeature(item.feature) : ''}
+            ${item.groups.map(g => html`<div class="mega-col"><h3>${g.title}</h3><ul>${g.links.map(([l, h]) => html`<li><a href="${h}">${l}</a></li>`)}</ul></div>`)}
           </div></li>`;
       })}
       <li class="mainnav-spacer" aria-hidden="true"></li>
@@ -77,9 +83,10 @@ module.exports = function (ctx) {
   }
 
   function searchForm(cls) {
+    const id = cls === 'is-head' ? 'q-head' : 'q-panel';
     return html`<form class="search ${cls || ''}" role="search" action="/suche" method="get" data-search>
-      <label class="visually-hidden" for="${cls === 'is-head' ? 'q-head' : 'q-panel'}">Suche nach Aktien, Indizes, Nachrichten und Begriffen</label>
-      <div class="search-field"><input id="${cls === 'is-head' ? 'q-head' : 'q-panel'}" type="search" name="q" placeholder="Aktie, Index, WKN/ISIN, Begriff …" autocomplete="off" spellcheck="false"><button type="submit" aria-label="Suchen">${raw(icons.search)}</button></div>
+      <label class="visually-hidden" for="${id}">Suche nach Aktien, Indizes, Nachrichten und Begriffen</label>
+      <div class="search-field"><input id="${id}" type="search" name="q" placeholder="Aktie, Index, ISIN, Begriff …" autocomplete="off" spellcheck="false"><button type="submit" aria-label="Suchen">${raw(icons.search)}</button></div>
       <div class="search-results" data-search-results hidden></div>
     </form>`;
   }
@@ -90,7 +97,7 @@ module.exports = function (ctx) {
       ${nav.nav.map((item, i) => item.groups
         ? html`<div class="nav-group"><button class="nav-group-btn" type="button" data-acc aria-expanded="false" aria-controls="navg-${i}">${item.label}${raw(icons.chevron)}</button><div class="nav-group-body" id="navg-${i}" hidden>${item.groups.map(g => html`<h4>${g.title}</h4>${g.links.map(([l, h]) => html`<a href="${h}">${l}</a>`)}`)}</div></div>`
         : html`<div class="nav-group"><a class="nav-group-btn" href="${item.href}">${item.label}</a></div>`)}
-      <div class="nav-panel-foot"><a class="btn btn-primary btn-block" href="/newsletter">Newsletter abonnieren</a><a class="btn btn-ghost btn-block" href="/merkliste">Merkliste öffnen</a></div>
+      <div class="nav-panel-foot"><a class="btn btn-teal btn-block" href="/newsletter">Newsletter abonnieren</a><a class="btn btn-ghost btn-block" href="/merkliste">Merkliste öffnen</a></div>
     </div>`;
   }
 
@@ -102,12 +109,39 @@ module.exports = function (ctx) {
         <a class="brand" href="/" aria-label="${config.brand} – Startseite">Börsen<em>blick</em></a>
         ${searchForm('is-head')}
         <div class="head-meta"><strong data-clock>${dateFull(ctx.now)}</strong><span class="market-status" data-market-status data-holidays="${holidays}">Xetra</span></div>
-        <div class="head-actions"><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a></div>
+        <div class="head-actions"><a class="btn btn-teal head-nl" href="/newsletter">${raw(icons.mail)}Newsletter</a><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a></div>
       </div>
       ${mainNav(current)}
       ${marketStrip()}
       <div class="progress" data-progress hidden></div>
     </header>${mobilePanel()}`;
+  }
+
+  // Formular-Attribute für den Versanddienst
+  const formAttrs = () => raw(config.newsletterAction ? `action="${esc(config.newsletterAction)}" method="post"` : 'action="#" method="post"');
+
+  function nlBar() {
+    return html`<div class="nl-bar" data-nl-bar hidden aria-live="polite"><div class="container">
+      <div class="txt"><strong>Gefällt Ihnen der Beitrag? Jeden Morgen so einen – kostenlos.</strong>Börsenblick am Morgen: Märkte, Termine, die wichtigste Meldung. 7:30 Uhr, zwei Minuten.</div>
+      <form class="newsletter-mini" data-newsletter ${formAttrs()} novalidate><label class="visually-hidden" for="nl-bar-email">E-Mail-Adresse</label><div class="control"><input id="nl-bar-email" type="email" name="${config.newsletterEmailField}" placeholder="ihre@e-mail.de" required autocomplete="email"></div><button class="btn btn-primary" type="submit">Anmelden</button></form>
+      <button class="close" type="button" data-nl-bar-close aria-label="Leiste schließen">×</button>
+    </div></div>`;
+  }
+  function nlModal() {
+    return html`<div class="nl-modal" data-nl-modal role="dialog" aria-modal="true" aria-labelledby="nl-modal-title" hidden><div class="dialog">
+      <button class="close" type="button" data-nl-modal-close aria-label="Schließen">×</button>
+      <span class="kicker">Bevor Sie gehen</span>
+      <h2 id="nl-modal-title">Die Börse in zwei Minuten – jeden Morgen um 7:30 Uhr</h2>
+      <p>Was über Nacht passiert ist, drei Termine des Tages und die eine Meldung, die zählt. Kostenlos, werbefrei, jederzeit abbestellbar.</p>
+      <form class="newsletter" data-newsletter ${formAttrs()} novalidate>
+        <label class="visually-hidden" for="nl-modal-email">E-Mail-Adresse</label>
+        <div class="control"><input id="nl-modal-email" type="email" name="${config.newsletterEmailField}" placeholder="ihre@e-mail.de" required autocomplete="email"></div>
+        <label class="check"><input type="checkbox" name="consent" required> Ich möchte den Newsletter erhalten und akzeptiere die <a href="/datenschutz">Datenschutzhinweise</a>.</label>
+        <button class="btn btn-teal btn-lg" type="submit">Kostenlos anmelden</button>
+        <div class="newsletter-note" data-newsletter-note hidden tabindex="-1">Der Versanddienst wird gerade angebunden – die Anmeldung ist in Kürze möglich. Bis dahin: <a href="/feed.xml">RSS-Feed abonnieren</a>.</div>
+      </form>
+      <button class="later" type="button" data-nl-modal-close>Vielleicht später</button>
+    </div></div>`;
   }
 
   function footer() {
@@ -124,10 +158,11 @@ module.exports = function (ctx) {
         <p>© ${ctx.now.getFullYear()} ${config.brand}. Alle Rechte vorbehalten.</p>
       </div>
     </div></footer>
-    <div class="cookie-note" data-cookie-note hidden><p>Diese Website verwendet nur technisch notwendige Speicherung (Merkliste, zuletzt gelesene Artikel) lokal in Ihrem Browser – keine Tracking-Cookies, keine Werbe-IDs. <a href="/cookie-einstellungen">Mehr erfahren</a></p><button class="btn btn-dark btn-sm" type="button" data-cookie-ok>Verstanden</button></div>`;
+    ${nlBar()}${nlModal()}
+    <div class="cookie-note" data-cookie-note hidden><p>Diese Website speichert nur technisch Notwendiges lokal in Ihrem Browser (Merkliste, zuletzt gelesene Beiträge) – keine Tracking-Cookies, keine Werbe-IDs. <a href="/cookie-einstellungen">Mehr erfahren</a></p><button class="btn btn-dark btn-sm" type="button" data-cookie-ok>Verstanden</button></div>`;
   }
 
-  function page({ title, description, path: p, body, section, noindex, ogType, jsonLd, extraHead, bodyClass }) {
+  function page({ title, description, path: p, body, section, noindex, ogType, jsonLd, extraHead, bodyClass, reading }) {
     const fullTitle = p === '/' ? `${config.brand} – ${config.claim}` : `${title} – ${config.brand}`;
     const desc = description || config.description;
     const canonical = `${config.domain}${p === '/' ? '' : p}`;
@@ -150,15 +185,15 @@ ${noindex ? '<meta name="robots" content="noindex, follow">' : ''}
 <meta name="theme-color" content="#0b1e3a">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="alternate" type="application/rss+xml" title="${esc(config.brand)} – Nachrichten" href="/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="${esc(config.brand)} – Nachrichten & Blog" href="/feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700&display=swap">
 <link rel="stylesheet" href="/assets/styles.css">
 ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ''}
 ${extraHead || ''}
 </head>
-<body${bodyClass ? ` class="${bodyClass}"` : ''}>
+<body${bodyClass ? ` class="${bodyClass}"` : ''}${reading ? ' data-reading' : ''}>
 <a class="skip" href="#main">Zum Inhalt springen</a>
 ${header(section)}
 <main id="main">
@@ -171,5 +206,5 @@ ${footer()}
 `;
   }
 
-  return { page, asOfLabel, icons, fmtPrice, stripSlugs };
+  return { page, asOfLabel, icons, fmtPrice, stripSlugs, formAttrs };
 };

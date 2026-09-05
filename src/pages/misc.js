@@ -9,7 +9,7 @@ module.exports = function (ctx) {
     const body = html`<div class="container page">
       ${c.breadcrumb([[title, path]])}
       <div class="layout"><article class="article"><header class="article-head"><span class="kicker">${opts.kicker || 'Über uns'}</span><h1>${title}</h1>${lead ? html`<p class="deck">${lead}</p>` : ''}</header>
-        <div class="prose">${sections.map(s => html`${s.h ? html`<h2 id="${util.slugify(s.h)}">${s.h}</h2>` : ''}${raw(s.html)}`)}</div>
+        <div class="prose">${sections.map(s => html`${s.h ? html`<h2 id="${util.slugify(s.h)}">${s.h}</h2>` : ''}${raw(c.wrapTables(s.html))}`)}</div>
         ${opts.updated !== false ? html`<p class="disclaimer">Stand: ${dateLong(ctx.now)}.</p>` : ''}
       </article><aside class="no-sticky">${sections.filter(s => s.h).length > 3 ? html`<nav class="toc" aria-label="Inhalt"><strong>Inhalt</strong><ol>${sections.filter(s => s.h).map(s => html`<li><a href="#${util.slugify(s.h)}">${s.h}</a></li>`)}</ol></nav>` : ''}${c.sideCard('Mehr über uns', html`<ul class="side-list">${[['Über Börsenblick', '/ueber-uns'], ['Redaktion', '/redaktion'], ['Redaktionelle Leitlinien', '/redaktionelle-leitlinien'], ['Methodik & Datenquellen', '/methodik'], ['Kontakt', '/kontakt'], ['Werben', '/werben']].filter(([, h]) => h !== path).map(([l, h]) => html`<li><a href="${h}"><span>${l}</span></a></li>`)}</ul>`)}${c.newsletterBox({ compact: true })}</aside></div></div>`;
     add(path, title, lead || title, body, opts);
@@ -33,13 +33,23 @@ module.exports = function (ctx) {
       ${c.breadcrumb([['Newsletter', '/newsletter']])}
       <div class="layout"><div class="stack">
         ${c.pageHead({ kicker: 'Newsletter', title: 'Börsenblick am Morgen', lead: 'Jeden Handelstag um 7:30 Uhr in Ihrem Postfach: wie Asien gelaufen ist, was die US-Futures anzeigen, die drei Termine des Tages und die eine Meldung, die Sie kennen sollten. In zwei Minuten gelesen, kostenlos, jederzeit abbestellbar.' })}
-        ${c.newsletterBox({ dark: true })}
+        ${c.nlBanner()}
         <section class="card">${c.sectionTitle('So sieht eine Ausgabe aus')}
           <div class="prose" style="font-size:15px"><p class="kicker">Beispielausgabe · ${dateLong(ctx.now)}, 7:30 Uhr</p><h3>Guten Morgen.</h3><p><strong>Die Lage:</strong> Der DAX hat gestern bei ${num(ctx.quote('dax').price, 0)} Punkten geschlossen (${util.pct(ctx.quote('dax').changePct)}). Der Nikkei notiert heute früh bei ${num(ctx.quote('nikkei-225').price, 0)} Punkten, Gold bei ${num(ctx.quote('gold').price, 0)} Dollar, der Euro bei ${num(ctx.quote('eur-usd').price, 4)} Dollar.</p><p><strong>Heute wichtig:</strong></p><ul>${content.upcomingEvents(3).map(e => `<li>${e.time} Uhr – ${e.title} (${e.countryName})</li>`).map(s => raw(s))}</ul><p><strong>Die Meldung:</strong> <a href="${c.articleUrl(content.articles[0])}">${content.articles[0].title}</a></p><p><strong>Zahl des Tages:</strong> ${num(ctx.quote('bund-10j').price, 2)} % – so hoch rentiert die zehnjährige Bundesanleihe.</p><p class="muted small">Sie erhalten diese E-Mail, weil Sie sich unter boersenblick.de angemeldet haben. Abmelden mit einem Klick.</p></div>
         </section>
         <section class="card faq">${c.sectionTitle('Fragen zum Newsletter')}<details><summary>Wie oft kommt der Newsletter?</summary><p>An jedem Xetra-Handelstag um 7:30 Uhr, also Montag bis Freitag außer an <a href="/termine/boersenfeiertage">Börsenfeiertagen</a>. Keine Sonderausgaben, keine Werbe-Mails.</p></details><details><summary>Was passiert mit meiner E-Mail-Adresse?</summary><p>Sie wird ausschließlich für den Versand verwendet und nicht weitergegeben. Nach der Anmeldung erhalten Sie eine Bestätigungs-Mail (Double Opt-in). Details in den <a href="/datenschutz">Datenschutzhinweisen</a>.</p></details><details><summary>Wie melde ich mich ab?</summary><p>Über den Link am Ende jeder Ausgabe – mit einem Klick, ohne Login.</p></details></section>
       </div><aside>${c.sideCard('Alternativ: RSS', html`<p class="small">Alle Nachrichten und Analysen als <a href="/feed.xml">RSS-Feed</a> für Ihren Feedreader – ohne Anmeldung, in Echtzeit.</p>`)}${c.sideUpcoming(4)}${c.sideRecent()}</aside></div></div>`;
     add('/newsletter', 'Newsletter „Börsenblick am Morgen“', 'Der kostenlose Börsen-Newsletter: jeden Handelstag um 7:30 Uhr die Lage an den Märkten, drei Termine und die wichtigste Meldung.', body, { kicker: 'Newsletter', section: 'nachrichten' });
+  }
+
+  // ---------- Newsletter: Danke ----------
+  {
+    const body = html`<div class="container page"><div class="layout"><div>
+      ${c.pageHead({ kicker: 'Newsletter', title: 'Fast geschafft – bitte bestätigen Sie Ihre Anmeldung', lead: 'Wir haben Ihnen eine E-Mail geschickt. Klicken Sie auf den Bestätigungslink, dann kommt die erste Ausgabe von „Börsenblick am Morgen“ am nächsten Handelstag um 7:30 Uhr.' })}
+      <section class="card"><h2 style="font-size:18px;margin-bottom:10px">Keine E-Mail erhalten?</h2><ul style="padding-left:1.2em;display:grid;gap:6px"><li>Prüfen Sie den Spam- oder Werbeordner und markieren Sie die Nachricht als „kein Spam“.</li><li>Fügen Sie unsere Absenderadresse zu Ihren Kontakten hinzu, damit künftige Ausgaben im Posteingang landen.</li><li>Nach fünf Minuten immer noch nichts? Melden Sie sich einfach <a href="/newsletter">erneut an</a>.</li></ul></section>
+      <section class="card" style="margin-top:20px">${c.sectionTitle('Bis dahin: die meistgelesenen Beiträge', { href: '/blog', more: 'Zum Blog' })}${c.postList(content.blog.posts.slice(0, 4))}</section>
+    </div><aside class="no-sticky">${c.sideIndices()}${c.sideUpcoming(4)}</aside></div></div>`;
+    pages.push({ path: '/newsletter/danke', html: layout.page({ title: 'Anmeldung bestätigen', description: 'Bitte bestätigen Sie Ihre Newsletter-Anmeldung.', path: '/newsletter/danke', body, section: 'nachrichten', noindex: true }) });
   }
 
   // ---------- Über uns ----------

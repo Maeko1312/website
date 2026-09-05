@@ -32,18 +32,29 @@ src/data/
   calendar.js             Börsenfeiertage 2026 (echt), Wirtschaftskalender (Regeln), Unternehmenstermine (Platzhalter)
   glossary.js             Börsenlexikon, ~75 Begriffe
   guides.js               Ratgeber (Börsenwissen), 8 Stück
+  blog.js                 Blog-Beiträge (18) mit Themen
   ipos.js                 Börsengänge (Platzhalter, klar gekennzeichnet)
   categories.js, authors.js, nav.js, content.js
 src/render/
   layout.js               Seitenhülle: Kopf, Mega-Menü, Marktleiste, Mobilmenü, Fußzeile, <head>
   components.js           Wiederverwendbare Bausteine (Kurstabellen, Nachrichtenlisten, Sidebar-Karten …)
   charts.js               Statische SVG-Charts (Linie, Sparkline, Balken, 52-Wochen-Spanne)
-src/pages/*.js            Seitenmodule: home, news, markets, quote, calendar, rankings, knowledge, tools, misc
+src/pages/*.js            Seitenmodule: home, news, blog, markets, quote, calendar, rankings, knowledge, tools, misc
 src/assets/               styles.css, app.js, favicon.svg  → dist/assets/
 src/public/               robots.txt, manifest.webmanifest → dist/
 scripts/fetch-market-data.js   Aktualisiert Snapshot + Historie (manuell, siehe unten)
 scripts/serve.js          Lokaler Vorschau-Server
 ```
+
+## Ziel: Newsletter-Anmeldungen
+
+Der Newsletter „Börsenblick am Morgen“ ist das Konversionsziel. Bausteine:
+
+- **Formulare** überall (Startseiten-Banner, Sidebar, in jedem Artikel/Blogpost nach dem zweiten Absatz, am Ende jedes Beitrags, Newsletter-Seite).
+- **Slide-in-Leiste** auf Lese-Seiten nach 45 % Scrolltiefe; nach Schließen sieben Tage Ruhe.
+- **Exit-Intent-Dialog** (Desktop), wenn der Mauszeiger die Seite nach oben verlässt; einmal pro Woche, nie nach erfolgter Anmeldung.
+- **Versanddienst anbinden:** in `src/site.config.js` `newsletterAction` auf die POST-URL des Anbieters setzen (Brevo, Mailchimp, Buttondown, ConvertKit …) und `newsletterEmailField` auf den erwarteten Feldnamen (z. B. `EMAIL` bei Mailchimp). Dankeseite: `/newsletter/danke` (beim Anbieter als Redirect eintragen). Solange `newsletterAction` leer ist, zeigt jedes Formular einen ehrlichen Hinweis statt zu senden.
+- **Blog** (`src/data/blog.js`): evergreen Beiträge mit Themen-Filter, „Das Wichtigste in einem Satz“, Inhaltsverzeichnis und Newsletter-CTAs; erscheint im RSS-Feed und in der Suche. Neue Beiträge = neues Objekt im Array.
 
 ## Seiten
 
@@ -52,12 +63,13 @@ scripts/serve.js          Lokaler Vorschau-Server
 | Start | `/` |
 | Nachrichten | `/nachrichten`, `/nachrichten/<ressort>` (7 Ressorts), `/artikel/<slug>` |
 | Analysen | `/analysen`, `/analysen/<kategorie>` (5) |
+| Blog | `/blog`, `/blog/thema/<thema>` (10), `/blog/<slug>` (18 Beiträge) |
 | Märkte | `/maerkte`, `/indizes`, `/aktien`, `/rohstoffe`, `/devisen`, `/krypto`, `/anleihen`, `/rankings` |
 | Kursseiten | `/kurs/<slug>` für alle 89 Instrumente (Chart 1M/3M/6M/1J, Kennzahlen, Historie, Peers/Mitglieder, Umrechnungen) |
 | Termine | `/termine/wirtschaftskalender`, `/termine/unternehmen`, `/termine/dividenden`, `/termine/hauptversammlungen`, `/termine/boersenfeiertage`, `/termine/ipos`, `/ipo/<slug>` |
 | Wissen | `/wissen`, `/wissen/<ratgeber>` (8), `/wissen/boersenlexikon` |
 | Werkzeuge | `/werkzeuge`, 7 Rechner unter `/werkzeuge/<rechner>`, `/merkliste` |
-| Sonstiges | `/suche`, `/newsletter`, `/ueber-uns`, `/redaktion`, `/redaktionelle-leitlinien`, `/methodik`, `/kontakt`, `/werben`, `/impressum`, `/datenschutz`, `/nutzungsbedingungen`, `/cookie-einstellungen`, `404` |
+| Sonstiges | `/suche`, `/newsletter`, `/newsletter/danke`, `/ueber-uns`, `/redaktion`, `/redaktionelle-leitlinien`, `/methodik`, `/kontakt`, `/werben`, `/impressum`, `/datenschutz`, `/nutzungsbedingungen`, `/cookie-einstellungen`, `404` |
 | Dateien | `/feed.xml` (RSS), `/sitemap.xml`, `/search-index.json`, `/instruments.json` |
 
 Der Build prüft jeden internen Link gegen die erzeugten Seiten und bricht bei toten Links ab.

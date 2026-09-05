@@ -85,6 +85,27 @@ const nav = [
     label: 'Rankings', href: '/rankings', key: 'rankings',
   },
   {
+    label: 'Blog', href: '/blog', key: 'blog', cols: 2,
+    groups: [
+      { title: 'Themen', links: [
+        ['Alle Beiträge', '/blog'],
+        ['Einsteiger', '/blog/thema/einsteiger'],
+        ['ETF & Sparplan', '/blog/thema/etf-sparplan'],
+        ['Aktien', '/blog/thema/aktien'],
+        ['Dividenden', '/blog/thema/dividenden'],
+      ] },
+      { title: 'Weitere Themen', links: [
+        ['Zinsen & Anleihen', '/blog/thema/zinsen-anleihen'],
+        ['Gold & Rohstoffe', '/blog/thema/gold-rohstoffe'],
+        ['Krypto', '/blog/thema/krypto'],
+        ['Steuern', '/blog/thema/steuern'],
+        ['Anlegerpsychologie', '/blog/thema/psychologie'],
+        ['Chartanalyse', '/blog/thema/chartanalyse'],
+      ] },
+    ],
+    feature: 'blog',
+  },
+  {
     label: 'Wissen', href: '/wissen', key: 'wissen', cols: 3,
     groups: [
       { title: 'Einstieg', links: [
@@ -128,7 +149,7 @@ const nav = [
 
 const footer = [
   { title: 'Märkte', links: [['Marktüberblick', '/maerkte'], ['DAX', '/kurs/dax'], ['Indizes', '/indizes'], ['Aktien A–Z', '/aktien'], ['Rohstoffe', '/rohstoffe'], ['Devisen', '/devisen'], ['Krypto', '/krypto'], ['Anleihen & Zinsen', '/anleihen'], ['Rankings', '/rankings']] },
-  { title: 'Nachrichten', links: [['Alle Nachrichten', '/nachrichten'], ['Marktberichte', '/nachrichten/marktberichte'], ['Unternehmen', '/nachrichten/unternehmen'], ['Wirtschaft', '/nachrichten/wirtschaft'], ['Zentralbanken', '/nachrichten/zentralbanken'], ['Analysen', '/analysen'], ['Newsletter', '/newsletter'], ['RSS-Feed', '/feed.xml']] },
+  { title: 'Nachrichten & Blog', links: [['Alle Nachrichten', '/nachrichten'], ['Marktberichte', '/nachrichten/marktberichte'], ['Unternehmen', '/nachrichten/unternehmen'], ['Analysen', '/analysen'], ['Blog', '/blog'], ['Blog: Einsteiger', '/blog/thema/einsteiger'], ['Newsletter', '/newsletter'], ['RSS-Feed', '/feed.xml']] },
   { title: 'Termine & Wissen', links: [['Wirtschaftskalender', '/termine/wirtschaftskalender'], ['Unternehmenstermine', '/termine/unternehmen'], ['Dividendenkalender', '/termine/dividenden'], ['Börsenfeiertage', '/termine/boersenfeiertage'], ['Börse für Einsteiger', '/wissen/einsteiger'], ['Börsenlexikon', '/wissen/boersenlexikon'], ['Rechner', '/werkzeuge'], ['Merkliste', '/merkliste']] },
   { title: 'Über uns', links: [['Über Börsenblick', '/ueber-uns'], ['Redaktion', '/redaktion'], ['Redaktionelle Leitlinien', '/redaktionelle-leitlinien'], ['Methodik & Datenquellen', '/methodik'], ['Kontakt', '/kontakt'], ['Werben', '/werben'], ['Impressum', '/impressum'], ['Datenschutz', '/datenschutz']] },
 ];

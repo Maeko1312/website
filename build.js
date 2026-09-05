@@ -23,7 +23,7 @@ const components = require('./src/render/components.js')(ctx);
 ctx.layout = layout; ctx.c = components;
 
 // Seitenmodule
-const pageModules = ['home', 'news', 'markets', 'quote', 'calendar', 'rankings', 'knowledge', 'tools', 'misc'];
+const pageModules = ['home', 'news', 'blog', 'markets', 'quote', 'calendar', 'rankings', 'knowledge', 'tools', 'misc'];
 const pages = [];
 for (const m of pageModules) {
   const mod = require(`./src/pages/${m}.js`);
@@ -49,7 +49,7 @@ for (const p of pages) {
 }
 
 // Linkprüfung: jeder interne Link muss auf eine Seite oder Datei zeigen
-const extra = new Set(['/feed.xml', '/sitemap.xml', '/search-index.json', '/instruments.json', '/robots.txt', '/assets/styles.css', '/assets/app.js', '/assets/favicon.svg', '/manifest.webmanifest']);
+const extra = new Set(['/feed.xml', '/sitemap.xml', '/search-index.json', '/instruments.json', '/robots.txt', '/assets/styles.css', '/assets/app.js', '/assets/favicon.svg', '/manifest.webmanifest', config.newsletterAction].filter(Boolean));
 const broken = new Map();
 for (const p of pages) {
   const html = String(p.html);

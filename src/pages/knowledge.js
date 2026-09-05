@@ -36,8 +36,9 @@ module.exports = function (ctx) {
         <article class="article" data-article="${g.title}" data-article-cat="Wissen">
           <header class="article-head"><span class="kicker">${g.kicker}</span><h1>${g.title}</h1><p class="deck">${g.lead}</p>
             <div class="article-meta"><div class="author-line">${c.avatar(author)}<div><strong>${author.name}</strong><span>${author.role}</span></div></div><span class="spacer"></span><span>${g.minutes} Min. Lesezeit</span><span>· Aktualisiert ${dateLong(ctx.now)}</span></div></header>
-          <div class="prose">${g.sections.map(s => html`<h2 id="${s.id}">${s.h}</h2>${raw(s.html)}`)}</div>
+          <div class="prose">${g.sections.map((s, i) => html`<h2 id="${s.id}">${s.h}</h2>${raw(c.wrapTables(s.html))}${i === 1 ? c.nlInline('Börse verstehen – jeden Morgen ein Stück mehr') : ''}`)}</div>
           <footer class="article-foot">
+            ${c.newsletterBox({ dark: true })}
             <div class="card"><h3 style="margin-bottom:10px">Weiterlesen</h3><ul class="side-list">${others.map(o => html`<li><a href="/wissen/${o.slug}"><span class="kicker">${o.kicker}</span><span>${o.title}</span></a></li>`)}</ul></div>
             ${c.disclaimer()}
           </footer>
@@ -48,7 +49,7 @@ module.exports = function (ctx) {
           ${c.newsletterBox({ compact: true })}
         </aside>
       </div></div>`;
-    add(`/wissen/${g.slug}`, g.title, g.lead, body, { ogType: 'article', jsonLd: { '@context': 'https://schema.org', '@type': 'Article', headline: g.title, description: g.lead, author: { '@type': author.slug === 'redaktion' ? 'Organization' : 'Person', name: author.name }, publisher: { '@type': 'Organization', name: config.brand }, dateModified: ctx.now.toISOString(), inLanguage: 'de' } });
+    add(`/wissen/${g.slug}`, g.title, g.lead, body, { ogType: 'article', reading: true, jsonLd: { '@context': 'https://schema.org', '@type': 'Article', headline: g.title, description: g.lead, author: { '@type': author.slug === 'redaktion' ? 'Organization' : 'Person', name: author.name }, publisher: { '@type': 'Organization', name: config.brand }, dateModified: ctx.now.toISOString(), inLanguage: 'de' } });
   }
 
   // ---------- Lexikon ----------

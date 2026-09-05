@@ -1,7 +1,8 @@
 'use strict';
+const charts = require('../render/charts');
 module.exports = function (ctx) {
   const { c, layout, util, instruments, content, config } = ctx;
-  const { html, raw, num, pct, dateWeekday, isoDate } = util;
+  const { html, raw, num, pct, dateWeekday } = util;
   const q = (s) => ctx.quote(s) || {};
   const news = content.articles.filter(a => a.kind === 'news');
   const analyses = content.articles.filter(a => a.kind === 'analysis');
@@ -10,9 +11,10 @@ module.exports = function (ctx) {
   const todayCards = rest.slice(0, 3);
   const feed = rest.slice(3, 15);
   const m = c.movers(5);
-  const upcoming = content.upcomingEvents(6);
+  const upcoming = content.upcomingEvents(5);
   const daxUp = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length;
-  const asOf = new Date(config.quotesAsOf);
+  const dax = q('dax'), daxInst = instruments.bySlug.dax, daxHist = ctx.hist('dax');
+  const posts = content.blog.posts;
 
   const tabsFeed = html`
     <div class="tabs" data-tabs="feed-panels" role="tablist" aria-label="Nachrichten filtern">
@@ -28,28 +30,52 @@ module.exports = function (ctx) {
       <div data-panel="rohstoffe" hidden>${c.denseList(news.filter(a => ['rohstoffe', 'krypto'].includes(a.category)).slice(0, 10))}</div>
     </div>`;
 
+  const moversCard = html`<section class="card" aria-labelledby="h-mv">
+    <div class="section-title"><h2 id="h-mv">Gewinner & Verlierer heute</h2><a class="more" href="/rankings">Rankings</a></div>
+    <div class="movers-mini"><div><span class="kicker up">▲ Gewinner</span>${c.miniQuotes(m.gainers.slice(0, 4))}</div><div><span class="kicker down">▼ Verlierer</span>${c.miniQuotes(m.losers.slice(0, 4))}</div></div>
+    <p class="small muted" style="margin-top:10px">DAX und MDAX · ${daxUp} von ${instruments.dax.length} DAX-Werten im Plus · ${layout.asOfLabel}</p>
+  </section>`;
+
   const body = html`
 <div class="container page">
-  <div class="home-top">
-    <div class="home-hero">
-      ${c.storyLead(lead)}
-      <section aria-labelledby="h-today">
-        ${c.sectionTitle('Nachrichten des Tages', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-today' })}
-        ${c.storyCards(todayCards)}
-      </section>
+  <div class="hero">
+    ${c.heroStory(lead)}
+    <div class="hero-side">
+      ${c.newsletterBox({ compact: true })}
+      ${moversCard}
+    </div>
+  </div>
+
+  <section aria-labelledby="h-today" style="margin-bottom:28px">
+    ${c.sectionTitle('Nachrichten des Tages', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-today' })}
+    ${c.storyCards(todayCards)}
+  </section>
+
+  ${c.nlBanner()}
+
+  <div class="layout no-sticky">
+    <div class="stack">
       <section aria-labelledby="h-feed">
         ${c.sectionTitle('Aktuelle Meldungen', { href: '/nachrichten', more: 'Mehr Nachrichten', id: 'h-feed' })}
         ${tabsFeed}
       </section>
+      <section aria-labelledby="h-blog">
+        ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
+        <div class="post-grid">${posts.slice(0, 3).map(p => c.postCard(p))}</div>
+      </section>
+
     </div>
     <aside>
-      ${c.sideIndices()}
       <section class="card">
         ${c.sectionTitle('Ideen des Tages', { href: '/analysen', more: 'Alle Analysen' })}
         <div class="ideas">${analyses.slice(0, 4).map(a => { const inst = instruments.bySlug[(a.instruments || [])[0]]; return html`<div class="idea"><span class="kicker">${a.categoryObj.name} · ${inst ? inst.short || inst.name : ''}</span><div class="idea-title"><a href="${c.articleUrl(a)}">${a.title}</a></div><div class="idea-meta"><span class="dir ${a.direction || 'flat'}">${a.direction === 'up' ? '▲ bullish' : a.direction === 'down' ? '▼ bearish' : '► neutral'}</span><span>· ${util.dateDM(a.date)}</span></div></div>`; })}</div>
       </section>
-      ${c.newsletterBox({ compact: true })}
+      <section class="card">
+        ${c.sectionTitle('Termine der Woche', { href: '/termine/wirtschaftskalender', more: 'Kalender' })}
+        <ul class="upcoming">${upcoming.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>
+      </section>
       ${c.sideRecent()}
+      ${c.newsletterBox({ compact: true })}
     </aside>
   </div>
 </div>
@@ -58,17 +84,13 @@ module.exports = function (ctx) {
   <div class="container">
     ${c.sectionTitle('Marktüberblick', { href: '/maerkte', more: 'Alle Märkte', id: 'h-board' })}
     ${c.board(layout.stripSlugs)}
-    <p class="small muted" style="margin-top:12px">${layout.asOfLabel} · ${daxUp} von ${instruments.dax.length} DAX-Werten im Plus · Xetra-Kurse 15 Minuten verzögert, Devisen und Krypto nahezu Echtzeit.</p>
+    <p class="small muted" style="margin-top:12px">${layout.asOfLabel} · Xetra-Kurse 15 Minuten verzögert, Devisen und Krypto nahezu Echtzeit.</p>
   </div>
 </section>
 
-<div class="container">
-  <div class="layout no-sticky" style="margin-bottom:32px">
+<div class="container" style="padding-bottom:40px">
+  <div class="layout no-sticky">
     <div class="stack">
-      <section class="movers" aria-label="Gewinner und Verlierer">
-        <div class="card">${c.sectionTitle('Gewinner DAX/MDAX', { href: '/rankings#gewinner', more: 'Ranking' })}${c.quoteTable(m.gainers, { cols: ['price', 'change'], compact: true, sortable: false })}</div>
-        <div class="card">${c.sectionTitle('Verlierer DAX/MDAX', { href: '/rankings#verlierer', more: 'Ranking' })}${c.quoteTable(m.losers, { cols: ['price', 'change'], compact: true, sortable: false })}</div>
-      </section>
       <section aria-labelledby="h-analysis">
         ${c.sectionTitle('Technische Analysen', { href: '/analysen', more: 'Alle Analysen', id: 'h-analysis' })}
         <div class="tabs is-pills" data-tabs="ana-panels" role="tablist"><button class="tab is-active" role="tab" type="button" data-tab="alle">Alle</button><button class="tab" role="tab" type="button" data-tab="indizes">Indizes</button><button class="tab" role="tab" type="button" data-tab="aktien">Aktien</button><button class="tab" role="tab" type="button" data-tab="rohstoffe">Rohstoffe & Devisen</button><button class="tab" role="tab" type="button" data-tab="produkte">ETF & Hebel</button></div>
@@ -91,10 +113,6 @@ module.exports = function (ctx) {
       </section>
     </div>
     <aside>
-      <section class="card">
-        ${c.sectionTitle('Termine der Woche', { href: '/termine/wirtschaftskalender', more: 'Kalender' })}
-        <ul class="upcoming">${upcoming.map(e => html`<li><div class="date"><b>${new Date(e.date + 'T00:00:00').getDate()}</b><span>${util.MONTHS_SHORT[new Date(e.date + 'T00:00:00').getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(new Date(e.date + 'T00:00:00'))} · ${e.time} Uhr · ${e.countryName} <span class="impact is-${e.impact}" title="Relevanz ${e.impact} von 3"><i></i><i></i><i></i></span></div></div></li>`)}</ul>
-      </section>
       <section class="card">
         ${c.sectionTitle('Börsengänge', { href: '/termine/ipos', more: 'Alle IPOs' })}
         <p class="small" style="margin-bottom:8px">${c.placeholder()}</p>
