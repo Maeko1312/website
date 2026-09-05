@@ -83,6 +83,9 @@ function slugify(s) {
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+// WKN aus einer deutschen ISIN: DE + 9-stellige NSIN (WKN mit führenden Nullen) + Prüfziffer
+function wkn(isin) { if (!isin || !/^DE[0-9A-Z]{9}[0-9]$/.test(isin)) return null; const w = isin.slice(2, 11).replace(/^0+/, ''); return w.length === 6 ? w : null; }
+
 function readTime(text) {
   const words = String(text).replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
@@ -93,5 +96,5 @@ module.exports = {
   num, pct, eur, bigEur, nf, nf0,
   MONTHS, MONTHS_SHORT, DAYS, DAYS_SHORT, pad,
   isoDate, dateShort, dateDM, dateLong, dateFull, dateWeekday, time, addDays, startOfWeek, relDate,
-  slugify, readTime,
+  slugify, readTime, wkn,
 };

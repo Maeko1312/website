@@ -109,9 +109,20 @@ Artikel, Kategorien, Autoren, Ratgeber, Lexikon, Termine und IPOs sind reine JS/
 
 Domainverfügbarkeit ist nicht geprüft.
 
+## Design: „Kursblatt“
+
+Die visuelle Identität wurde in einer Design-Jury (vier Entwürfe, drei unabhängige Bewertungen, eine Synthese) gegen die Kriterien des Design-Skills ausgewählt: keine KI-Standardoptik (kein Navy/Gold, keine Inter, keine Akzentleiste auf abgerundeten Karten), WCAG-AA für jedes Textpaar, Bodenhaftung im Thema.
+
+- **Konzept:** ein Dokument, kein Dashboard – das Kursblatt der Frankfurter Börse auf dem Bildschirm. Kühles Papier mit Stempelviolett-Stich, 1px-Ledgerlinien statt Schatten und Rundungen.
+- **Farben** (`src/assets/styles.css`, `:root`): Papier `#f4f3f8`, Blatt `#ffffff`, Tinte `#16132a`, Stempelviolett `#4a3b96` (nur Text, Fokus, Badges, CTA-Fläche), CTA `#3a2d85`, Plus `#166b35`, Minus `#b71f27`; dunkle Flächen Makler-Schwarz `#1a1727` und Kurstafel `#231f35` mit eigenen On-Dark-Varianten (`--up-dark`, `--down-dark`, `--accent-dark`). Ein Geltungsbereich-Selektor stellt in dunklen Bereichen alle Token um – Violett wird nie auf Schwarz gemalt.
+- **Schrift:** IBM Plex Sans (Text, Tabellen – Ziffern von Haus aus tabellarisch), Archivo condensed (Wortmarke, Überschriften, Kurspreis), IBM Plex Mono nur für WKN/ISIN, Zeitstempel und Stand-Zeilen. Fallbacks mit `size-adjust`, damit nichts springt.
+- **Themen-Detail:** die WKN, aus der ISIN abgeleitet (`util.wkn`), als kopierbare Spalte in Marktleiste, Tabellen, Kacheln und Kurskopf.
+- **Vorzeichen:** Dreiecke aus CSS-Rahmen vor jedem Veränderungswert (Form + Farbe, nie Farbe allein).
+- Alle Kontrastpaare sind in `scratchpad`-unabhängig im Stylesheet kommentiert; die Jury-Ergebnisse liegen im Session-Protokoll.
+
 ## Konventionen
 
 - Sprache Deutsch, Sie-Ansprache. Zahlen im Format `1.234,56`, Datum `04.09.2026`, Zeiten 24 h mit „Uhr“ (MEZ/MESZ). Einheiten metrisch (g, kg, l, kWh) neben den Weltmarkteinheiten.
-- Grün = Plus, Rot = Minus. Prozentvorzeichen `+`/`−` (echtes Minuszeichen).
+- Grün = Plus, Rot = Minus, immer mit Dreieck davor. Prozentvorzeichen `+`/`−` (echtes Minuszeichen U+2212).
 - Keine Login-, Konto- oder Bezahlfunktionen. Merkliste, zuletzt gelesene Artikel und Umfrage laufen nur im Browser (localStorage), keine Cookies.
-- Externe Ressourcen: nur Google Fonts (Inter, Barlow Condensed). Optional lokal einbinden, dann Datenschutz-Abschnitt anpassen.
+- Externe Ressourcen: nur Google Fonts (IBM Plex Sans, IBM Plex Mono, Archivo). Optional lokal einbinden, dann Datenschutz-Abschnitt anpassen.

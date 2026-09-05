@@ -50,7 +50,7 @@ module.exports = function (ctx) {
       <div class="layout">
         <article class="article" data-article="${a.title}" data-article-cat="${cat.name}">
           <header class="article-head">
-            <div class="story-top"><span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>${a.kind === 'analysis' && a.direction ? html`<span class="badge ${a.direction === 'up' ? 'is-up' : 'is-down'}">${a.direction === 'up' ? '▲ Bullisch' : '▼ Bärisch'}</span>` : a.kind === 'analysis' ? html`<span class="badge">► Neutral</span>` : ''}${a.generated ? html`<span class="badge" title="Aus offiziellen Kursdaten erzeugt und redaktionell geprüft">Datenbasiert</span>` : ''}</div>
+            <div class="story-top"><span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>${a.kind === 'analysis' && a.direction ? html`<span class="badge ${a.direction === 'up' ? 'is-up' : 'is-down'}">${a.direction === 'up' ? 'Bullisch' : 'Bärisch'}</span>` : a.kind === 'analysis' ? html`<span class="badge">Neutral</span>` : ''}${a.generated ? html`<span class="badge" title="Aus offiziellen Kursdaten erzeugt und redaktionell geprüft">Datenbasiert</span>` : ''}</div>
             <h1>${a.title}</h1>
             <p class="deck">${a.deck}</p>
             <div class="article-meta">

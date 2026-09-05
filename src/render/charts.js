@@ -79,7 +79,7 @@ function lineChart(points, { w = 760, h = 300, days = 0, id = 'ch', label = '', 
 <defs><linearGradient id="${id}-g" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".22"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
 ${yTicks.join('')}${xTicks.join('')}
 <path d="${area}" fill="url(#${id}-g)" class="chart-area"/>
-<path d="${path}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="chart-line"/>
+<path d="${path}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" class="chart-line"/>
 ${marker(iMax, 'is-max', anchorFor(iMax))}${marker(iMin, 'is-min', anchorFor(iMin))}
 <line x1="${padL}" x2="${w - padR}" y1="${y(last).toFixed(1)}" y2="${y(last).toFixed(1)}" class="chart-last"/>
 <rect x="${w - padR - 62}" y="${(y(last) - 10).toFixed(1)}" width="62" height="20" rx="4" class="chart-last-bg"/>

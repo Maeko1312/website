@@ -31,9 +31,9 @@ module.exports = function (ctx) {
     </div>`;
 
   const moversCard = html`<section class="card" aria-labelledby="h-mv">
-    <div class="section-title"><h2 id="h-mv">Gewinner & Verlierer heute</h2><a class="more" href="/rankings">Rankings</a></div>
-    <div class="movers-mini"><div><span class="kicker up">▲ Gewinner</span>${c.miniQuotes(m.gainers.slice(0, 4))}</div><div><span class="kicker down">▼ Verlierer</span>${c.miniQuotes(m.losers.slice(0, 4))}</div></div>
-    <p class="small muted" style="margin-top:10px">DAX und MDAX · ${daxUp} von ${instruments.dax.length} DAX-Werten im Plus · ${layout.asOfLabel}</p>
+    <div class="section-title"><h2 id="h-mv">Gewinner & Verlierer</h2><span class="stand">${layout.asOfLabel}</span></div>
+    <div class="movers-mini"><div><span class="kicker up">▲ Gewinner</span>${c.miniQuotes(m.gainers.slice(0, 3))}</div><div><span class="kicker down">▼ Verlierer</span>${c.miniQuotes(m.losers.slice(0, 3))}</div></div>
+    <p class="small muted" style="margin-top:10px">DAX und MDAX · ${daxUp} von ${instruments.dax.length} DAX-Werten im Plus · <a href="/rankings">Alle Rankings ›</a></p>
   </section>`;
 
   const body = html`
@@ -68,7 +68,7 @@ module.exports = function (ctx) {
     <aside>
       <section class="card">
         ${c.sectionTitle('Ideen des Tages', { href: '/analysen', more: 'Alle Analysen' })}
-        <div class="ideas">${analyses.slice(0, 4).map(a => { const inst = instruments.bySlug[(a.instruments || [])[0]]; return html`<div class="idea"><span class="kicker">${a.categoryObj.name} · ${inst ? inst.short || inst.name : ''}</span><div class="idea-title"><a href="${c.articleUrl(a)}">${a.title}</a></div><div class="idea-meta"><span class="dir ${a.direction || 'flat'}">${a.direction === 'up' ? '▲ bullish' : a.direction === 'down' ? '▼ bearish' : '► neutral'}</span><span>· ${util.dateDM(a.date)}</span></div></div>`; })}</div>
+        <div class="ideas">${analyses.slice(0, 4).map(a => { const inst = instruments.bySlug[(a.instruments || [])[0]]; return html`<div class="idea"><span class="kicker">${a.categoryObj.name} · ${inst ? inst.short || inst.name : ''}</span><div class="idea-title"><a href="${c.articleUrl(a)}">${a.title}</a></div><div class="idea-meta"><span class="dir ${a.direction || 'flat'}">${a.direction === 'up' ? 'bullish' : a.direction === 'down' ? 'bearish' : 'neutral'}</span><span>· ${util.dateDM(a.date)}</span></div></div>`; })}</div>
       </section>
       <section class="card">
         ${c.sectionTitle('Termine der Woche', { href: '/termine/wirtschaftskalender', more: 'Kalender' })}
@@ -82,9 +82,9 @@ module.exports = function (ctx) {
 
 <section class="section-dark" aria-labelledby="h-board">
   <div class="container">
-    ${c.sectionTitle('Marktüberblick', { href: '/maerkte', more: 'Alle Märkte', id: 'h-board' })}
+    ${c.sectionTitle('Marktüberblick', { id: 'h-board', stand: true })}
     ${c.board(layout.stripSlugs)}
-    <p class="small muted" style="margin-top:12px">${layout.asOfLabel} · Xetra-Kurse 15 Minuten verzögert, Devisen und Krypto nahezu Echtzeit.</p>
+    <p class="small muted" style="margin-top:12px">Xetra-Kurse 15 Minuten verzögert, Devisen und Krypto nahezu Echtzeit · <a href="/maerkte">Alle Märkte ›</a></p>
   </div>
 </section>
 

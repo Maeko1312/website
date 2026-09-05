@@ -35,9 +35,9 @@ module.exports = function (ctx) {
       <div class="strip-scroll">${stripSlugs.map(s => {
         const inst = instruments.bySlug[s], qq = q(s); if (!inst || !qq) return '';
         const d = dir(qq.changePct);
-        return html`<a class="strip-item" href="/kurs/${inst.slug}"><span class="strip-name">${inst.short || inst.name}</span><span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
+        const w = util.wkn(qq.isin || inst.isin); return html`<a class="strip-item" href="/kurs/${inst.slug}"><span class="strip-name">${inst.short || inst.name}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
       })}</div>
-      <div class="strip-meta"><a href="/methodik" title="Kursdaten: Herkunft und Verzögerung">${asOfLabel} · Xetra-Kurse 15 Min. verzögert</a></div>
+      <div class="strip-meta"><a href="/methodik" title="Kursdaten: Herkunft und Verzögerung">${asOfLabel} · Xetra 15 Min. verzögert</a></div>
     </div></div>`;
   }
 
@@ -136,7 +136,7 @@ module.exports = function (ctx) {
       <form class="newsletter" data-newsletter ${formAttrs()} novalidate>
         <label class="visually-hidden" for="nl-modal-email">E-Mail-Adresse</label>
         <div class="control"><input id="nl-modal-email" type="email" name="${config.newsletterEmailField}" placeholder="ihre@e-mail.de" required autocomplete="email"></div>
-        <label class="check"><input type="checkbox" name="consent" required> Ich möchte den Newsletter erhalten und akzeptiere die <a href="/datenschutz">Datenschutzhinweise</a>.</label>
+        <label class="check"><input type="checkbox" name="consent" required><span>Ich möchte den Newsletter erhalten und akzeptiere die <a href="/datenschutz">Datenschutzhinweise</a>.</span></label>
         <button class="btn btn-teal btn-lg" type="submit">Kostenlos anmelden</button>
         <div class="newsletter-note" data-newsletter-note hidden tabindex="-1">Der Versanddienst wird gerade angebunden – die Anmeldung ist in Kürze möglich. Bis dahin: <a href="/feed.xml">RSS-Feed abonnieren</a>.</div>
       </form>
@@ -182,13 +182,13 @@ ${noindex ? '<meta name="robots" content="noindex, follow">' : ''}
 <meta property="og:url" content="${canonical}">
 <meta property="og:locale" content="de_DE">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0b1e3a">
+<meta name="theme-color" content="#1a1727">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="alternate" type="application/rss+xml" title="${esc(config.brand)} – Nachrichten & Blog" href="/feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/assets/styles.css">
 ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ''}
 ${extraHead || ''}
