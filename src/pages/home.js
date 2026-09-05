@@ -15,6 +15,18 @@ module.exports = function (ctx) {
   const daxUp = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length;
   const dax = q('dax'), daxInst = instruments.bySlug.dax, daxHist = ctx.hist('dax');
   const posts = content.blog.posts;
+  // Rankings kompakt + Branchen (echte Daten)
+  const stocksQ = instruments.stocks.filter(s => q(s.slug).price != null);
+  const byKey = (fn, desc = true, n = 6) => stocksQ.map(s => ({ s, v: fn(q(s.slug)) })).filter(o => o.v != null && !Number.isNaN(o.v)).sort((a, b) => desc ? b.v - a.v : a.v - b.v).slice(0, n).map(o => o.s);
+  const rankSets = [
+    { key: 'gewinner', label: 'Tagesgewinner', rows: byKey(x => x.changePct), cols: ['price', 'change', 'ytd'], note: 'Größte Kursgewinne gegenüber dem Vortag.' },
+    { key: 'verlierer', label: 'Tagesverlierer', rows: byKey(x => x.changePct, false), cols: ['price', 'change', 'ytd'], note: 'Größte Kursverluste gegenüber dem Vortag.' },
+    { key: 'ytd', label: 'Seit Jahresbeginn', rows: byKey(x => x.perf && x.perf.ytd), cols: ['price', 'ytd', 'y1'], note: 'Beste Kursentwicklung seit dem Jahreswechsel.' },
+    { key: 'dividende', label: 'Dividendenrendite', rows: byKey(x => x.dividendYield), cols: ['price', 'dy', 'pe'], note: 'Ausschüttung der letzten zwölf Monate im Verhältnis zum Kurs.' },
+  ];
+  const sectors = {};
+  for (const s of stocksQ) { const x = q(s.slug); if (x.changePct == null) continue; (sectors[s.sector] = sectors[s.sector] || []).push(x.changePct); }
+  const sectorItems = Object.entries(sectors).filter(([, v]) => v.length >= 2).map(([k, v]) => ({ label: k.length > 14 ? k.slice(0, 13) + '…' : k, sub: v.length + ' Werte', value: v.reduce((a, b) => a + b, 0) / v.length })).sort((a, b) => b.value - a.value).slice(0, 8);
 
   const tabsFeed = html`
     <div class="tabs" data-tabs="feed-panels" role="tablist" aria-label="Nachrichten filtern">
@@ -64,6 +76,16 @@ module.exports = function (ctx) {
         ${c.sectionTitle('Aktuelle Meldungen', { href: '/nachrichten', more: 'Mehr Nachrichten', id: 'h-feed' })}
         ${tabsFeed}
       </section>
+      <section aria-labelledby="h-rank">
+        ${c.sectionTitle('Rankings kompakt', { href: '/rankings', more: 'Alle Rankings', id: 'h-rank' })}
+        <div class="tabs" data-tabs="rank-home" role="tablist" aria-label="Ranking wählen">${rankSets.map((r, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${r.key}">${r.label}</button>`)}</div>
+        <div id="rank-home" class="card">${rankSets.map((r, i) => html`<div data-panel="${r.key}"${i ? raw(' hidden') : ''}>${c.quoteTable(r.rows, { cols: r.cols, compact: true, sortable: false })}<p class="small muted" style="margin-top:8px">${r.note}</p></div>`)}</div>
+      </section>
+      <section class="card" aria-labelledby="h-sector">
+        ${c.sectionTitle('Branchen heute', { href: '/maerkte', more: 'Marktüberblick', id: 'h-sector' })}
+        <p class="section-sub">Durchschnittliche Tagesveränderung der DAX- und MDAX-Aktien je Branche (mindestens zwei Werte).</p>
+        ${charts.barChart(sectorItems, { w: 760, h: 230 })}
+      </section>
 
     </div>
     <aside>
@@ -76,7 +98,6 @@ module.exports = function (ctx) {
         <ul class="upcoming">${upcoming.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>
       </section>
       ${c.sideRecent()}
-      ${c.newsletterBox({ compact: true })}
     </aside>
   </div>
 </div>
@@ -125,6 +146,7 @@ module.exports = function (ctx) {
       </section>
       ${c.quizBox()}
       ${c.pollBox()}
+      ${c.newsletterBox({ compact: true })}
     </aside>
   </div>
 </div>`;
