@@ -44,7 +44,7 @@ module.exports = function (ctx) {
   function megaFeature(kind) {
     const c = ctx.content;
     if (kind === 'quotes') {
-      return html`<div class="mega-feature"><span class="kicker">Deutsche Indizes</span>${['dax', 'mdax', 'sdax', 'tecdax'].map(s => { const i = instruments.bySlug[s], qq = q(s); return html`<div class="mega-quote"><a href="/kurs/${s}">${i.name}</a><span><strong>${fmtPrice(i, qq)}</strong> <span class="${dir(qq.changePct)} delta">${pct(qq.changePct)}</span></span></div>`; })}<p style="margin-top:10px">${asOfLabel}</p></div>`;
+      return html`<div class="mega-feature"><span class="kicker">Deutsche Indizes</span>${['dax', 'mdax', 'sdax', 'tecdax'].map(s => { const i = instruments.bySlug[s], qq = q(s); return html`<a class="mega-quote" href="/kurs/${s}"><span class="name">${i.name}</span><span class="vals"><strong>${fmtPrice(i, qq)}</strong><span class="delta ${dir(qq.changePct)}">${pct(qq.changePct)}</span></span></a>`; })}<p style="margin-top:10px">${asOfLabel}</p></div>`;
     }
     if (kind === 'latest' && c) {
       const a = c.articles.filter(x => x.kind === 'news')[0];
