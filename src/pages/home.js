@@ -53,15 +53,16 @@ module.exports = function (ctx) {
 
   ${c.nlBanner()}
 
+  <section aria-labelledby="h-blog" style="margin-bottom:32px">
+    ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
+    <div class="post-grid">${posts.slice(0, 3).map(p => c.postCard(p))}</div>
+  </section>
+
   <div class="layout no-sticky">
     <div class="stack">
       <section aria-labelledby="h-feed">
         ${c.sectionTitle('Aktuelle Meldungen', { href: '/nachrichten', more: 'Mehr Nachrichten', id: 'h-feed' })}
         ${tabsFeed}
-      </section>
-      <section aria-labelledby="h-blog">
-        ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
-        <div class="post-grid">${posts.slice(0, 3).map(p => c.postCard(p))}</div>
       </section>
 
     </div>
@@ -89,6 +90,10 @@ module.exports = function (ctx) {
 </section>
 
 <div class="container" style="padding-bottom:40px">
+  <section aria-labelledby="h-wissen" style="margin-bottom:32px">
+    ${c.sectionTitle('Börsenwissen', { href: '/wissen', more: 'Alle Ratgeber', id: 'h-wissen' })}
+    <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
+  </section>
   <div class="layout no-sticky">
     <div class="stack">
       <section aria-labelledby="h-analysis">
@@ -110,10 +115,6 @@ module.exports = function (ctx) {
       <section aria-labelledby="h-calc">
         ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
         ${c.calcTabs(content.tools, { id: 'home' })}
-      </section>
-      <section aria-labelledby="h-wissen">
-        ${c.sectionTitle('Börsenwissen', { href: '/wissen', more: 'Alle Ratgeber', id: 'h-wissen' })}
-        <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
       </section>
     </div>
     <aside>

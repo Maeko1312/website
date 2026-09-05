@@ -336,11 +336,11 @@ a.mega-quote:hover .name { color: var(--accent-dark); }
 .analysis-list .dir { font-size: 12px; }
 .analysis-list .dir::before { margin-right: 0; }
 .story-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.story-card { display: grid; gap: 10px; align-content: start; background: var(--surface); border: 1px solid var(--line); padding: 0 0 20px; }
+.story-card { display: grid; gap: 12px; align-content: start; background: var(--surface); border: 1px solid var(--line); padding: 0 0 22px; }
 .story-card > a:first-child .thumb { border-bottom: 1px solid var(--line); }
-.story-card .story-top, .story-card .story-title, .story-card .story-excerpt { padding: 0 20px; }
-.story-card .story-title { font-family: var(--font-display); font-stretch: 100%; font-weight: 700; font-size: 19px; line-height: 26px; letter-spacing: -0.005em; }
-.story-card .story-excerpt { font-size: 14.5px; line-height: 22px; }
+.story-card .story-top, .story-card .story-title, .story-card .story-excerpt { padding: 0 22px; }
+.story-card .story-title { font-family: var(--font-body); font-weight: 600; font-size: 18px; line-height: 26px; letter-spacing: -0.01em; }
+.story-card .story-excerpt { font-size: 15px; line-height: 24px; }
 .author-line { display: flex; align-items: center; gap: 10px; }
 .avatar { width: 36px; height: 36px; background: var(--navy); color: var(--dark-text); display: grid; place-items: center; font-weight: 600; font-size: 13px; letter-spacing: .04em; flex: none; }
 .avatar.is-lg { width: 64px; height: 64px; font-size: 20px; }
@@ -439,19 +439,19 @@ a.mega-quote:hover .name { color: var(--accent-dark); }
 
 /* ---------- Blog ---------- */
 .post-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.post-card { display: grid; gap: 14px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); padding: 20px; transition: border-color .15s; }
+.post-card { display: grid; gap: 16px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); padding: 22px; transition: border-color .15s; }
 .post-card > div { display: grid; gap: 12px; }
 .post-card .kicker { margin-bottom: -4px; }
 .post-card:hover { border-color: var(--line-strong); border-top-color: var(--surface-2); }
-.post-card h3 { font-family: var(--font-display); font-stretch: 100%; font-weight: 700; font-size: 19px; line-height: 26px; letter-spacing: -0.005em; }
+.post-card h3 { font-family: var(--font-body); font-weight: 600; font-size: 18px; line-height: 26px; letter-spacing: -0.01em; }
 .post-card h3 a { color: var(--ink); }
 .post-card h3 a:hover { color: var(--link); text-decoration: none; }
-.post-card p { font-size: 14.5px; color: var(--body); line-height: 23px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.post-card p { font-size: 15px; color: var(--body); line-height: 24px; }
 .post-card .meta { display: flex; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .post-card .kicker a { color: var(--muted); }
 .post-card.is-featured { grid-column: span 2; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: center; }
 .post-card.is-featured .thumb { aspect-ratio: 4 / 3; }
-.post-card.is-featured h3 { font-stretch: 75%; font-size: 30px; line-height: 34px; letter-spacing: 0; text-wrap: balance; }
+.post-card.is-featured h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 30px; line-height: 34px; letter-spacing: 0; text-wrap: balance; }
 .post-card.is-featured p { font-size: 15px; line-height: 23px; -webkit-line-clamp: 5; }
 .topic-chips { margin-bottom: 22px; }
 .post-list { list-style: none; display: grid; gap: 0; }
@@ -673,11 +673,11 @@ aside .perf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .term dd { margin: 4px 0 0; font-size: 15px; line-height: 22px; color: var(--body); }
 .term dd a { font-weight: 500; }
 .guide-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.guide-card { display: grid; gap: 12px; padding: 22px 22px 20px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); color: var(--ink); align-content: start; transition: border-color .15s; }
+.guide-card { display: grid; gap: 14px; padding: 24px 24px 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); color: var(--ink); align-content: start; transition: border-color .15s; }
 .guide-card:hover { border-color: var(--line-strong); border-top-color: var(--surface-2); text-decoration: none; color: var(--ink); }
 .guide-card .num { text-align: left; font-family: var(--font-mono); font-size: 13px; letter-spacing: .06em; color: var(--muted); line-height: 1; }
-.guide-card h3 { font-family: var(--font-display); font-stretch: 100%; font-weight: 700; font-size: 19px; line-height: 26px; letter-spacing: -0.005em; }
-.guide-card p { font-size: 14.5px; line-height: 22px; color: var(--body); }
+.guide-card h3 { font-family: var(--font-body); font-weight: 600; font-size: 18px; line-height: 26px; letter-spacing: -0.01em; }
+.guide-card p { font-size: 15px; line-height: 24px; color: var(--body); }
 .guide-card .meta { padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .toc { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
 .toc strong { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
@@ -708,7 +708,7 @@ aside .perf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .tool-card:hover { border-color: var(--line-strong); border-top-color: var(--surface-2); text-decoration: none; color: var(--ink); }
 .tool-card .icon { width: 44px; height: 44px; background: var(--surface-2); color: var(--ink); display: grid; place-items: center; }
 .tool-card .icon svg { width: 24px; height: 24px; }
-.tool-card h3 { font-family: var(--font-display); font-stretch: 100%; font-weight: 700; font-size: 19px; line-height: 26px; letter-spacing: -0.005em; }
+.tool-card h3 { font-family: var(--font-body); font-weight: 600; font-size: 18px; line-height: 26px; letter-spacing: -0.01em; }
 .tool-card p { font-size: 14.5px; line-height: 22px; color: var(--body); }
 .calc { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
 .calc-form { display: grid; gap: 14px; }
