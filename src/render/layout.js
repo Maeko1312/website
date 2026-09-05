@@ -71,7 +71,7 @@ module.exports = function (ctx) {
         const cur = item.key === current ? ' is-current' : '';
         if (!item.groups) return html`<li class="mainnav-item${raw(cur)}"><a class="mainnav-link" href="${item.href}">${item.label}</a></li>`;
         return html`<li class="mainnav-item${raw(cur)}" data-menu>
-          <button class="mainnav-link" type="button" data-menu-btn aria-expanded="false" aria-haspopup="true">${item.label}${raw(icons.chevron)}</button>
+          <button class="mainnav-link" type="button" data-menu-btn data-href="${item.href}" aria-expanded="false" aria-haspopup="true">${item.label}${raw(icons.chevron)}</button>
           <div class="mega ${item.feature ? 'has-feature' : ''}" style="--cols:${item.cols}">
             ${item.feature ? megaFeature(item.feature) : ''}
             ${item.groups.map(g => html`<div class="mega-col"><h3>${g.title}</h3><ul>${g.links.map(([l, h]) => html`<li><a href="${h}">${l}</a></li>`)}</ul></div>`)}

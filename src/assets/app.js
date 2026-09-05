@@ -56,6 +56,8 @@
       if (!btn) return;
       btn.addEventListener('click', function (e) {
         e.preventDefault();
+        // Mit Maus: Menü öffnet per Hover, Klick führt zur Bereichsseite
+        if (window.matchMedia('(hover: hover)').matches && btn.getAttribute('data-href')) { location.href = btn.getAttribute('data-href'); return; }
         var open = item.classList.contains('is-open');
         $$('[data-menu].is-open').forEach(function (o) { o.classList.remove('is-open'); $('[data-menu-btn]', o).setAttribute('aria-expanded', 'false'); });
         if (!open) { item.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); }
