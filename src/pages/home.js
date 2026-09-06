@@ -9,6 +9,8 @@ module.exports = function (ctx) {
   const lead = content.blog.posts.find(p => p.featured) || news.find(a => a.featured) || news[0];
   const rest = news.filter(a => a !== lead);
   const todayCards = rest.slice(0, 4);
+  // „Mehr Nachrichten“: hervorgehobene Nachricht zuerst, dann chronologisch (ohne Aufmacher und Tageszeilen)
+  const moreNews = [...news.filter(a => a.featured && a !== lead && !todayCards.includes(a)), ...news.filter(a => !a.featured && a !== lead && !todayCards.includes(a))].slice(0, 12);
   const feed = rest.slice(3, 17);
   const m = c.movers(5);
   const upcoming = content.upcomingEvents(5);
@@ -60,7 +62,16 @@ module.exports = function (ctx) {
   </div>
 
 
-  ${c.focusCompany()}
+  <div class="snap-row" aria-label="Schnellübersicht">${c.marketToday()}${c.eventsCard(5)}${c.focusCard() || c.toolsCard()}</div>
+
+  <section class="news-section" aria-labelledby="h-more">
+    ${c.sectionTitle('Mehr Nachrichten', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-more' })}
+    <div class="news-layout">
+      <div class="news-rows">${moreNews.map(a => c.newsRow(a))}</div>
+      <aside class="news-aside">${c.newsletterBox({ compact: true })}${c.sideAnalysis(6)}</aside>
+    </div>
+  </section>
+
   <section aria-labelledby="h-blog" style="margin-bottom:32px">
     ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
     <div class="blog-sub"><h3>Neueste Beiträge</h3><label class="select-wrap"><span>Thema</span><select data-post-filter aria-label="Thema wählen"><option value="all">Alle Themen</option>${content.blog.topics.filter(t => homePosts.some(p => p.topic === t.slug)).map(t => html`<option value="${t.slug}">${t.name}</option>`)}</select></label></div>
@@ -68,7 +79,6 @@ module.exports = function (ctx) {
     <nav class="pager" data-pager aria-label="Weitere Beiträge" hidden></nav>
   </section>
 
-  ${c.nlSlim()}
 
 </div>
 

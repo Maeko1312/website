@@ -22,7 +22,7 @@ module.exports = function (ctx) {
 
   /* ---------- Bild-Platzhalter: deterministische Grafik pro Beitrag ---------- */
   function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-  c.thumb = (seed, { label = '', cls = '' } = {}) => {
+  c.thumbArt = (seed, { label = '', cls = '' } = {}) => {
     const h = hash(String(seed));
     const hue = 252 + (h % 24) - 12;
     const pts = []; let y = 60 + (h % 20);
@@ -101,6 +101,16 @@ module.exports = function (ctx) {
     return html`<div class="story-top">${a.featured ? html`<span class="badge is-accent">Top</span>` : ''}${showDate ? html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>${qq ? c.delta(qq.changePct) : ''}` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
   };
   // Aufmacher (Startseite): großes Bild mit Textüberlagerung
+  // Vorschaubilder: echte Fotos (src/public/img/stock, deterministisch je Beitrag); eigenes Bild (image-Feld) hat Vorrang; Chart-Grafik nur als Rückfall
+  const STOCK = [0, 1, 2, 3, 4, 5, 6, 8, 9, 20, 26, 36, 42, 48, 60, 119, 122, 160, 164, 180, 188, 192, 193, 201, 349, 357, 370, 378, 403, 411, 420, 431, 175, 142, 212, 240];
+  // Zuordnung in Renderreihenfolge (Startseite zuerst): keine Wiederholung, solange weniger Motive gebraucht werden als vorhanden sind; je Seed über alle Seiten stabil
+  const assignedImages = new Map(); let imageCounter = 0;
+  const stockImage = (seed) => { if (!assignedImages.has(seed)) assignedImages.set(seed, STOCK[imageCounter++ % STOCK.length]); return '/img/stock/' + assignedImages.get(seed) + '.jpg'; };
+  c.thumb = (seed, { label = '', cls = '', image = null, art = false, alt = '', eager = false } = {}) => {
+    if (art) return c.thumbArt(seed, { label, cls });
+    const src = image || stockImage(seed);
+    return html`<span class="thumb is-photo ${cls}"><img src="${src}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}"${eager ? raw(' fetchpriority="high"') : ''} decoding="async" width="1200" height="750"></span>`;
+  };
   c.heroStory = (a) => {
     // Aufmacher: hervorgehobener Beitrag (Blog oder Nachricht) oder die neueste Meldung
     const isPost = !!a.topicObj;
@@ -108,17 +118,17 @@ module.exports = function (ctx) {
     const url = isPost ? c.blogUrl(a) : c.articleUrl(a);
     const kicker = isPost ? a.topicObj.name : cat.name;
     const label = inst ? inst.short || inst.name : kicker;
-    return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label })}<div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
+    return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image, eager: true })}<div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
   };
   c.storyItem = (a, { thumb = false, excerpt = false } = {}) => {
     const inst = instOf(a); const cat = catOf(a);
-    return html`<li><article class="story ${thumb ? 'has-thumb' : ''}">${thumb ? html`<a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a>` : ''}<div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3>${excerpt ? html`<p class="story-excerpt">${a.deck}</p>` : ''}</div></article></li>`;
+    return html`<li><article class="story ${thumb ? 'has-thumb' : ''}">${thumb ? html`<a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>` : ''}<div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3>${excerpt ? html`<p class="story-excerpt">${a.deck}</p>` : ''}</div></article></li>`;
   };
   c.storyList = (arts, { variant = '', thumb = false, excerpt = false } = {}) => html`<ul class="story-list ${variant}">${arts.map(a => c.storyItem(a, { thumb, excerpt }))}</ul>`;
   c.denseList = (arts) => html`<ul class="story-list is-dense">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); const dup = inst && [inst.short, inst.name].filter(Boolean).some(n => a.title.toLowerCase().startsWith(n.toLowerCase())); return html`<li><time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now) === 'heute' ? time(a.date) : util.dateDM(a.date)}</time><span class="story-title">${inst && !dup ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>` : !inst ? html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>` : ''} <a href="${c.articleUrl(a)}">${a.title}</a></span></li>`; })}</ul>`;
   c.analysisList = (arts) => html`<ul class="story-list is-dense analysis-list">${arts.map(a => { const inst = instOf(a); const dup = inst && [inst.short, inst.name].filter(Boolean).some(n => a.title.toLowerCase().startsWith(n.toLowerCase())); return html`<li><time datetime="${a.date.toISOString()}" translate="no">${util.dateDM(a.date)}</time><span class="dir ${a.direction || 'flat'}" title="${a.direction === 'up' ? 'Positive Einschätzung' : a.direction === 'down' ? 'Negative Einschätzung' : 'Neutral'}" aria-label="${a.direction === 'up' ? 'bullish' : a.direction === 'down' ? 'bearish' : 'neutral'}"></span><span class="story-title">${inst && !dup ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>` : ''} <a href="${c.articleUrl(a)}">${a.title}</a></span></li>`; })}</ul>`;
   // Kompakte Zeile für „Nachrichten des Tages“ neben dem Aufmacher
-  c.todayItem = (a) => { const inst = instOf(a); const cat = catOf(a); return html`<li><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a><div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></div></li>`; };
+  c.todayItem = (a) => { const inst = instOf(a); const cat = catOf(a); return html`<li><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a><div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></div></li>`; };
   // Promo-Karte für Seitenleisten: der hervorgehobene Beitrag (Blog bevorzugt, sonst Nachricht); ohne Flag nichts
   c.featuredPromo = () => {
     const post = ctx.content.blog.posts.find(p => p.featured);
@@ -150,14 +160,38 @@ module.exports = function (ctx) {
   };
   // Schmale Newsletter-Leiste (eine Zeile) für die Seitenmitte
   c.nlSlim = () => { const id = `nl-${++nlCounter}`; return html`<section class="nl-slim" aria-labelledby="nl-slim-title"><div class="nl-slim-text"><span class="kicker">Newsletter · kostenlos</span><h3 id="nl-slim-title">Börsenblick am Morgen – die Börse in zwei Minuten</h3><p>Jeden Handelstag um 7:30&nbsp;Uhr: Märkte, drei Termine, eine Meldung. Abmeldung jederzeit.</p></div>${nlForm({ id, cls: 'btn-teal', compactRow: true, fine: false })}</section>`; };
-  c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
+  // „Markt heute“: DAX groß, vier Vergleichswerte, Marktbreite – kompakt
+  c.marketToday = () => {
+    const dax = q('dax') || {}; if (dax.price == null) return '';
+    const up = instruments.dax.filter(s => ((q(s.slug) || {}).changePct || 0) > 0).length, down = instruments.dax.filter(s => ((q(s.slug) || {}).changePct || 0) < 0).length;
+    const h = history['dax'];
+    return html`<section class="card snap-card market-card" aria-labelledby="h-market">${c.sectionTitle('Markt heute', { href: '/maerkte', more: 'Alle Märkte', id: 'h-market' })}<div class="market-lead"><a class="market-name" href="/kurs/dax">DAX</a><div class="market-price"><strong>${c.priceCell(instruments.bySlug.dax, dax)}</strong>${c.delta(dax.changePct, { pill: true })}</div>${h && h.points.length > 2 ? html`<div class="market-spark">${charts.sparkline(h.points, { w: 220, h: 40, days: 22, id: 'ms-dax' })}</div>` : ''}</div>${c.miniQuotes(['mdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'eur-usd'].map(s => instruments.bySlug[s]).filter(Boolean))}<p class="small muted market-breadth"><span class="up">${up}</span> DAX-Werte im Plus, <span class="down">${down}</span> im Minus · ${ctx.layout.asOfLabel}</p></section>`;
+  };
+  // „Termine der Woche“: die nächsten Termine mit Relevanz ≥ 2
+  c.eventsCard = (n = 5) => {
+    const ev = ctx.content.upcomingEvents(n); if (!ev.length) return '';
+    return html`<section class="card snap-card" aria-labelledby="h-events">${c.sectionTitle('Termine der Woche', { href: '/termine/wirtschaftskalender', more: 'Kalender', id: 'h-events' })}<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${util.dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul></section>`;
+  };
+  // „Werkzeuge“: Rechner-Links als Karte (Platz des Fokus-Blocks, wenn kein Unternehmen hervorgehoben ist)
+  c.toolsCard = () => html`<section class="card snap-card tools-card" aria-labelledby="h-tools">${c.sectionTitle('Werkzeuge', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-tools' })}<ul class="tools-list">${ctx.content.tools.slice(0, 6).map(t => html`<li><a href="/werkzeuge/${t.slug}"><span class="tools-icon">${raw(t.icon || '')}</span><span><strong>${t.title}</strong><small>${t.short}</small></span></a></li>`)}</ul></section>`;
+  // Kompakte Fokus-Karte (Spalte in der Schnellübersicht)
+  c.focusCard = () => {
+    const inst = instruments.all.find(i => i.featured); if (!inst) return '';
+    const qq = q(inst.slug) || {}; if (qq.price == null) return '';
+    const h = history[inst.slug];
+    const art = ctx.content.articles.find(a => (a.instruments || []).includes(inst.slug)) || null;
+    return html`<section class="card snap-card focus-mini" aria-labelledby="h-focus"><div class="card-flag"><span class="badge is-accent">Im Fokus</span>${inst.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</div><h2 id="h-focus" class="focus-name"><a href="${c.url(inst)}">${inst.name}</a></h2><p class="focus-ids" translate="no">${[c.typeLabel(inst), inst.index, inst.sector].filter(Boolean).join(' · ')}</p><div class="focus-price"><strong>${c.priceCell(inst, qq)}</strong>${c.delta(qq.changePct, { pill: true })}</div>${h && h.points.length > 2 ? html`<div class="focus-spark">${charts.sparkline(h.points, { w: 260, h: 44, days: 66, id: 'fs-' + inst.slug })}<span class="small muted">3 Monate</span></div>` : ''}${art ? html`<p class="focus-article"><a href="${c.articleUrl(art)}">${art.title}</a></p>` : ''}<div class="focus-actions"><a class="btn btn-dark btn-sm" href="${c.url(inst)}">Kursseite</a>${c.watchButton(inst.slug, true)}</div></section>`;
+  };
+  // Nachrichtenzeile für „Mehr Nachrichten“ (Foto links, Kicker, Titel, Teaser); hervorgehobene Nachricht dezent getönt
+  c.newsRow = (a) => { const inst = instOf(a); const cat = catOf(a); return html`<article class="news-row ${a.featured ? 'is-promoted' : ''}"><a class="news-row-media" href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a><div><div class="story-top">${a.featured ? html`<span class="badge is-accent">Im Fokus</span>` : ''}<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}</time><span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span></div><h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></div></article>`; };
+  c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);
   c.authorOf = (a) => ctx.content.authors.bySlug[a.author];
   c.avatar = (author, lg = false) => html`<span class="avatar ${lg ? 'is-lg' : ''}" aria-hidden="true">${author.initials}</span>`;
 
   /* ---------- Blog ---------- */
-  c.postCard = (p, { featured = false } = {}) => html`<article class="post-card ${featured ? 'is-featured' : ''} ${p.featured ? 'is-promoted' : ''}" data-topic="${p.topic}">${p.featured ? html`<span class="card-flag"><span class="badge is-accent">Im Fokus</span>${p.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</span>` : ''}<a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p><a class="read-more" href="${c.blogUrl(p)}">Weiterlesen<span aria-hidden="true"> ›</span></a></div></article>`;
+  c.postCard = (p, { featured = false } = {}) => html`<article class="post-card ${featured ? 'is-featured' : ''} ${p.featured ? 'is-promoted' : ''}" data-topic="${p.topic}">${p.featured ? html`<span class="card-flag"><span class="badge is-accent">Im Fokus</span>${p.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</span>` : ''}<a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name, image: p.image })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p><a class="read-more" href="${c.blogUrl(p)}">Weiterlesen<span aria-hidden="true"> ›</span></a></div></article>`;
   c.postList = (posts) => html`<ul class="post-list">${posts.map(p => html`<li><a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker">${p.topicObj.name} · ${p.minutes} Min.</span><h3 class="story-title"><a href="${c.blogUrl(p)}">${p.title}</a></h3></div></li>`)}</ul>`;
   c.sideBlog = (n = 5, exclude) => c.sideCard('Aus dem Blog', html`<ul class="side-list">${ctx.content.blog.posts.filter(p => p.slug !== exclude).slice(0, n).map(p => html`<li><a href="${c.blogUrl(p)}"><span class="kicker">${p.topicObj.name}</span><span>${p.title}</span></a></li>`)}</ul>`, { href: '/blog', more: 'Alle Beiträge' });
 
