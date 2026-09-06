@@ -82,10 +82,10 @@ module.exports = function (ctx) {
     </div>
     <aside>
       ${c.pollBox()}
-      ${c.newsletterBox({ compact: true })}
     </aside>
   </div>
-</div>`;
+</div>
+${c.nlClosing()}`;
 
   const jsonLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: config.brand, url: config.domain, inLanguage: 'de', potentialAction: { '@type': 'SearchAction', target: `${config.domain}/suche?q={search_term_string}`, 'query-input': 'required name=search_term_string' } };
   return [{ path: '/', html: layout.page({ title: config.brand, description: config.description, path: '/', body, section: null, jsonLd }) }];
