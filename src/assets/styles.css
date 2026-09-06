@@ -393,12 +393,14 @@ aside .story.has-thumb .story-excerpt { display: -webkit-box; -webkit-line-clamp
 .idea-meta .dir { font-family: var(--font-body); letter-spacing: 0; font-size: 13px; }
 
 /* ---------- Newsletter: Konversion ---------- */
-.nl-banner { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr); gap: 28px; align-items: center; background: var(--surface); color: var(--body); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); padding: 28px 32px; margin: 8px 0 32px; }
-.nl-banner h2 { color: var(--ink); font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(24px, 2.4vw, 30px); line-height: 1.12; margin-bottom: 10px; text-wrap: balance; }
+.nl-banner { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr); gap: 28px; align-items: stretch; background: var(--surface); color: var(--body); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); padding: 28px 32px; margin: 8px 0 32px; }
+.nl-banner h2 { color: var(--ink); font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(22px, 2.2vw, 28px); line-height: 1.12; margin-bottom: 10px; text-wrap: balance; max-width: 24ch; }
+.nl-banner > .newsletter { align-self: stretch; display: grid; align-content: center; gap: 10px; padding: 22px; background: var(--surface-2); border: 1px solid var(--line); }
 .nl-banner > div > .kicker { color: var(--muted); }
 .nl-banner p { color: var(--body); font-size: 15px; line-height: 22px; }
 .nl-banner ul { list-style: none; display: grid; gap: 6px; margin-top: 14px; font-size: 14px; color: var(--body); }
-.nl-banner li::before { content: ""; display: inline-block; width: 4px; height: 4px; background: var(--ink); margin-right: 10px; vertical-align: 3px; }
+.nl-banner li { position: relative; padding-left: 14px; line-height: 20px; }
+.nl-banner li::before { content: ""; position: absolute; left: 0; top: 8px; width: 4px; height: 4px; background: var(--ink); }
 .newsletter { display: grid; gap: 12px; }
 .newsletter h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 22px; line-height: 24px; }
 .newsletter p { font-size: 14px; line-height: 20px; }
@@ -955,4 +957,56 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 
 @media (max-width: 560px) {
   .story-list.is-dense .story-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+}
+
+/* ---------- Artikelseiten: interaktiver Chart, Instrument-Details, „Für Anleger relevant“ ---------- */
+.ichart { margin: 0 0 22px; background: var(--surface); border: 1px solid var(--line); padding: 16px 16px 12px; }
+.ichart-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin-bottom: 10px; }
+.ichart-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.ichart-name { font-weight: 600; color: var(--ink); margin-right: 4px; }
+.ichart-last { font-family: var(--font-display); font-stretch: 100%; font-weight: 600; font-size: 26px; line-height: 30px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.ichart-abs { font-size: 14px; font-variant-numeric: tabular-nums; }
+.ichart-abs.up { color: var(--up); } .ichart-abs.down { color: var(--down); }
+.ichart-ccy { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); }
+.ichart-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; width: 100%; font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em; color: var(--muted); }
+.ichart-meta .delta { font-family: var(--font-body); letter-spacing: 0; font-size: 13px; }
+.ichart-ranges { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 10px; }
+.ichart-range { padding: 4px 9px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: transparent; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s, background-color .15s; }
+.ichart-range:hover { color: var(--ink); border-color: var(--line-strong); }
+.ichart-range.is-active { background: var(--navy); border-color: var(--navy); color: #fff; }
+.ichart-range:disabled { opacity: .4; cursor: not-allowed; }
+.ichart-body { position: relative; min-height: 200px; }
+.ichart-body svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.ichart-svg.is-up { color: var(--up); } .ichart-svg.is-down { color: var(--down); }
+.chart-area-i { fill: currentColor; opacity: .07; }
+.chart-cross { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 3 3; }
+.ichart-svg .is-off { visibility: hidden; }
+.ichart-hit { cursor: crosshair; }
+.ichart-tip { position: absolute; top: 0; left: 0; z-index: 5; pointer-events: none; display: grid; gap: 2px; min-width: 150px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--line-strong); box-shadow: var(--shadow-lg); font-size: 13px; }
+.ichart-tip-date { font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em; color: var(--muted); }
+.ichart-tip strong { font-size: 15px; font-variant-numeric: tabular-nums; }
+.ichart-tip-note { font-size: 11.5px; color: var(--muted); }
+.ichart-fallback { margin-top: 8px; }
+.ichart figcaption { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .02em; color: var(--muted); margin-top: 8px; }
+
+.instrument-card { margin: 0 0 22px; }
+.instrument-card .section-title .stand { margin-left: auto; }
+.kv-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+.kv-list > div { display: grid; grid-template-columns: minmax(0, 44%) minmax(0, 1fr); gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 20px; }
+.kv-list dt { color: var(--muted); }
+.kv-list dd { margin: 0; color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.kv-list dd.is-strong { font-weight: 600; }
+.kv-list dd.mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: .02em; font-weight: 400; }
+.kv-list dd small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+
+.investor-box { margin: 0 0 22px; padding: 16px 20px; background: var(--accent-soft); border: 1px solid var(--line); border-left: 3px solid var(--accent); }
+.investor-box .kicker { display: block; margin-bottom: 10px; color: var(--accent); }
+.investor-box ul { list-style: none; display: grid; gap: 8px; margin: 0 0 10px; padding: 0; }
+.investor-box li { position: relative; padding-left: 16px; font-size: 15px; line-height: 22px; color: var(--body); }
+.investor-box li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; background: var(--accent); }
+.investor-box p { margin: 0; }
+@media (max-width: 560px) {
+  .kv-list { grid-template-columns: minmax(0, 1fr); }
+  .ichart { padding: 12px 12px 10px; }
+  .ichart-last { font-size: 22px; line-height: 26px; }
 }

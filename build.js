@@ -72,6 +72,22 @@ fs.writeFileSync(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="
 fs.writeFileSync(path.join(DIST, 'feed.xml'), components.rssFeed());
 fs.writeFileSync(path.join(DIST, 'search-index.json'), JSON.stringify(components.searchIndex()));
 fs.writeFileSync(path.join(DIST, 'instruments.json'), JSON.stringify(components.instrumentsJson()));
+// Kurshistorien für den interaktiven Chart: ein JSON je Instrument (Tages-, Intraday-, Wochen- und Monatsreihen)
+{
+  const longPath = path.join(__dirname, 'src', 'data', 'history-long.json');
+  const histLong = fs.existsSync(longPath) ? JSON.parse(fs.readFileSync(longPath, 'utf8')) : {};
+  fs.mkdirSync(path.join(DIST, 'data', 'history'), { recursive: true });
+  let n = 0;
+  for (const inst of instruments.all) {
+    const h = history[inst.slug], l = histLong[inst.slug] || {};
+    if (!h && !l.w5y) continue;
+    const qq = snapshot.quotes[inst.slug] || {};
+    const doc = { slug: inst.slug, name: inst.name, currency: (h && h.currency) || l.currency || inst.currency || null, unit: inst.unit || null, asOf: config.quotesAsOf, source: config.dataSource || null, delay: util.delayLabel(qq.updateMode),
+      series: { d1y: h ? h.points.map(p => [p[0], p[1]]) : null, i1d: l.i1d || null, w5y: l.w5y || null, mMax: l.mMax || null } };
+    fs.writeFileSync(path.join(DIST, 'data', 'history', inst.slug + '.json'), JSON.stringify(doc)); n++;
+  }
+  console.log(`Kurshistorien: ${n} Instrumente → dist/data/history/`);
+}
 
 console.log(`${pages.length} Seiten gebaut → dist/  (Kurse Stand ${snapshot.asOf})`);
 

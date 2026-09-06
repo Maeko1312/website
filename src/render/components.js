@@ -134,7 +134,7 @@ module.exports = function (ctx) {
   </form>`;
   c.newsletterBox = ({ dark = true, compact = false } = {}) => { const id = `nl-${++nlCounter}`; return html`<section class="card ${dark ? 'is-dark' : ''}"><div class="newsletter"><h3>${compact ? 'Börsenblick am Morgen' : 'Der Morgen-Überblick per E-Mail'}</h3><p>Jeden Handelstag um 7:30 Uhr: die Lage an den Märkten, drei Termine des Tages und die wichtigste Meldung – kostenlos, in zwei Minuten gelesen.</p>${nlForm({ id, cls: dark ? 'btn-primary' : 'btn-teal', fine: !compact })}</div></section>`; };
   c.nlInline = (context) => { const id = `nl-${++nlCounter}`; return html`<aside class="nl-inline"><span class="kicker">Newsletter</span><h3>${context || 'Lesen Sie so etwas gern? Dann jeden Morgen.'}</h3><p>Börsenblick am Morgen bringt um 7:30 Uhr die Lage an den Märkten, drei Termine und die wichtigste Meldung – kostenlos, in zwei Minuten gelesen.</p>${nlForm({ id, compactRow: true, button: 'Anmelden' })}</aside>`; };
-  c.nlBanner = () => { const id = `nl-${++nlCounter}`; return html`<section class="nl-banner" aria-labelledby="nl-banner-title"><div><span class="kicker" style="color:var(--accent)">Newsletter · kostenlos</span><h2 id="nl-banner-title">Die Börse in zwei Minuten – jeden Morgen um 7:30 Uhr in Ihrem Postfach</h2><p>Was über Nacht in Asien und an der Wall Street passiert ist, die drei Termine des Tages und die eine Meldung, die Sie kennen sollten.</p><ul><li>Werktäglich vor Börsenstart, pünktlich um 7:30 Uhr</li><li>Echte Schlusskurse statt Meinungen, kein Produktverkauf</li><li>Abmeldung jederzeit mit einem Klick</li></ul></div><div class="newsletter">${nlForm({ id, cls: 'btn-primary', fine: false })}</div></section>`; };
+  c.nlBanner = () => { const id = `nl-${++nlCounter}`; return html`<section class="nl-banner" aria-labelledby="nl-banner-title"><div><span class="kicker" style="color:var(--accent)">Newsletter · kostenlos</span><h2 id="nl-banner-title">Die Börse in zwei Minuten – jeden Morgen um 7:30&nbsp;Uhr in Ihrem Postfach</h2><p>Was über Nacht in Asien und an der Wall Street passiert ist, die drei Termine des Tages und die eine Meldung, die Sie kennen sollten.</p><ul><li>Werktäglich vor Börsenstart, pünktlich um 7:30 Uhr</li><li>Echte Schlusskurse statt Meinungen, kein Produktverkauf</li><li>Abmeldung jederzeit mit einem Klick</li></ul></div><div class="newsletter">${nlForm({ id, cls: 'btn-primary', fine: false })}</div></section>`; };
   // Fügt einen Block nach dem n-ten Absatz eines HTML-Textes ein (für Inline-Newsletter in Artikeln)
   c.injectAfterParagraph = (bodyHtml, block, n = 2) => {
     let idx = -1, count = 0;
@@ -181,6 +181,81 @@ module.exports = function (ctx) {
       .map(i => `  <item>\n    <title>${esc(i.title)}</title>\n    <link>${config.domain}${i.url}</link>\n    <guid>${config.domain}${i.url}</guid>\n    <pubDate>${i.date.toUTCString()}</pubDate>\n    <category>${esc(i.cat)}</category>\n    <description>${esc(i.desc)}</description>\n  </item>`).join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n  <title>${esc(config.brand)} – Nachrichten & Blog</title>\n  <link>${config.domain}</link>\n  <description>${esc(config.description)}</description>\n  <language>de-de</language>\n  <lastBuildDate>${now.toUTCString()}</lastBuildDate>\n  <atom:link href="${config.domain}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n</channel>\n</rss>\n`;
   };
+  // ---------- Kursdaten-Metadaten (Quelle, Verzögerung) ----------
+  c.sourceLabel = () => ctx.config.dataSource || null;
+  c.delayLabel = (quote) => util.delayLabel(quote && quote.updateMode);
+  const chartDigits = (inst, qq) => inst.type === 'fx' ? 4 : inst.type === 'bond' ? 3 : (qq.price >= 1000 ? 0 : qq.price < 10 ? 3 : 2);
+
+  // ---------- Interaktiver Kurschart (progressive Enhancement über dem statischen 1-Jahres-SVG) ----------
+  c.interactiveChart = (inst, quote, hist, { caption } = {}) => {
+    const pts = hist && hist.points ? hist.points : [];
+    if (!inst || pts.length < 2) return '';
+    const qq = quote || {};
+    const digits = chartDigits(inst, qq), unit = c.unit(inst), delay = c.delayLabel(qq), source = c.sourceLabel();
+    const ranges = [['1D', '1 Tag (Intraday, 15-Minuten-Kurse)'], ['1W', '1 Woche'], ['1M', '1 Monat'], ['3M', '3 Monate'], ['1Y', '1 Jahr'], ['5Y', '5 Jahre (Wochenschlusskurse)'], ['MAX', 'Gesamte Historie (Monatsschlusskurse)']];
+    return html`<figure class="article-hero ichart" data-chart="/data/history/${inst.slug}.json" data-chart-digits="${digits}" data-chart-unit="${unit}" data-chart-name="${inst.name}">
+      <div class="ichart-head">
+        <div class="ichart-price"><span class="ichart-name">${inst.name}</span><strong class="ichart-last">${num(qq.price, digits)}${inst.type === 'bond' ? ' %' : ''}</strong>${qq.changePct != null ? c.delta(qq.changePct, { pill: true }) : ''}${qq.changeAbs != null ? html`<span class="ichart-abs ${dir(qq.changeAbs)}">${qq.changeAbs > 0 ? '+' : ''}${num(qq.changeAbs, digits)} ${unit}</span>` : ''}${inst.currency ? html`<span class="ichart-ccy" translate="no">${inst.currency}${inst.unit && inst.unit !== unit ? ' · ' + inst.unit : ''}</span>` : ''}</div>
+        <div class="ichart-meta"><span translate="no">${ctx.layout.asOfLabel}</span>${inst.exchange || delay ? html`<span>${[inst.exchange, delay].filter(Boolean).join(', ')}</span>` : ''}${source ? html`<span>Quelle: ${source}</span>` : ''}<span data-chart-range-info></span></div>
+      </div>
+      <div class="ichart-ranges" role="tablist" aria-label="Zeitraum wählen">${ranges.map(([k, l]) => html`<button type="button" class="ichart-range ${k === '1Y' ? 'is-active' : ''}" role="tab" aria-selected="${k === '1Y' ? 'true' : 'false'}" data-range="${k}" title="${l}">${k}</button>`)}</div>
+      <div class="ichart-body" data-chart-body>${charts.lineChart(pts, { days: 0, id: 'ich-' + inst.slug, label: inst.name, unit })}</div>
+      <figcaption>${caption || html`${inst.name}: Tagesschlusskurse, 1 Jahr. Zeitraum wählen und Kurs mit Maus oder Finger abfragen. <a href="${c.url(inst)}">Zur Kursseite</a>.`}</figcaption>
+    </figure>`;
+  };
+
+  // ---------- Instrument-Details (nur Felder mit gültigen Werten) ----------
+  c.instrumentCard = (inst, quote) => {
+    const qq = quote || {};
+    if (!inst || qq.price == null) return '';
+    const digits = chartDigits(inst, qq), unit = c.unit(inst);
+    const withUnit = (v, d = digits) => v == null || Number.isNaN(v) ? null : (inst.type === 'bond' ? num(v, d) + ' %' : num(v, d) + ' ' + unit);
+    const eurusd = (q('eur-usd') || {}).price;
+    const asOf = new Date(ctx.config.quotesAsOf);
+    const rows = [];
+    const add = (label, value, opts = {}) => { if (value == null || value === '') return; rows.push({ label, value, ...opts }); };
+    const w = util.wkn(qq.isin || inst.isin);
+    add('Name', inst.name);
+    add('Symbol', inst.tv || inst.yahoo, { mono: true });
+    add('ISIN / WKN', (qq.isin || inst.isin) ? [(qq.isin || inst.isin), w].filter(Boolean).join(' · ') : null, { mono: true });
+    add('Typ', c.typeLabel(inst) || null);
+    add('Börse', inst.exchange);
+    add('Kontrakt', inst.contract);
+    add('Kontraktmonat', inst.rollRule === 'nymex-ng' ? util.frontMonth(asOf) : null, { sub: inst.rollRule === 'nymex-ng' ? 'rechnerisch nach Terminplan der NYMEX (drei Geschäftstage vor Liefermonatsbeginn)' : null });
+    add('Preisart', inst.priceKind);
+    add('Laufzeit', inst.maturity);
+    add('Währung', inst.currency, { mono: true });
+    add('Notierung', inst.type === 'stock' ? '€ je Aktie' : inst.type === 'index' ? 'Indexpunkte' : inst.type === 'bond' ? 'Rendite in % p. a.' : inst.type === 'crypto' ? 'US-$ je Einheit' : inst.unit || null);
+    add('Kurs', withUnit(qq.price), { strong: true });
+    add('Vortagesschluss', qq.changeAbs != null ? withUnit(qq.price - qq.changeAbs) : null);
+    add('Tagesveränderung', qq.changePct != null ? html`${c.delta(qq.changePct)}${qq.changeAbs != null ? html` <span class="muted">(${qq.changeAbs > 0 ? '+' : ''}${num(qq.changeAbs, digits)})</span>` : ''}` : null);
+    add('Tagesspanne', qq.low != null && qq.high != null ? `${num(qq.low, digits)} – ${num(qq.high, digits)}` : null);
+    add('52-Wochen-Spanne', qq.low52w != null && qq.high52w != null ? `${num(qq.low52w, digits)} – ${num(qq.high52w, digits)}` : null);
+    add('50-Tage-Linie', withUnit(qq.sma50));
+    add('200-Tage-Linie', withUnit(qq.sma200));
+    add('Volumen', qq.volume ? num(qq.volume, 0) : null, { sub: qq.avgVolume30d ? `Ø 30 Tage: ${num(qq.avgVolume30d, 0)}` : null });
+    add('Open Interest', qq.openInterest ? num(qq.openInterest, 0) : null);
+    if (inst.kwhPerUnit && inst.currency === 'USD' && eurusd) add('Umgerechnet', `${num(qq.price / eurusd / inst.kwhPerUnit * 100, 2)} ct/kWh`, { sub: `in Euro; 1 ${(inst.unit || '').split('/').pop()} = ${num(inst.kwhPerUnit, 3)} kWh, EUR/USD ${num(eurusd, 4)}` });
+    else if (inst.currency === 'USD' && eurusd && inst.type !== 'fx') add('In Euro', num(qq.price / eurusd, digits) + ' €', { sub: `EUR/USD ${num(eurusd, 4)}` });
+    add('Referenz', inst.benchmarkNote);
+    add('Quelle', c.sourceLabel());
+    add('Stand', ctx.layout.asOfLabel.replace(/^Stand /, ''), { mono: true });
+    add('Verzögerung', c.delayLabel(qq) || (inst.exchange === 'Xetra' ? '15 Min. verzögert' : null));
+    if (rows.length < 4) return '';
+    return html`<section class="card instrument-card" aria-labelledby="ic-${inst.slug}">
+      <div class="section-title"><h2 id="ic-${inst.slug}">Instrument-Details</h2><span class="stand">${c.watchButton(inst.slug, true)}</span></div>
+      <dl class="kv-list">${rows.map(r => html`<div><dt>${r.label}</dt><dd class="${[r.mono ? 'mono' : '', r.strong ? 'is-strong' : ''].join(' ').trim()}">${r.value}${r.sub ? html`<small>${r.sub}</small>` : ''}</dd></div>`)}</dl>
+    </section>`;
+  };
+
+  // ---------- „Für Anleger relevant“ (CMS-Feld investorContext: 3–5 Punkte; ohne Inhalt wird nichts gerendert) ----------
+  c.investorBox = (points) => {
+    if (!Array.isArray(points)) return '';
+    const list = points.filter(p => p && String(p).trim()).slice(0, 5);
+    if (list.length < 3) return '';
+    return html`<aside class="investor-box" aria-labelledby="ib-title"><span class="kicker" id="ib-title">Für Anleger relevant</span><ul>${list.map(p => html`<li>${p}</li>`)}</ul><p class="small muted">Einordnung auf Basis der Kursdaten – informativ, keine Anlageberatung und keine Kauf- oder Verkaufsempfehlung.</p></aside>`;
+  };
+
   c.searchIndex = () => {
     const out = [];
     for (const i of instruments.all) out.push({ t: i.name, k: [i.short, i.isin, i.index, i.sector].filter(Boolean).join(' · '), u: c.url(i), y: i.type, w: i.type === 'stock' || i.type === 'index' ? 3 : 2, d: i.blurb });

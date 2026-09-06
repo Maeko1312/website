@@ -1,4 +1,8 @@
 'use strict';
+// Sitzungstermine für den Ausblick in „Für Anleger relevant“ (offizielle Kalender 2026)
+const ECB_DATES = ['2026-02-05', '2026-03-19', '2026-04-30', '2026-06-11', '2026-07-23', '2026-09-10', '2026-10-29', '2026-12-17'];
+const FED_DATES = ['2026-01-28', '2026-03-18', '2026-04-29', '2026-06-17', '2026-07-29', '2026-09-16', '2026-10-28', '2026-12-09'];
+const nextAfter = (dates, now) => dates.map(d => new Date(d + 'T12:00:00')).find(d => d > now) || null;
 // Artikel. Zwei Sorten:
 //  1) datengetrieben – Marktberichte, Aktien-Checks, Chartanalysen, Rohstoff-/Kryptomeldungen werden
 //     aus den echten Schlusskursen und Kennzahlen (market-snapshot.json, history.json) erzeugt.
@@ -54,7 +58,14 @@ module.exports = function (ctx) {
     const cl = (v) => v > 0 ? 'up' : v < 0 ? 'down' : '';
     const facts = [['DAX Schluss', num(dax.close, 0) + ' Pkt.', cl(dax.chg), sign(dax.chg) + ' %'], ['Tagesspanne', num(dax.low, 0) + ' – ' + num(dax.high, 0)], mdax ? ['MDAX', num(mdax.close, 0), cl(mdax.chg), sign(mdax.chg) + ' %'] : null, sx ? ['EURO STOXX 50', num(sx.close, 0), cl(sx.chg), sign(sx.chg) + ' %'] : null, spx ? ['S&P 500', num(spx.close, 0), cl(spx.chg), sign(spx.chg) + ' %'] : null, eur ? ['EUR/USD', num(eur.close, 4), cl(eur.chg), sign(eur.chg) + ' %'] : null].filter(Boolean);
     const summary = [`DAX ${up ? 'gewinnt' : 'verliert'} ${num(Math.abs(dax.chg), 2)} % und schließt bei ${num(dax.close, 0)} Punkten.`, `Gewinner: ${top[0].s.name} (${sign(top[0].m.chg)} %), ${top[1].s.name} (${sign(top[1].m.chg)} %). Verlierer: ${flop[0].s.name} (${sign(flop[0].m.chg)} %).`, spx ? `Wall Street: S&P 500 ${sign(spx.chg)} %, Nasdaq 100 ${ndx ? sign(ndx.chg) + ' %' : '–'}.` : 'US-Börsen geschlossen.'];
-    articles.push({ slug: `boerse-frankfurt-${date}`, title, deck, category: 'marktberichte', kind: 'news', author: 'redaktion', date: at(d, 17, 48 + (idx % 7)), instruments: ['dax', top[0].s.slug, flop[0].s.slug], body, generated: true, featured: idx === 0, facts, summary });
+    const investorContext = [
+      `Bewegung: ${top[0].s.name} (${sign(top[0].m.chg)} %) und ${top[1].s.name} (${sign(top[1].m.chg)} %) stützten den Index, ${flop[0].s.name} (${sign(flop[0].m.chg)} %) belastete.`,
+      `Bedeutung: Ein Tages${up ? 'plus' : 'minus'} von ${num(Math.abs(dax.chg), 2)} % ist ${Math.abs(dax.chg) >= 1 ? 'eine deutliche' : 'eine moderate'} Bewegung; die Handelsspanne reichte von ${num(dax.low, 0)} bis ${num(dax.high, 0)} Punkten.`,
+      `Maßgebliche Benchmark: DAX (Performance-Index, Xetra-Schluss)${mdax ? '; MDAX ' + sign(mdax.chg) + ' %' : ''}${sx ? ', EURO STOXX 50 ' + sign(sx.chg) + ' %' : ''}${spx ? ', S&P 500 ' + sign(spx.chg) + ' %' : ''}.`,
+      `Betroffen: die Sektoren ${top[0].s.sector} und ${flop[0].s.sector}${eur ? '; Wechselkurs EUR/USD ' + num(eur.close, 4) : ''}${brent ? ', Brent ' + num(brent.close, 2) + ' US-$' : ''}.`,
+      `Als Nächstes im Blick: ${(() => { const e = nextAfter(ECB_DATES, now), fd = nextAfter(FED_DATES, now); return [e ? 'EZB-Zinsentscheid am ' + dateLong(e) : null, fd ? 'Fed-Sitzung am ' + dateLong(fd) : null].filter(Boolean).join(', '); })()} sowie die Konjunkturdaten der Woche (Wirtschaftskalender).`,
+    ];
+    articles.push({ slug: `boerse-frankfurt-${date}`, title, deck, category: 'marktberichte', kind: 'news', author: 'redaktion', date: at(d, 17, 48 + (idx % 7)), instruments: ['dax', top[0].s.slug, flop[0].s.slug], body, generated: true, featured: idx === 0, facts, summary, investorContext });
   });
 
   // ---------- 2) Aktien im Check (Kennzahlen aus dem Snapshot) ----------
@@ -84,7 +95,14 @@ module.exports = function (ctx) {
     const cl2 = (v) => v > 0 ? 'up' : v < 0 ? 'down' : '';
     const facts = [['Kurs', num(x.price) + ' €', cl2(x.changePct), sign(x.changePct) + ' % heute'], ['Seit Jahresbeginn', sign(x.perf.ytd) + ' %', cl2(x.perf.ytd), '1 Jahr ' + sign(x.perf.y1) + ' %'], ['KGV', x.pe ? num(x.pe, 1) : '–', '', 'letzte 12 Monate'], ['Dividendenrendite', x.dividendYield ? num(x.dividendYield, 2) + ' %' : '–', '', x.dividendYield ? 'ca. ' + num(x.price * x.dividendYield / 100, 2) + ' € je Aktie' : 'keine Ausschüttung'], ['Marktkapitalisierung', bigEur(x.marketCap)], ['52-Wochen-Spanne', num(x.low52w) + ' – ' + num(x.high52w) + ' €', '', pos52 != null ? 'aktuell bei ' + num(pos52, 0) + ' %' : '']];
     const summary = [`${s.name} notiert bei ${num(x.price)} € – ${aboveSma200 ? 'über' : 'unter'} der 200-Tage-Linie, der Trend ist damit ${aboveSma200 ? 'aufwärts' : 'abwärts'} gerichtet.`, `Bewertung: ${x.pe == null ? 'KGV nicht berechenbar (kein Gewinn)' : 'KGV ' + num(x.pe, 1) + (x.pe > 30 ? ', anspruchsvoll' : x.pe > 15 ? ', angemessen' : ', günstig')}; Dividendenrendite ${x.dividendYield ? num(x.dividendYield, 2) + ' %' : 'keine'}.`, `Seit Jahresbeginn ${sign(x.perf.ytd)} %, auf zwölf Monate ${sign(x.perf.y1)} %; Jahresspanne ${num(x.low52w)} bis ${num(x.high52w)} €.`];
-    articles.push({ slug: `${slug}-aktie-im-check`, title, deck, category: 'unternehmen', kind: 'news', author: 'miriam-koch', date: at(addDays(now, -(i % 6)), 8 + (i * 3) % 9, (i * 17) % 60), instruments: [slug], body, generated: true, facts, summary });
+    const investorContext = [
+      `Bewegung: ${s.name} ${x.changePct >= 0 ? 'legt heute' : 'gibt heute'} ${num(Math.abs(x.changePct), 2)} % ${x.changePct >= 0 ? 'zu' : 'nach'}; auf Monatssicht ${sign(x.perf.m1)} %, seit Jahresbeginn ${sign(x.perf.ytd)} %.`,
+      `Bedeutung: ${aboveSma200 == null ? 'Eine 200-Tage-Linie liegt nicht vor.' : aboveSma200 ? 'Der Kurs liegt über der 200-Tage-Linie (' + num(x.sma200) + ' €), der langfristige Trend gilt als intakt.' : 'Der Kurs liegt unter der 200-Tage-Linie (' + num(x.sma200) + ' €), der langfristige Trend ist angeschlagen.'}${pos52 != null ? ' Im 52-Wochen-Band steht die Aktie bei ' + num(pos52, 0) + ' % (0 = Tief, 100 = Hoch).' : ''}`,
+      `Maßgebliche Benchmark: ${s.index} (Xetra); Vergleichsgruppe: Sektor ${s.sector}.`,
+      `Betroffen: weitere Werte des Sektors ${s.sector} im ${s.index}${q('eur-usd').price ? '; bei Umsätzen außerhalb des Euroraums auch der Wechselkurs EUR/USD (' + num(q('eur-usd').price, 4) + ')' : ''}.`,
+      `Als Nächstes im Blick: Quartalszahlen und Dividendentermine (Unternehmenskalender)${(() => { const e = nextAfter(ECB_DATES, now); return e ? ', EZB-Zinsentscheid am ' + dateLong(e) : ''; })()}.`,
+    ];
+    articles.push({ slug: `${slug}-aktie-im-check`, title, deck, category: 'unternehmen', kind: 'news', author: 'miriam-koch', date: at(addDays(now, -(i % 6)), 8 + (i * 3) % 9, (i * 17) % 60), instruments: [slug], body, generated: true, facts, summary, investorContext });
   });
 
   // ---------- 3) Technische Analysen ----------
@@ -116,7 +134,16 @@ module.exports = function (ctx) {
 <p class="note is-plain">Technische Analyse auf Basis von Tagesschlusskursen, Stand ${dateShort(new Date(ctx.config.quotesAsOf))}. Gleitende Durchschnitte einfach (SMA), RSI über 14 Tage. Keine Anlageempfehlung.</p>`;
     const facts = [['Kurs', fmtLvl(x.price) + ' ' + unit, x.changePct > 0 ? 'up' : x.changePct < 0 ? 'down' : '', sign(x.changePct) + ' % heute'], ['Trend', direction === 'up' ? 'aufwärts' : direction === 'down' ? 'abwärts' : 'seitwärts', direction === 'up' ? 'up' : direction === 'down' ? 'down' : '', 'Kurs ' + (above200 ? 'über' : 'unter') + ' der 200-Tage-Linie'], ['Widerstand', fmtLvl(res), '', 'Hoch der letzten 20 Tage'], ['Unterstützung', fmtLvl(sup), '', 'Tief der letzten 20 Tage'], ['200-Tage-Linie', fmtLvl(x.sma200), '', '50-Tage-Linie ' + fmtLvl(x.sma50)], ['RSI (14)', num(x.rsi, 0), x.rsi > 70 ? 'down' : x.rsi < 30 ? 'up' : '', x.rsi > 70 ? 'überkauft' : x.rsi < 30 ? 'überverkauft' : 'neutral']];
     const summary = [`Trend ${direction === 'up' ? 'aufwärts: Kurs über 50- und 200-Tage-Linie' : direction === 'down' ? 'abwärts: Kurs unter 50- und 200-Tage-Linie' : 'seitwärts: Kurs zwischen den gleitenden Durchschnitten'}.`, `Entscheidende Marken: Widerstand ${fmtLvl(round(res, stepFor(res)))}, Unterstützung ${fmtLvl(round(sup, stepFor(sup)))} ${unit}.`, `RSI ${num(x.rsi, 0)} – ${x.rsi > 70 ? 'überkauft, Rücksetzer wahrscheinlicher' : x.rsi < 30 ? 'überverkauft, Gegenbewegung möglich' : 'kein Extremwert'}; Wochenbilanz ${sign(x.perf.w)} %.`];
-    articles.push({ slug: `${slug}-chartanalyse-${isoDate(addDays(now, -(i % 5)))}`, title, deck, category: cat, kind: 'analysis', author: 'jonas-weber', direction, date: at(addDays(now, -(i % 5)), 7 + (i % 4), (i * 13) % 60), instruments: [slug], body, generated: true, facts, summary });
+    const benchmarkFor = s.type === 'index' ? s.name + ' (Tagesschlusskurse)' : s.type === 'stock' ? s.index + ' (Xetra)' : s.type === 'fx' ? 'EUR/USD-Referenzkurs' : s.type === 'crypto' ? 'BTC/USD' : s.name + ' in US-Dollar (Terminmarkt)';
+    const affectedFor = s.type === 'index' ? 'Index-ETFs und die enthaltenen Einzelwerte' : s.type === 'stock' ? 'Werte des Sektors ' + s.sector + ' im ' + s.index : s.type === 'fx' ? 'exportorientierte Unternehmen und US-Dollar-Anlagen' : s.type === 'crypto' ? 'Kryptowerte und Krypto-ETPs' : 'Rohstoffwerte, Minen- und Energieaktien';
+    const investorContext = [
+      `Bewegung: ${s.name} notiert bei ${fmtLvl(x.price)} ${unit} (${sign(x.changePct)} % zum Vortag); der Trend nach 50- und 200-Tage-Linie ist ${direction === 'up' ? 'aufwärts' : direction === 'down' ? 'abwärts' : 'seitwärts'} gerichtet.`,
+      `Bedeutung: Widerstand bei ${fmtLvl(res)} und Unterstützung bei ${fmtLvl(sup)} begrenzen die aktuelle Spanne; ein Tagesschluss außerhalb würde das technische Bild verändern.`,
+      `Maßgebliche Benchmark: ${benchmarkFor}.`,
+      `Betroffen: ${affectedFor}.`,
+      `Als Nächstes im Blick: RSI ${num(x.rsi, 0)} (${x.rsi > 70 ? 'überkauft' : x.rsi < 30 ? 'überverkauft' : 'neutraler Bereich'})${(() => { const e = nextAfter(ECB_DATES, now), fd = nextAfter(FED_DATES, now); return (e ? ', EZB am ' + dateLong(e) : '') + (fd ? ', Fed am ' + dateLong(fd) : ''); })()}.`,
+    ];
+    articles.push({ slug: `${slug}-chartanalyse-${isoDate(addDays(now, -(i % 5)))}`, title, deck, category: cat, kind: 'analysis', author: 'jonas-weber', direction, date: at(addDays(now, -(i % 5)), 7 + (i % 4), (i * 13) % 60), instruments: [slug], body, generated: true, facts, summary, investorContext });
   });
 
   // ---------- 4) Rohstoffe & Krypto (Meldungen aus Daten, mit europäischen Einheiten) ----------
@@ -132,7 +159,20 @@ module.exports = function (ctx) {
   commodityNews.forEach(([slug, fn], i) => { const s = inst(slug), x = q(slug); if (!x.price || !x.perf) return; const a = fn(s, x); const cl3 = (v) => v > 0 ? 'up' : v < 0 ? 'down' : '';
     const facts = [['Preis', num(x.price, slug === 'kupfer' || slug === 'erdgas' ? 3 : 2) + ' US-$', cl3(x.changePct), s.unit + ' · ' + sign(x.changePct) + ' % heute'], ['In Euro', num(x.price / eurusd, 2) + ' €', '', metricOf(slug, x)], ['1 Monat', sign(x.perf.m1) + ' %', cl3(x.perf.m1)], ['Seit Jahresbeginn', sign(x.perf.ytd) + ' %', cl3(x.perf.ytd), '1 Jahr ' + sign(x.perf.y1) + ' %'], ['52-Wochen-Spanne', num(x.low52w, 0) + ' – ' + num(x.high52w, 0)], ['Trend', x.price > x.sma200 ? 'aufwärts' : 'abwärts', x.price > x.sma200 ? 'up' : 'down', '200-Tage-Linie ' + num(x.sma200, 0)]];
     const summary = [`${s.name} kostet ${num(x.price, 2)} US-Dollar (${s.unit}), umgerechnet ${metricOf(slug, x)}.`, `Auf Monatssicht ${sign(x.perf.m1)} %, seit Jahresbeginn ${sign(x.perf.ytd)} %, auf zwölf Monate ${sign(x.perf.y1)} %.`, `Der Preis liegt ${x.price > x.sma200 ? 'über' : 'unter'} der 200-Tage-Linie; Jahresspanne ${num(x.low52w, 0)} bis ${num(x.high52w, 0)} US-Dollar.`];
-    articles.push({ slug: `${slug}-preis-${isoDate(addDays(now, -(i % 4)))}`, ...a, category: 'rohstoffe', kind: 'news', author: 'redaktion', date: at(addDays(now, -(i % 4)), 9 + i, (i * 23) % 60), instruments: [slug], generated: true, facts, summary }); });
+    const investorContext = slug === 'erdgas' ? [
+      `Bewegung: Henry Hub ${x.changePct >= 0 ? 'steigt' : 'fällt'} um ${num(Math.abs(x.changePct), 2)} % auf ${num(x.price, 3)} US-$/MMBtu (Front-Month-Future); auf Monatssicht ${sign(x.perf.m1)} %, seit Jahresbeginn ${sign(x.perf.ytd)} %.`,
+      'Benchmark: Henry Hub ist der US-Referenzpreis (NYMEX-Terminkontrakt, kein Spotpreis). Für den europäischen Markt ist der TTF (Title Transfer Facility, Niederlande) maßgeblich – beide Preise können deutlich auseinanderlaufen.',
+      `Bedeutung: Umgerechnet entspricht der Preis ${num(x.price / eurusd / 293.071 * 100, 2)} Cent je Kilowattstunde (EUR/USD ${num(eurusd, 4)}); Wechselkursbewegungen verändern den Euro-Preis unabhängig vom US-Markt.`,
+      'Betroffen: Gasversorger und Förderunternehmen, energieintensive Industrie (Chemie, Stahl, Glas), Düngemittel- und LNG-Werte; indirekt die Strompreise.',
+      'Als Nächstes im Blick: die wöchentlichen US-Lagerbestandsdaten der EIA (donnerstags), Wetter- und Temperaturprognosen, LNG-Exportflüsse, US-Förderung und Nachfrage sowie der EUR/USD-Kurs.',
+    ] : [
+      `Bewegung: ${s.name} ${x.changePct >= 0 ? 'steigt' : 'fällt'} um ${num(Math.abs(x.changePct), 2)} % auf ${num(x.price, slug === 'kupfer' ? 3 : 2)} US-$ (${s.unit}); auf Monatssicht ${sign(x.perf.m1)} %, seit Jahresbeginn ${sign(x.perf.ytd)} %.`,
+      `Bedeutung: In Euro gerechnet sind das ${metricOf(slug, x)} (EUR/USD ${num(eurusd, 4)}); der Preis liegt ${x.price > x.sma200 ? 'über' : 'unter'} der 200-Tage-Linie.`,
+      `Maßgebliche Benchmark: ${slug === 'brent' ? 'Brent (ICE) als Referenz für Europa; WTI (NYMEX) für die USA' : slug === 'wti' ? 'WTI (NYMEX) für die USA; Brent (ICE) für Europa' : slug === 'gold' || slug === 'silber' || slug === 'platin' ? s.name + ' in US-$ je Feinunze (COMEX-Future)' : 'Kupfer in US-$ je Pfund (COMEX-Future); LME in US-$ je Tonne'}.`,
+      `Betroffen: ${slug === 'brent' || slug === 'wti' ? 'Öl- und Gasförderer, Raffinerien, Fluggesellschaften und Logistik; indirekt die Kraftstoffpreise' : slug === 'kupfer' ? 'Minenwerte, Elektro- und Bauindustrie; Kupfer gilt als Konjunkturindikator' : 'Minenwerte und Edelmetall-ETCs; Gold reagiert auf Realzinsen und den US-Dollar'}.`,
+      `Als Nächstes im Blick: ${slug === 'brent' || slug === 'wti' ? 'die wöchentlichen US-Lagerdaten der EIA (mittwochs), OPEC+-Entscheidungen' : 'die US-Realzinsen'}${(() => { const fd = nextAfter(FED_DATES, now); return fd ? ', die Fed-Sitzung am ' + dateLong(fd) : ''; })()} und der EUR/USD-Kurs.`,
+    ];
+    articles.push({ slug: `${slug}-preis-${isoDate(addDays(now, -(i % 4)))}`, ...a, category: 'rohstoffe', kind: 'news', author: 'redaktion', date: at(addDays(now, -(i % 4)), 9 + i, (i * 23) % 60), instruments: [slug], generated: true, facts, summary, investorContext }); });
 
   const cryptoNews = [
     ['bitcoin', (s, x) => ({ title: `Bitcoin bei ${num(x.price, 0)} Dollar (${num(x.price / eurusd, 0)} Euro): ${sign(x.perf.m1)} % im Monat`, deck: `Die größte Kryptowährung notiert bei ${num(x.price, 0)} US-Dollar, umgerechnet ${num(x.price / eurusd, 0)} Euro. Das 52-Wochen-Hoch liegt bei ${num(x.high52w, 0)} US-Dollar.`, body: `<p>Bitcoin kostet aktuell <strong>${num(x.price, 2)} US-Dollar</strong> (${sign(x.changePct)} % in 24 Stunden), umgerechnet <strong>${num(x.price / eurusd, 2)} Euro</strong>. Anders als Aktien wird Bitcoin rund um die Uhr gehandelt, auch am Wochenende.</p><h2>Entwicklung</h2><table><thead><tr><th>Zeitraum</th><th class="num">1 Woche</th><th class="num">1 Monat</th><th class="num">3 Monate</th><th class="num">seit 1.1.</th><th class="num">1 Jahr</th></tr></thead><tbody><tr><td>Bitcoin (US-$)</td>${['w', 'm1', 'm3', 'ytd', 'y1'].map(k => `<td class="num ${x.perf[k] >= 0 ? 'up' : 'down'}">${sign(x.perf[k])} %</td>`).join('')}</tr></tbody></table><p>Die Jahresspanne reicht von ${num(x.low52w, 0)} bis ${num(x.high52w, 0)} US-Dollar – der aktuelle Kurs liegt ${num(Math.abs(x.price / x.high52w - 1) * 100, 1)} % unter dem Hoch. ${x.price > x.sma200 ? 'Der Kurs notiert über der 200-Tage-Linie.' : 'Der Kurs notiert unter der 200-Tage-Linie.'}</p><h2>Was Anleger wissen sollten</h2><ul><li>Bitcoin-Gewinne sind in Deutschland nach einem Jahr Haltedauer steuerfrei (privates Veräußerungsgeschäft, § 23 EStG); innerhalb eines Jahres gilt eine Freigrenze von 1.000 € pro Jahr.</li><li>Kryptowährungen unterliegen extremen Schwankungen: Tagesbewegungen von 5 bis 10 % sind keine Seltenheit.</li><li>Seit 2024 gibt es in den USA börsengehandelte Bitcoin-Spot-ETFs; in der EU sind vergleichbare Produkte als ETNs (Exchange Traded Notes) erhältlich.</li></ul>` })],
@@ -141,7 +181,14 @@ module.exports = function (ctx) {
   cryptoNews.forEach(([slug, fn], i) => { const s = inst(slug), x = q(slug); if (!x.price || !x.perf) return; const a = fn(s, x); const cl4 = (v) => v > 0 ? 'up' : v < 0 ? 'down' : '';
     const facts = [['Kurs', num(x.price, 0) + ' US-$', cl4(x.changePct), sign(x.changePct) + ' % in 24 h'], ['In Euro', num(x.price / eurusd, 0) + ' €', '', 'EUR/USD ' + num(eurusd, 4)], ['1 Monat', sign(x.perf.m1) + ' %', cl4(x.perf.m1)], ['Seit Jahresbeginn', sign(x.perf.ytd) + ' %', cl4(x.perf.ytd), '1 Jahr ' + sign(x.perf.y1) + ' %'], ['Abstand zum Jahreshoch', sign((x.price / x.high52w - 1) * 100) + ' %', 'down', 'Hoch ' + num(x.high52w, 0) + ' US-$'], ['Trend', x.price > x.sma200 ? 'aufwärts' : 'abwärts', x.price > x.sma200 ? 'up' : 'down', '200-Tage-Linie ' + num(x.sma200, 0)]];
     const summary = [`${s.name} notiert bei ${num(x.price, 0)} US-Dollar, umgerechnet ${num(x.price / eurusd, 0)} Euro.`, `Monatsbilanz ${sign(x.perf.m1)} %, seit Jahresbeginn ${sign(x.perf.ytd)} %; das Jahreshoch bei ${num(x.high52w, 0)} US-Dollar ist ${num(Math.abs(x.price / x.high52w - 1) * 100, 1)} % entfernt.`, 'Gewinne sind in Deutschland nach einem Jahr Haltedauer steuerfrei; darunter gilt eine Freigrenze von 1.000 € pro Jahr.'];
-    articles.push({ slug: `${slug}-kurs-${isoDate(addDays(now, -(i * 2)))}`, ...a, category: 'krypto', kind: 'news', author: 'redaktion', date: at(addDays(now, -(i * 2)), 10 + i * 2, (i * 31) % 60), instruments: [slug], generated: true, facts, summary }); });
+    const investorContext = [
+      `Bewegung: ${s.name} ${x.changePct >= 0 ? 'steigt' : 'fällt'} in 24 Stunden um ${num(Math.abs(x.changePct), 2)} % auf ${num(x.price, 0)} US-$; auf Monatssicht ${sign(x.perf.m1)} %, seit Jahresbeginn ${sign(x.perf.ytd)} %.`,
+      `Bedeutung: Der Kurs liegt ${num((1 - x.price / x.high52w) * 100, 1)} % unter dem 52-Wochen-Hoch (${num(x.high52w, 0)} US-$) und ${x.price > x.sma200 ? 'über' : 'unter'} der 200-Tage-Linie.`,
+      `Maßgebliche Benchmark: ${slug === 'bitcoin' ? 'BTC/USD (Handel rund um die Uhr, keine Börsenschlusskurse)' : 'BTC/USD; für Ether zusätzlich das ETH/BTC-Verhältnis (' + num(x.price / q('bitcoin').price, 4) + ')'}.`,
+      'Betroffen: Kryptowerte, Krypto-ETPs und Aktien mit Bezug zum Sektor (Börsenbetreiber, Miner).',
+      `Als Nächstes im Blick: ${(() => { const fd = nextAfter(FED_DATES, now); return fd ? 'die Fed-Sitzung am ' + dateLong(fd) + ', ' : ''; })()}US-Realzinsen und der Dollar (EUR/USD ${num(eurusd, 4)}); Umrechnung in Euro: ${num(x.price / eurusd, 0)} €.`,
+    ];
+    articles.push({ slug: `${slug}-kurs-${isoDate(addDays(now, -(i * 2)))}`, ...a, category: 'krypto', kind: 'news', author: 'redaktion', date: at(addDays(now, -(i * 2)), 10 + i * 2, (i * 31) % 60), instruments: [slug], generated: true, facts, summary, investorContext }); });
 
   // ---------- 5) Zinsen & Anleihen (Daten) ----------
   const b10 = q('bund-10j'), b2 = q('bund-2j'), us10 = q('us-treasury-10j');
@@ -152,7 +199,13 @@ module.exports = function (ctx) {
 <h2>Was die Zinskurve sagt</h2><p>${spread >= 0 ? 'Die Kurve ist normal geformt: Längere Laufzeiten bringen mehr Rendite als kurze. Anleger verlangen für die längere Kapitalbindung einen Aufschlag, was auf stabile Wachstums- und Inflationserwartungen hindeutet.' : 'Die Kurve ist invers: Kurze Laufzeiten rentieren höher als lange. Historisch ging eine inverse Zinskurve Rezessionen oft um zwölf bis 18 Monate voraus, weil der Markt sinkende Leitzinsen erwartet.'}</p>
 <h2>Vergleich mit den USA</h2><p>Zehnjährige US-Staatsanleihen rentieren mit ${num(us10.price, 3)} %, also ${num((us10.price - b10.price) * 100, 0)} Basispunkte über der Bundrendite. Dieser Renditeabstand ist ein wichtiger Treiber für den Euro-Dollar-Kurs: Je höher die US-Zinsen relativ zu Europa, desto attraktiver der Dollar.</p>
 <h2>Bedeutung für Anleger</h2><table><thead><tr><th>Bereich</th><th>Zusammenhang</th></tr></thead><tbody><tr><td>Tages- und Festgeld</td><td>Orientiert sich an den kurzen Laufzeiten und dem EZB-Einlagensatz; Festgeld über 2 Jahre sollte in der Nähe von ${num(b2.price, 1)} % oder darüber liegen.</td></tr><tr><td>Baufinanzierung</td><td>Zehnjährige Hypothekenzinsen folgen der Bundrendite mit einem Aufschlag von typischerweise 0,7 bis 1,2 Prozentpunkten.</td></tr><tr><td>Aktien</td><td>Steigende Renditen machen Anleihen als Alternative attraktiver und belasten hoch bewertete Wachstumsaktien; Banken und Versicherer profitieren tendenziell.</td></tr><tr><td>Anleihen-ETFs</td><td>Kurse bestehender Anleihen fallen, wenn Renditen steigen – je länger die Laufzeit, desto stärker.</td></tr></tbody></table>
-<p class="note is-plain">Renditen Stand ${dateShort(new Date(ctx.config.quotesAsOf))}. Basispunkt = ein Hundertstel Prozentpunkt.</p>` });
+<p class="note is-plain">Renditen Stand ${dateShort(new Date(ctx.config.quotesAsOf))}. Basispunkt = ein Hundertstel Prozentpunkt.</p>`, investorContext: [
+      `Bewegung: Die zehnjährige Bundrendite liegt bei ${num(b10.price, 2)} % (${sign(b10.changePct)} % zum Vortag), die zweijährige bei ${num(b2.price, 2)} %.`,
+      `Bedeutung: Die Zinskurve ist ${spread >= 0 ? 'normal' : 'invers'} (Abstand ${num(Math.abs(spread), 0)} Basispunkte); ${spread >= 0 ? 'längere Laufzeiten bringen mehr Rendite als kurze' : 'kurze Laufzeiten rentieren höher als lange – historisch ein Warnsignal für die Konjunktur'}.`,
+      `Maßgebliche Benchmark: zehnjährige Bundesanleihe als Referenzzins der Eurozone${us10.price ? '; Vergleich US-Staatsanleihe 10 Jahre ' + num(us10.price, 2) + ' %' : ''}.`,
+      'Betroffen: Anleihen-ETFs und Rentenfonds (Kursverluste bei steigenden Renditen), Baufinanzierungen, Banken und Versicherer, Immobilienwerte.',
+      `Als Nächstes im Blick: ${(() => { const e = nextAfter(ECB_DATES, now); return e ? 'der EZB-Zinsentscheid am ' + dateLong(e) + ', ' : ''; })()}Inflationsdaten und Emissionen der Finanzagentur.`,
+    ] });
   }
 
   // ---------- 6) Redaktionelle Erklärstücke ----------
@@ -193,8 +246,45 @@ module.exports = function (ctx) {
       title: 'Optionsscheine verstehen: Delta, Omega, Aufgeld und der Zeitwertverlust', deck: 'Anders als Knock-outs hängt der Preis eines Optionsscheins auch von Restlaufzeit und Volatilität ab. Die fünf Kennzahlen, ohne die man keinen Schein kaufen sollte.',
       body: `<p>Ein Call-Optionsschein verbrieft das Recht, den Basiswert zum Basispreis zu kaufen; ein Put das Recht, ihn zu verkaufen. Der Preis setzt sich aus <strong>innerem Wert</strong> und <strong>Zeitwert</strong> zusammen.</p><h2>Die Kennzahlen</h2><dl><div><dt>Innerer Wert</dt><dd>Beim Call: Kurs des Basiswerts minus Basispreis (mal Bezugsverhältnis), mindestens null.</dd></div><div><dt>Zeitwert</dt><dd>Preis minus innerer Wert. Er schmilzt bis zum Laufzeitende auf null – am Ende immer schneller.</dd></div><div><dt>Delta</dt><dd>Um wie viel sich der Schein bewegt, wenn der Basiswert um 1 Euro steigt. Calls: 0 bis 1, Puts: 0 bis −1. Ein Delta von 0,5 bedeutet: „am Geld“.</dd></div><div><dt>Omega (effektiver Hebel)</dt><dd>Delta mal einfacher Hebel. Die aussagekräftige Hebelkennzahl: Omega 4 heißt, der Schein bewegt sich etwa viermal so stark wie der Basiswert in Prozent.</dd></div><div><dt>Implizite Volatilität</dt><dd>Vom Markt erwartete Schwankungsbreite. Steigt sie, werden Calls und Puts teurer – auch ohne Kursbewegung des Basiswerts. Nach Quartalszahlen fällt sie oft abrupt („Vola-Crush“).</dd></div></dl><h2>Faustregeln</h2><ul><li>Kurze Restlaufzeit und hoher Hebel bedeuten hohen täglichen Zeitwertverlust.</li><li>Scheine „aus dem Geld“ (ohne inneren Wert) sind reine Wetten auf Zeit und Volatilität.</li><li>Vor Ereignissen mit hoher Unsicherheit ist die implizite Volatilität hoch – Scheine sind dann teuer.</li></ul><p>Für ein Grundverständnis von Trends und Marken lohnt sich zuerst der Ratgeber <a href="/wissen/chartanalyse">Chartanalyse</a>.</p>` },
   ];
+  const editorialContext = {
+    'ezb-zinsentscheid-was-anleger-wissen-muessen': [
+      `Termin: Zinsentscheid ${nextEcb ? 'am ' + dateLong(nextEcb) : 'am nächsten Sitzungstag'} um 14:15 Uhr, Pressekonferenz ab 14:45 Uhr.`,
+      'Bedeutung: Leitzinsen bestimmen die Finanzierungskosten im Euroraum; Erwartungsänderungen wirken sofort auf Anleiherenditen und den Euro.',
+      `Maßgebliche Benchmark: Einlagensatz der EZB; am Markt die zweijährige Bundrendite (${b2.price ? num(b2.price, 2) + ' %' : 'siehe Anleihen'}).`,
+      'Betroffen: Banken und Versicherer, Immobilienwerte, Anleihen-ETFs, EUR/USD.',
+      'Als Nächstes im Blick: Inflationsdaten (HVPI) und die EZB-Projektionen, die den Entscheid begleiten.',
+    ],
+    'fed-zinsentscheid-fomc-erklaert': [
+      `Termin: FOMC-Entscheid ${nextFed ? 'am ' + dateLong(nextFed) : 'am nächsten Sitzungstag'} um 20:00 Uhr MEZ, Pressekonferenz 20:30 Uhr.`,
+      'Bedeutung: Der US-Leitzins prägt Dollar, US-Renditen und die Bewertung von Wachstumsaktien weltweit.',
+      `Maßgebliche Benchmark: Fed Funds Rate; am Markt die zehnjährige US-Rendite (${us10.price ? num(us10.price, 2) + ' %' : 'siehe Anleihen'}) und der S&P 500.`,
+      'Betroffen: Technologiewerte, Gold, Kryptowerte, Schwellenländer und der Wechselkurs EUR/USD.',
+      'Als Nächstes im Blick: der „Dot Plot“ (Zinsprojektionen der Mitglieder) und der US-Arbeitsmarktbericht.',
+    ],
+    'ifo-index-erklaert': [
+      'Termin: Der ifo-Index erscheint monatlich um 10:00 Uhr (Termin im Wirtschaftskalender).',
+      'Bedeutung: Er gilt als wichtigster Frühindikator für die deutsche Konjunktur; Überraschungen bewegen DAX und Euro.',
+      'Maßgebliche Benchmark: DAX und MDAX (konjunktursensible Industriewerte).',
+      'Betroffen: Industrie, Automobil, Chemie und Maschinenbau; zyklische Konsumwerte.',
+      'Als Nächstes im Blick: Einkaufsmanagerindizes (PMI) und die ZEW-Konjunkturerwartungen.',
+    ],
+    'inflation-verbraucherpreise-richtig-lesen': [
+      'Termin: Deutsche Verbraucherpreise als Schnellschätzung am Monatsende, Eurozone (HVPI) wenige Tage später.',
+      'Bedeutung: Die Kernrate entscheidet über den Kurs der EZB; Abweichungen von der Erwartung bewegen Anleihen und Euro.',
+      `Maßgebliche Benchmark: HVPI der Eurozone; am Markt die zehnjährige Bundrendite (${b10.price ? num(b10.price, 2) + ' %' : 'siehe Anleihen'}).`,
+      'Betroffen: Anleihen (real verzinst), Versorger und Konsumwerte, inflationsindexierte Anleihen.',
+      'Als Nächstes im Blick: Erzeugerpreise, Energiepreise (Brent, Erdgas) und Lohnabschlüsse.',
+    ],
+    'us-arbeitsmarktbericht-payrolls-erklaert': [
+      'Termin: Am ersten Freitag des Monats um 14:30 Uhr MEZ.',
+      'Bedeutung: Stellenaufbau, Arbeitslosenquote und Stundenlöhne beeinflussen die Zinserwartungen an die Fed unmittelbar.',
+      'Maßgebliche Benchmark: S&P 500 und die zehnjährige US-Rendite; EUR/USD reagiert in den ersten Minuten am stärksten.',
+      'Betroffen: US-Aktien, Dollar, Gold und Kryptowerte.',
+      'Als Nächstes im Blick: Revisionen der Vormonate und die Fed-Sitzung, auf die die Daten einzahlen.',
+    ],
+  };
   editorial.forEach(e => {
-    articles.push({ slug: e.slug, title: e.title, deck: e.deck, category: e.category, kind: e.kind || 'news', author: e.author, direction: null, date: at(addDays(now, -e.daysAgo), e.hour, e.min), instruments: e.instruments, body: e.body, summary: e.summary, facts: e.facts });
+    articles.push({ slug: e.slug, title: e.title, deck: e.deck, category: e.category, kind: e.kind || 'news', author: e.author, direction: null, date: at(addDays(now, -e.daysAgo), e.hour, e.min), instruments: e.instruments, body: e.body, summary: e.summary, facts: e.facts, investorContext: e.investorContext || editorialContext[e.slug] || null });
   });
 
   // ---------- Nachbearbeitung ----------

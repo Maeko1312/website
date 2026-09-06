@@ -50,7 +50,6 @@ module.exports = function (ctx) {
           </footer>
         </article>
         <aside class="no-sticky">
-          <nav class="toc" aria-label="Inhalt"><strong>Inhalt</strong><ol>${p.sections.map(s => html`<li><a href="#${util.slugify(s.h)}">${s.h}</a></li>`)}</ol></nav>
           ${c.newsletterBox({ compact: true })}
           ${c.sideBlog(5, p.slug)}
           ${c.sideTools()}

@@ -576,7 +576,6 @@
   /* ---------- Bewegung: Ladebalken beim Seitenwechsel + Scroll-Reveal ---------- */
   function motion() {
     var root = d.documentElement;
-    window.BB_MOTION = true;
     var leaveTimer;
     function leaving() { root.classList.add('is-leaving'); clearTimeout(leaveTimer); leaveTimer = setTimeout(function () { root.classList.remove('is-leaving'); }, 8000); }
     d.addEventListener('click', function (e) {
@@ -590,6 +589,7 @@
     });
     d.addEventListener('submit', function (e) { if (!e.defaultPrevented && e.target.method !== 'dialog') leaving(); });
     window.addEventListener('pageshow', function () { root.classList.remove('is-leaving'); });
+    window.BB_MOTION = true;
     if (!root.classList.contains('reveal-on') || !('IntersectionObserver' in window)) return;
     /* Liste identisch mit styles.css (Abschnitt "Bewegung") */
     var sel = '.card, .post-card, .story-card, .guide-card, .tool-card, .board-item, .number-tile, .nl-banner, .facts, .summary, .article-hero, .post-list > li';
@@ -609,6 +609,7 @@
       });
     }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
     els.forEach(function (el) { io.observe(el); });
+    window.BB_MOTION = true;
   }
 
   /* ---------- Seitenleiste: folgt dem Scrollen; hohe Leisten laufen richtungsabhängig mit (kein Sprung) ---------- */
@@ -629,6 +630,103 @@
     window.addEventListener('resize', function () { update(0); });
     window.addEventListener('load', function () { update(0); });
     if (window.ResizeObserver) { var ro = new ResizeObserver(function () { update(0); }); asides.forEach(function (as) { ro.observe(as); }); }
+  }
+
+  /* ---------- Interaktiver Kurschart (Artikelseiten): Zeiträume, Tooltip, responsiv; Daten aus /data/history/<slug>.json ---------- */
+  function ichart() {
+    var hosts = $$('[data-chart]'); if (!hosts.length || !window.fetch) return;
+    var MONTHS = ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function parseDate(s) { return s.length > 10 ? new Date(s) : new Date(s + 'T12:00:00'); }
+    function fmtDate(s, range) {
+      var dt = parseDate(s);
+      if (range === '1D') return pad(dt.getDate()) + '.' + pad(dt.getMonth() + 1) + '.' + dt.getFullYear() + ', ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ' Uhr';
+      if (range === '5Y' || range === 'MAX') return MONTHS[dt.getMonth()] + ' ' + dt.getFullYear();
+      return pad(dt.getDate()) + '.' + pad(dt.getMonth() + 1) + '.' + dt.getFullYear();
+    }
+    function fmtTick(s, range) {
+      var dt = parseDate(s);
+      if (range === '1D') return pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+      if (range === '5Y' || range === 'MAX') return String(dt.getFullYear());
+      if (range === '1Y') return MONTHS[dt.getMonth()];
+      return pad(dt.getDate()) + '.' + pad(dt.getMonth() + 1) + '.';
+    }
+    function tickDigits(span) { return span >= 100 ? 0 : span >= 10 ? 1 : span >= 1 ? 2 : 4; }
+    hosts.forEach(function (host) {
+      var body = $('[data-chart-body]', host), info = $('[data-chart-range-info]', host); if (!body) return;
+      var digits = parseInt(host.getAttribute('data-chart-digits'), 10); if (isNaN(digits)) digits = 2;
+      var unit = host.getAttribute('data-chart-unit') || '', name = host.getAttribute('data-chart-name') || '';
+      var buttons = $$('.ichart-range', host);
+      var data = null, range = '1Y';
+      function seriesFor(r) {
+        if (!data) return null; var s = data.series || {};
+        if (r === '1D') return s.i1d;
+        if (r === '5Y') return s.w5y;
+        if (r === 'MAX') return s.mMax;
+        var dly = s.d1y; if (!dly) return null;
+        var days = r === '1W' ? 7 : r === '1M' ? 31 : r === '3M' ? 92 : 0;
+        if (!days) return dly;
+        var last = parseDate(dly[dly.length - 1][0]).getTime(), from = last - days * 86400000;
+        return dly.filter(function (p) { return parseDate(p[0]).getTime() >= from; });
+      }
+      function draw() {
+        var pts = seriesFor(range);
+        buttons.forEach(function (b) { var on = b.getAttribute('data-range') === range; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+        if (!pts || pts.length < 2) { body.innerHTML = '<div class="chart-empty">Für diesen Zeitraum liegen keine Kursdaten vor.</div>'; if (info) info.textContent = ''; return; }
+        var W = Math.max(280, Math.round(body.clientWidth || 760)), H = Math.round(Math.min(340, Math.max(200, W * 0.42)));
+        var padL = 8, padR = 64, padT = 18, padB = 28, iw = W - padL - padR, ih = H - padT - padB;
+        var vals = pts.map(function (p) { return p[1]; }), min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+        if (max === min) { max += 1; min -= 1; }
+        var margin = (max - min) * 0.08; min -= margin; max += margin; var span = max - min;
+        var X = function (i) { return padL + (i / (pts.length - 1)) * iw; }, Y = function (v) { return padT + (1 - (v - min) / span) * ih; };
+        var first = vals[0], last = vals[vals.length - 1], up = last >= first, chg = (last / first - 1) * 100;
+        var td = tickDigits(span), grid = '', ticks = '', xt = '';
+        for (var g = 0; g <= 4; g++) { var v = min + span * g / 4, y = Y(v); grid += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" class="chart-grid"/>'; ticks += '<text x="' + (W - padR + 6) + '" y="' + (y + 4).toFixed(1) + '" class="chart-tick">' + fmt.num(v, td) + '</text>'; }
+        var n = Math.min(W < 480 ? 4 : 6, pts.length);
+        for (var k = 0; k < n; k++) { var idx = Math.round(k * (pts.length - 1) / (n - 1)); xt += '<text x="' + X(idx).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="' + (k === 0 ? 'start' : k === n - 1 ? 'end' : 'middle') + '" class="chart-tick">' + fmtTick(pts[idx][0], range) + '</text>'; }
+        var path = pts.map(function (p, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ');
+        var area = path + ' L' + X(pts.length - 1).toFixed(1) + ',' + (padT + ih) + ' L' + padL + ',' + (padT + ih) + ' Z';
+        var yl = Y(last);
+        body.innerHTML = '<svg class="ichart-svg ' + (up ? 'is-up' : 'is-down') + '" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="' + escapeHtml(name) + ': Kursverlauf ' + range + '">' + grid + ticks + xt +
+          '<path d="' + area + '" class="chart-area-i"/><path d="' + path + '" fill="none" stroke="currentColor" class="chart-line" stroke-linejoin="round" stroke-linecap="round"/>' +
+          '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + yl.toFixed(1) + '" y2="' + yl.toFixed(1) + '" class="chart-last"/>' +
+          '<rect x="' + (W - padR + 2) + '" y="' + (yl - 9).toFixed(1) + '" width="' + (padR - 4) + '" height="18" rx="2" class="chart-last-bg"/><text x="' + (W - padR + 6) + '" y="' + (yl + 4).toFixed(1) + '" class="chart-last-text">' + fmt.num(last, digits) + '</text>' +
+          '<line class="chart-cross is-off" x1="0" x2="0" y1="' + padT + '" y2="' + (padT + ih) + '"/><circle class="chart-dot chart-cross-dot is-off" r="4" cx="0" cy="0"/>' +
+          '<rect class="ichart-hit" x="' + padL + '" y="' + padT + '" width="' + iw + '" height="' + ih + '" fill="transparent"/></svg><div class="ichart-tip" hidden></div>';
+        if (info) info.innerHTML = '<span class="delta ' + (up ? 'up' : 'down') + '">' + (chg > 0 ? '+' : '') + fmt.num(chg, 2) + ' %</span> im Zeitraum ' + range;
+        var svg = $('svg', body), hit = $('.ichart-hit', body), cross = $('.chart-cross', body), dot = $('.chart-cross-dot', body), tip = $('.ichart-tip', body);
+        function show(clientX) {
+          var r = svg.getBoundingClientRect(); if (!r.width) return;
+          var x = (clientX - r.left) * (W / r.width);
+          var i = Math.round((x - padL) / iw * (pts.length - 1)); i = Math.max(0, Math.min(pts.length - 1, i));
+          var cx = X(i), cy = Y(pts[i][1]);
+          cross.setAttribute('x1', cx.toFixed(1)); cross.setAttribute('x2', cx.toFixed(1)); cross.classList.remove('is-off');
+          dot.setAttribute('cx', cx.toFixed(1)); dot.setAttribute('cy', cy.toFixed(1)); dot.classList.remove('is-off');
+          var dPct = (pts[i][1] / first - 1) * 100, dAbs = pts[i][1] - first;
+          tip.innerHTML = '<span class="ichart-tip-date">' + fmtDate(pts[i][0], range) + '</span><strong>' + fmt.num(pts[i][1], digits) + ' ' + escapeHtml(unit) + '</strong><span class="delta ' + (dPct >= 0 ? 'up' : 'down') + '">' + (dPct > 0 ? '+' : '') + fmt.num(dPct, 2) + ' % (' + (dAbs > 0 ? '+' : '') + fmt.num(dAbs, digits) + ')</span><span class="ichart-tip-note">seit Beginn des Zeitraums</span>';
+          tip.hidden = false;
+          var px = cx / W * r.width, tw = tip.offsetWidth, left = px + 14;
+          if (left + tw > r.width - 4) left = px - tw - 14;
+          tip.style.left = Math.max(0, left) + 'px'; tip.style.top = Math.max(0, cy / H * r.height - 12) + 'px';
+        }
+        function hide() { cross.classList.add('is-off'); dot.classList.add('is-off'); tip.hidden = true; }
+        hit.addEventListener('pointermove', function (e) { show(e.clientX); });
+        hit.addEventListener('pointerdown', function (e) { show(e.clientX); });
+        hit.addEventListener('pointerleave', hide);
+        hit.addEventListener('pointercancel', hide);
+      }
+      buttons.forEach(function (b) { b.addEventListener('click', function () { if (!data || b.disabled) return; range = b.getAttribute('data-range'); draw(); }); });
+      var resizeTimer; window.addEventListener('resize', function () { if (!data) return; clearTimeout(resizeTimer); resizeTimer = setTimeout(draw, 150); });
+      fetch(host.getAttribute('data-chart')).then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); }).then(function (j) {
+        data = j; host.classList.add('is-live');
+        buttons.forEach(function (b) { var s = seriesFor(b.getAttribute('data-range')); if (!s || s.length < 2) { b.disabled = true; b.title = 'Für diesen Zeitraum liegen keine Kursdaten vor'; } });
+        draw();
+      }).catch(function () {
+        host.classList.add('is-static');
+        buttons.forEach(function (b) { b.disabled = true; });
+        var note = d.createElement('p'); note.className = 'small muted ichart-fallback'; note.textContent = 'Interaktiver Chart derzeit nicht verfügbar – angezeigt wird der Jahresverlauf aus Tagesschlusskursen.'; body.appendChild(note);
+      });
+    });
   }
 
   /* ---------- FAQ: weich auf- und zuklappen ---------- */
@@ -674,6 +772,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); motion(); stickyAside(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
   });
 })();

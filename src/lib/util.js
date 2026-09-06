@@ -91,7 +91,29 @@ function readTime(text) {
   return Math.max(1, Math.round(words / 200));
 }
 
+// NYMEX-Erdgas (Henry Hub): Der Handel eines Liefermonats endet drei Geschäftstage vor dem ersten Kalendertag des Liefermonats (ohne Feiertagsregel).
+function frontMonth(d) {
+  d = toDate(d);
+  let y = d.getFullYear(), m = d.getMonth() + 1;
+  for (let k = 0; k < 3; k++) {
+    const first = new Date(y, m, 1);
+    const exp = new Date(first); let n = 0;
+    while (n < 3) { exp.setDate(exp.getDate() - 1); if (exp.getDay() !== 0 && exp.getDay() !== 6) n++; }
+    if (d.getTime() <= exp.getTime() + 86399999) return `${MONTHS[first.getMonth()]} ${first.getFullYear()}`;
+    m++;
+  }
+  return null;
+}
+// Verzögerungsstatus aus dem TradingView-Feld update_mode
+function delayLabel(updateMode) {
+  const m = String(updateMode || ''); const s = /delayed_streaming_(\d+)/.exec(m);
+  if (s) return `${Math.round(+s[1] / 60)} Min. verzögert`;
+  if (m === 'streaming' || m === 'realtime') return 'nahezu Echtzeit';
+  return m ? 'verzögert' : null;
+}
+
 module.exports = {
+  frontMonth, delayLabel,
   esc, attr, raw, html, render, Raw,
   num, pct, eur, bigEur, nf, nf0,
   MONTHS, MONTHS_SHORT, DAYS, DAYS_SHORT, pad,

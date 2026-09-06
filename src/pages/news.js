@@ -63,9 +63,11 @@ module.exports = function (ctx) {
               <button class="btn btn-ghost btn-sm" type="button" data-share><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Link teilen</button>
             </div>
           </header>
-          <figure class="article-hero">${c.thumb(a.slug, { label: main ? main.short || main.name : cat.name })}<figcaption>${main ? html`${main.name} – Kursverlauf schematisch. Echte Charts auf der <a href="${c.url(main)}">Kursseite</a>.` : 'Symbolbild.'}</figcaption></figure>
+          ${main && ctx.hist(main.slug) && ctx.hist(main.slug).points.length > 1 ? c.interactiveChart(main, ctx.quote(main.slug), ctx.hist(main.slug)) : html`<figure class="article-hero">${c.thumb(a.slug, { label: main ? main.short || main.name : cat.name })}<figcaption>${main ? html`${main.name} – Kursverlauf schematisch. Echte Charts auf der <a href="${c.url(main)}">Kursseite</a>.` : 'Symbolbild.'}</figcaption></figure>`}
           ${main ? html`<div class="instrument-box"><div><a href="${c.url(main)}">${main.name}</a><span class="muted small block">${c.typeLabel(main)}${main.isin ? ' · ' + main.isin : ''} · ${layout.asOfLabel}</span></div><div class="vals"><strong>${c.priceCell(main, ctx.quote(main.slug) || {})}</strong>${c.delta((ctx.quote(main.slug) || {}).changePct, { pill: true })}${c.watchButton(main.slug, true)}</div></div>` : ''}
+          ${c.investorBox(a.investorContext)}
           ${c.factsBox(a.facts)}
+          ${main ? c.instrumentCard(main, ctx.quote(main.slug)) : ''}
           <div class="prose">${raw(c.injectAfterParagraph(c.wrapTables(a.body), c.nlInline(a.kind === 'analysis' ? 'Jeden Morgen die wichtigsten Marken – kostenlos' : undefined), 2))}</div>
           <footer class="article-foot">
             ${c.newsletterBox({ dark: true })}

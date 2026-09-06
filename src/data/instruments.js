@@ -108,7 +108,7 @@ const commodities = [
     blurb: 'Brent ist die Referenzsorte für Rohöl aus der Nordsee und der wichtigste Ölpreis für Europa.' },
   { slug: 'wti', name: 'WTI-Öl', type: 'commodity', tv: 'NYMEX:CL1!', yahoo: 'CL=F', exchange: 'NYMEX', currency: 'USD', unit: 'US-$/Barrel', unitMetric: '1 Barrel = 158,99 l',
     blurb: 'West Texas Intermediate ist die US-Referenzsorte für leichtes, schwefelarmes Rohöl.' },
-  { slug: 'erdgas', name: 'Erdgas (Henry Hub)', type: 'commodity', tv: 'NYMEX:NG1!', yahoo: 'NG=F', exchange: 'NYMEX', currency: 'USD', unit: 'US-$/MMBtu', unitMetric: '1 MMBtu ≈ 293 kWh',
+  { slug: 'erdgas', name: 'Erdgas (Henry Hub)', type: 'commodity', tv: 'NYMEX:NG1!', yahoo: 'NG=F', exchange: 'NYMEX', currency: 'USD', unit: 'US-$/MMBtu', unitMetric: '1 MMBtu ≈ 293 kWh', contract: 'Front-Month-Future (NYMEX)', rollRule: 'nymex-ng', priceKind: 'Terminkontrakt (Future) – kein Spotpreis', kwhPerUnit: 293.071, benchmarkNote: 'US-Referenzpreis; für Europa ist der TTF (Niederlande) maßgeblich',
     blurb: 'Henry Hub ist der US-Referenzpreis für Erdgas. Für Europa ist zusätzlich der niederländische TTF-Preis maßgeblich.' },
 ];
 
@@ -128,9 +128,9 @@ const crypto = [
 ];
 
 const bonds = [
-  { slug: 'bund-10j', name: 'Bundesanleihe 10 Jahre', short: 'Bund 10J', type: 'bond', tv: 'TVC:DE10Y', yahoo: null, currency: null, unit: '%', blurb: 'Rendite zehnjähriger deutscher Staatsanleihen – der Referenzzins für die Eurozone.' },
-  { slug: 'bund-2j', name: 'Bundesanleihe 2 Jahre', short: 'Bund 2J', type: 'bond', tv: 'TVC:DE02Y', yahoo: null, currency: null, unit: '%', blurb: 'Rendite zweijähriger Bundesanleihen, stark von den Zinserwartungen an die EZB geprägt.' },
-  { slug: 'us-treasury-10j', name: 'US-Staatsanleihe 10 Jahre', short: 'US 10J', type: 'bond', tv: 'TVC:US10Y', yahoo: '^TNX', currency: null, unit: '%', blurb: 'Rendite zehnjähriger US-Staatsanleihen – der wichtigste Zins der Welt.' },
+  { slug: 'bund-10j', name: 'Bundesanleihe 10 Jahre', short: 'Bund 10J', type: 'bond', tv: 'TVC:DE10Y', yahoo: null, currency: null, unit: '%', maturity: '10 Jahre', priceKind: 'Rendite bis Fälligkeit', blurb: 'Rendite zehnjähriger deutscher Staatsanleihen – der Referenzzins für die Eurozone.' },
+  { slug: 'bund-2j', name: 'Bundesanleihe 2 Jahre', short: 'Bund 2J', type: 'bond', tv: 'TVC:DE02Y', yahoo: null, currency: null, unit: '%', maturity: '2 Jahre', priceKind: 'Rendite bis Fälligkeit', blurb: 'Rendite zweijähriger Bundesanleihen, stark von den Zinserwartungen an die EZB geprägt.' },
+  { slug: 'us-treasury-10j', name: 'US-Staatsanleihe 10 Jahre', short: 'US 10J', type: 'bond', tv: 'TVC:US10Y', yahoo: '^TNX', currency: null, unit: '%', maturity: '10 Jahre', priceKind: 'Rendite bis Fälligkeit', blurb: 'Rendite zehnjähriger US-Staatsanleihen – der wichtigste Zins der Welt.' },
 ];
 
 const all = [...indices, ...dax, ...mdax, ...commodities, ...fx, ...crypto, ...bonds];
