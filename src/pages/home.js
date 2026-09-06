@@ -5,7 +5,8 @@ module.exports = function (ctx) {
   const q = (s) => ctx.quote(s) || {};
   const news = content.articles.filter(a => a.kind === 'news');
   const analyses = content.articles.filter(a => a.kind === 'analysis');
-  const lead = news.find(a => a.featured) || news[0];
+  // Aufmacher: hervorgehobener Blogbeitrag > hervorgehobene Nachricht > neueste Meldung
+  const lead = content.blog.posts.find(p => p.featured) || news.find(a => a.featured) || news[0];
   const rest = news.filter(a => a !== lead);
   const todayCards = rest.slice(0, 4);
   const feed = rest.slice(3, 17);

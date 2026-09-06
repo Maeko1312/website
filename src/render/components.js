@@ -102,8 +102,13 @@ module.exports = function (ctx) {
   };
   // Aufmacher (Startseite): großes Bild mit Textüberlagerung
   c.heroStory = (a) => {
-    const inst = instOf(a); const qq = inst ? q(inst.slug) : null; const cat = catOf(a);
-    return html`<article class="hero-main">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}<div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Top-Thema</span>` : ''}${cat.name}</span><h2><a href="${c.articleUrl(a)}">${a.title}</a></h2><p>${a.deck}</p></div></article>`;
+    // Aufmacher: hervorgehobener Beitrag (Blog oder Nachricht) oder die neueste Meldung
+    const isPost = !!a.topicObj;
+    const inst = isPost ? null : instOf(a); const cat = isPost ? null : catOf(a);
+    const url = isPost ? c.blogUrl(a) : c.articleUrl(a);
+    const kicker = isPost ? a.topicObj.name : cat.name;
+    const label = inst ? inst.short || inst.name : kicker;
+    return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label })}<div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
   };
   c.storyItem = (a, { thumb = false, excerpt = false } = {}) => {
     const inst = instOf(a); const cat = catOf(a);

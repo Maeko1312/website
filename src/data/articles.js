@@ -65,7 +65,7 @@ module.exports = function (ctx) {
       `Betroffen: die Sektoren ${top[0].s.sector} und ${flop[0].s.sector}${eur ? '; Wechselkurs EUR/USD ' + num(eur.close, 4) : ''}${brent ? ', Brent ' + num(brent.close, 2) + ' US-$' : ''}.`,
       `Als Nächstes im Blick: ${(() => { const e = nextAfter(ECB_DATES, now), fd = nextAfter(FED_DATES, now); return [e ? 'EZB-Zinsentscheid am ' + dateLong(e) : null, fd ? 'Fed-Sitzung am ' + dateLong(fd) : null].filter(Boolean).join(', '); })()} sowie die Konjunkturdaten der Woche (Wirtschaftskalender).`,
     ];
-    articles.push({ slug: `boerse-frankfurt-${date}`, title, deck, category: 'marktberichte', kind: 'news', author: 'redaktion', date: at(d, 17, 48 + (idx % 7)), instruments: ['dax', top[0].s.slug, flop[0].s.slug], body, generated: true, featured: idx === 0, facts, summary, investorContext });
+    articles.push({ slug: `boerse-frankfurt-${date}`, title, deck, category: 'marktberichte', kind: 'news', author: 'redaktion', date: at(d, 17, 48 + (idx % 7)), instruments: ['dax', top[0].s.slug, flop[0].s.slug], body, generated: true, facts, summary, investorContext });
   });
 
   // ---------- 2) Aktien im Check (Kennzahlen aus dem Snapshot) ----------
