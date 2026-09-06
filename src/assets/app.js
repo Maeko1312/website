@@ -609,7 +609,7 @@
         el.addEventListener('transitionend', done);
         setTimeout(done, 1300);
       });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+    }, { rootMargin: '0px 0px 120px 0px', threshold: 0 });
     els.forEach(function (el) { io.observe(el); });
     window.BB_MOTION = true;
   }
