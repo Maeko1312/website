@@ -15,6 +15,14 @@ Node 18 oder neuer, sonst nichts. Der Build dauert etwa eine Sekunde und erzeugt
 
 ## Deployment auf Vercel
 
+Live: https://website-krule.vercel.app (Vercel-Projekt „website“ im Team krule). Solange die GitHub-App von Vercel nicht auf dem Repo installiert ist, wird per CLI veröffentlicht:
+
+```bash
+vercel deploy --prod
+```
+
+Mit installierter GitHub-App (github.com/apps/vercel → Maeko1312/website) löst jeder Push auf  den Deploy automatisch aus.
+
 Repository importieren, fertig. `vercel.json` setzt Build-Kommando (`node build.js`) und Ausgabeordner (`dist`), aktiviert Clean-URLs (`/kurs/dax` statt `/kurs/dax.html`), lange Caching-Header für `/assets/` und ein paar Sicherheitsheader. `404.html` wird von Vercel automatisch für unbekannte Pfade ausgeliefert.
 
 **Empfehlung:** einen täglichen Rebuild einrichten (Vercel Deploy Hook per Cron, z. B. GitHub Actions um 6:00 Uhr). Artikel-Zeitstempel, Kalenderwochen und „heute/gestern“ werden relativ zum Build-Datum erzeugt – bei täglichem Build wirkt die Seite immer aktuell.

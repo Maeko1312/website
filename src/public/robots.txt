@@ -3,4 +3,4 @@ Allow: /
 Disallow: /suche
 Disallow: /merkliste
 
-Sitemap: https://boersenblick.vercel.app/sitemap.xml
+Sitemap: https://website-krule.vercel.app/sitemap.xml

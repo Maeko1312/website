@@ -4,7 +4,7 @@
 module.exports = {
   brand: 'Börsenblick',            // Arbeitstitel – siehe README (Namensvorschläge)
   brandShort: 'Börsenblick',
-  domain: 'https://boersenblick.vercel.app',
+  domain: 'https://website-krule.vercel.app',
   claim: 'Börse verstehen. Märkte im Blick.',
   description: 'Aktuelle Börsennachrichten, DAX-Kurse, Analysen, Wirtschaftskalender und Börsenwissen – klar erklärt, auf den Punkt.',
   lang: 'de',
