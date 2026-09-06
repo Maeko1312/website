@@ -83,7 +83,6 @@ module.exports = function (ctx) {
       ${c.quizBox()}
       ${c.pollBox()}
       ${c.newsletterBox({ compact: true })}
-      ${c.sideRecent()}
     </aside>
   </div>
 </div>`;

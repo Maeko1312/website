@@ -22,7 +22,6 @@ module.exports = function (ctx) {
         ${c.newsletterBox({ compact: true })}
         ${c.sideCard('Themen', html`<ul class="side-list">${topics.map(t => html`<li><a href="${c.topicUrl(t)}"><span>${t.name}</span><span class="kicker">${posts.filter(p => p.topic === t.slug).length} ${posts.filter(p => p.topic === t.slug).length === 1 ? 'Beitrag' : 'Beiträge'}</span></a></li>`)}</ul>`)}
         ${c.sideKnowledge()}
-        ${c.sideRecent()}
       </aside></div></div>`;
     add(path, title, lead, body);
   }
