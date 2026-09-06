@@ -729,6 +729,43 @@
     });
   }
 
+  /* ---------- Blog-Raster: Themenfilter + Seitenumbruch (clientseitig, alle Karten stehen im HTML) ---------- */
+  function pagedGrid() {
+    $$('[data-paged]').forEach(function (grid) {
+      var per = parseInt(grid.getAttribute('data-paged'), 10) || 6;
+      var items = $$(':scope > *', grid);
+      var section = grid.parentNode;
+      var pager = $('[data-pager]', section), filter = $('[data-post-filter]', section);
+      var page = 1, topic = 'all';
+      function visible() { return items.filter(function (it) { return topic === 'all' || it.getAttribute('data-topic') === topic; }); }
+      function render(focusFirst) {
+        var list = visible(), pages = Math.max(1, Math.ceil(list.length / per));
+        if (page > pages) page = pages;
+        items.forEach(function (it) { it.hidden = true; });
+        list.slice((page - 1) * per, page * per).forEach(function (it) { it.hidden = false; });
+        if (pager) {
+          if (pages <= 1) { pager.hidden = true; pager.innerHTML = ''; }
+          else {
+            var h = '<button type="button" class="pager-btn" data-page="' + (page - 1) + '"' + (page === 1 ? ' disabled' : '') + ' aria-label="Vorherige Seite">‹</button>';
+            for (var p = 1; p <= pages; p++) h += '<button type="button" class="pager-btn' + (p === page ? ' is-active' : '') + '" data-page="' + p + '"' + (p === page ? ' aria-current="page"' : '') + '>' + p + '</button>';
+            h += '<button type="button" class="pager-btn" data-page="' + (page + 1) + '"' + (page === pages ? ' disabled' : '') + ' aria-label="Nächste Seite">›</button>';
+            h += '<span class="pager-info">Seite ' + page + ' von ' + pages + ' · ' + list.length + ' Beiträge</span>';
+            pager.innerHTML = h; pager.hidden = false;
+          }
+        }
+        if (focusFirst) { var first = list[(page - 1) * per]; if (first) { var top = section.getBoundingClientRect().top + window.scrollY - 120; if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' }); } }
+      }
+      if (pager) pager.addEventListener('click', function (e) { var b = e.target.closest('[data-page]'); if (!b || b.disabled) return; page = parseInt(b.getAttribute('data-page'), 10); render(true); });
+      if (filter) filter.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-topic]'); if (!b) return;
+        topic = b.getAttribute('data-topic'); page = 1;
+        $$('[data-topic]', filter).forEach(function (c) { var on = c === b; c.classList.toggle('is-active', on); c.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+        render(false);
+      });
+      render(false);
+    });
+  }
+
   /* ---------- FAQ: weich auf- und zuklappen ---------- */
   function faq() {
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -772,6 +809,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
   });
 })();

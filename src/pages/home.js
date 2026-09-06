@@ -60,43 +60,12 @@ module.exports = function (ctx) {
 
   <section aria-labelledby="h-blog" style="margin-bottom:32px">
     ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
-    <div class="post-grid">${posts.slice(0, 3).map(p => c.postCard(p))}</div>
+    <div class="chips post-filter" data-post-filter role="group" aria-label="Thema wählen"><button type="button" class="chip is-active" data-topic="all" aria-pressed="true">Alle Themen</button>${content.blog.topics.filter(t => posts.some(p => p.topic === t.slug)).map(t => html`<button type="button" class="chip" data-topic="${t.slug}" aria-pressed="false">${t.name}</button>`)}</div>
+    <div class="post-grid" data-paged="6">${posts.map(p => c.postCard(p))}</div>
+    <nav class="pager" data-pager aria-label="Weitere Beiträge" hidden></nav>
   </section>
 
-  <div class="layout no-sticky">
-    <div class="stack">
-      <section aria-labelledby="h-feed">
-        ${c.sectionTitle('Aktuelle Meldungen', { href: '/nachrichten', more: 'Mehr Nachrichten', id: 'h-feed' })}
-        ${tabsFeed}
-      </section>
-      <section aria-labelledby="h-rank">
-        ${c.sectionTitle('Rankings kompakt', { href: '/rankings', more: 'Alle Rankings', id: 'h-rank' })}
-        <div class="tabs" data-tabs="rank-home" role="tablist" aria-label="Ranking wählen">${rankSets.map((r, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${r.key}">${r.label}</button>`)}</div>
-        <div id="rank-home" class="card">${rankSets.map((r, i) => html`<div data-panel="${r.key}"${i ? raw(' hidden') : ''}>${c.quoteTable(r.rows, { cols: r.cols, compact: true, sortable: false })}<p class="small muted" style="margin-top:8px">${r.note}</p></div>`)}</div>
-      </section>
-
-    </div>
-    <aside>
-      <section class="card">
-        ${c.sectionTitle('Ideen des Tages', { href: '/analysen', more: 'Alle Analysen' })}
-        <div class="ideas">${analyses.slice(0, 4).map(a => { const inst = instruments.bySlug[(a.instruments || [])[0]]; return html`<div class="idea"><span class="kicker">${a.categoryObj.name} · ${inst ? inst.short || inst.name : ''}</span><div class="idea-title"><a href="${c.articleUrl(a)}">${a.title}</a></div><div class="idea-meta"><span class="dir ${a.direction || 'flat'}">${a.direction === 'up' ? 'bullish' : a.direction === 'down' ? 'bearish' : 'neutral'}</span><span>· ${util.dateDM(a.date)}</span></div></div>`; })}</div>
-      </section>
-      <section class="card">
-        ${c.sectionTitle('Termine der Woche', { href: '/termine/wirtschaftskalender', more: 'Kalender' })}
-        <ul class="upcoming">${upcoming.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>
-      </section>
-      ${c.sideRecent()}
-    </aside>
-  </div>
 </div>
-
-<section class="section-band" aria-labelledby="h-board">
-  <div class="container">
-    ${c.sectionTitle('Marktüberblick', { id: 'h-board', stand: true })}
-    ${c.board(layout.stripSlugs)}
-    <p class="small muted" style="margin-top:12px">Xetra-Kurse 15 Minuten verzögert, Devisen und Krypto nahezu Echtzeit · <a href="/maerkte">Alle Märkte ›</a></p>
-  </div>
-</section>
 
 <div class="container" style="padding-bottom:40px">
   <section aria-labelledby="h-wissen" style="margin-bottom:32px">
@@ -105,21 +74,10 @@ module.exports = function (ctx) {
   </section>
   <div class="layout no-sticky">
     <div class="stack">
-      <section aria-labelledby="h-analysis">
-        ${c.sectionTitle('Technische Analysen', { href: '/analysen', more: 'Alle Analysen', id: 'h-analysis' })}
-        <div class="tabs is-pills" data-tabs="ana-panels" role="tablist"><button class="tab is-active" role="tab" type="button" data-tab="alle">Alle</button><button class="tab" role="tab" type="button" data-tab="indizes">Indizes</button><button class="tab" role="tab" type="button" data-tab="aktien">Aktien</button><button class="tab" role="tab" type="button" data-tab="rohstoffe">Rohstoffe & Devisen</button><button class="tab" role="tab" type="button" data-tab="produkte">ETF & Hebel</button></div>
-        <div id="ana-panels" class="card">
-          <div data-panel="alle">${c.analysisList(analyses.slice(0, 8))}</div>
-          <div data-panel="indizes" hidden>${c.analysisList(analyses.filter(a => a.category === 'analysen-indizes'))}</div>
-          <div data-panel="aktien" hidden>${c.analysisList(analyses.filter(a => a.category === 'analysen-aktien'))}</div>
-          <div data-panel="rohstoffe" hidden>${c.analysisList(analyses.filter(a => a.category === 'analysen-rohstoffe-devisen'))}</div>
-          <div data-panel="produkte" hidden>${c.analysisList(analyses.filter(a => ['analysen-etf', 'analysen-hebelprodukte'].includes(a.category)))}</div>
-        </div>
-      </section>
-      <section class="grid-3" aria-label="Weitere Märkte">
-        <div class="card">${c.sectionTitle('Rohstoffe', { href: '/rohstoffe', more: 'Alle' })}${c.miniQuotes(instruments.commodities.slice(0, 5))}</div>
-        <div class="card">${c.sectionTitle('Devisen', { href: '/devisen', more: 'Alle' })}${c.miniQuotes(instruments.fx.slice(0, 5))}</div>
-        <div class="card">${c.sectionTitle('Krypto & Zinsen', { href: '/krypto', more: 'Alle' })}${c.miniQuotes([...instruments.crypto.slice(0, 2), ...instruments.bonds])}</div>
+      <section aria-labelledby="h-rank">
+        ${c.sectionTitle('Rankings kompakt', { href: '/rankings', more: 'Alle Rankings', id: 'h-rank' })}
+        <div class="tabs" data-tabs="rank-home" role="tablist" aria-label="Ranking wählen">${rankSets.map((r, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${r.key}">${r.label}</button>`)}</div>
+        <div id="rank-home" class="card">${rankSets.map((r, i) => html`<div data-panel="${r.key}"${i ? raw(' hidden') : ''}>${c.quoteTable(r.rows, { cols: r.cols, compact: true, sortable: false })}<p class="small muted" style="margin-top:8px">${r.note}</p></div>`)}</div>
       </section>
       <section aria-labelledby="h-calc">
         ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
@@ -127,14 +85,10 @@ module.exports = function (ctx) {
       </section>
     </div>
     <aside>
-      <section class="card">
-        ${c.sectionTitle('Börsengänge', { href: '/termine/ipos', more: 'Alle IPOs' })}
-        ${c.ipoList(content.ipos.upcoming.slice(0, 3))}
-        <p class="small muted" style="margin-top:12px">${c.placeholder()} Firmennamen sind Beispiele, bis der IPO-Datenfeed angebunden ist.</p>
-      </section>
       ${c.quizBox()}
       ${c.pollBox()}
       ${c.newsletterBox({ compact: true })}
+      ${c.sideRecent()}
     </aside>
   </div>
 </div>`;
