@@ -1039,3 +1039,18 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .pager-btn.is-active { background: var(--navy); border-color: var(--navy); color: #fff; }
 .pager-btn:disabled { opacity: .35; cursor: not-allowed; }
 .pager-info { width: 100%; text-align: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em; color: var(--muted); margin-top: 4px; }
+
+/* Börsen-Quiz als breite Sektion (Startseite) */
+.quiz-wide { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.6fr); gap: 24px 44px; align-items: start; padding: 28px 32px; margin: 0 0 32px; border-top: 6px solid var(--surface-2); }
+.quiz-wide .quiz-intro .kicker { display: block; color: var(--accent); margin-bottom: 8px; }
+.quiz-title { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(24px, 2.4vw, 30px); line-height: 1.12; color: var(--ink); margin-bottom: 10px; text-wrap: balance; }
+.quiz-lead { font-size: 15px; line-height: 22px; color: var(--body); margin-bottom: 16px; }
+.quiz-wide .quiz-progress { margin: 0 0 4px; }
+.quiz-note { margin: 0; }
+.quiz-wide .quiz-q { font-size: 19px; line-height: 26px; margin-bottom: 14px; }
+.quiz-wide .quiz-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.quiz-wide .quiz-option { padding: 12px 14px; font-size: 15px; line-height: 21px; }
+.quiz-wide .quiz-expl { font-size: 14.5px; line-height: 21px; padding: 14px 16px; }
+.quiz-wide .quiz-result { font-size: 34px; line-height: 38px; }
+@media (max-width: 860px) { .quiz-wide { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 22px; } }
+@media (max-width: 560px) { .quiz-wide .quiz-options { grid-template-columns: minmax(0, 1fr); } .quiz-wide { padding: 18px; } }

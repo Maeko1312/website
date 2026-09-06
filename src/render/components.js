@@ -157,7 +157,15 @@ module.exports = function (ctx) {
   c.calcTabs = (tools, { id = 'calc' } = {}) => html`<div class="tabs" data-tabs="${id}-panels" role="tablist" aria-label="Rechner wählen">${tools.map((t, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${t.calc}">${t.tab}</button>`)}</div><div id="${id}-panels">${tools.map((t, i) => html`<div data-panel="${t.calc}"${i ? raw(' hidden') : ''}><p class="section-sub" style="margin-top:0">${t.lead} <a href="/werkzeuge/${t.slug}">Erklärung und Formel ›</a></p>${c.calcForm(t, { id })}</div>`)}</div>`;
 
   /* ---------- Quiz ---------- */
-  c.quizBox = () => { const z = ctx.content.quiz; return html`<section class="card quiz" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">${c.sectionTitle('Börsen-Quiz')}<p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p><div data-quiz-body><p class="quiz-q">${z.today[0].q}</p><div class="quiz-options">${z.today[0].o.map((o, i) => html`<button type="button" class="quiz-option" data-quiz-option="${i}"><span>${o}</span></button>`)}</div></div><p class="small muted" style="margin-top:12px">Fünf Fragen, täglich neu. Ihr Ergebnis bleibt nur in Ihrem Browser.</p></section>`; };
+  c.quizBox = ({ wide = false } = {}) => {
+    const z = ctx.content.quiz;
+    const body = html`<div data-quiz-body><p class="quiz-q">${z.today[0].q}</p><div class="quiz-options">${z.today[0].o.map((o, i) => html`<button type="button" class="quiz-option" data-quiz-option="${i}"><span>${o}</span></button>`)}</div></div>`;
+    if (wide) return html`<section class="card quiz quiz-wide" aria-labelledby="h-quiz" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">
+      <div class="quiz-intro"><span class="kicker">Börsen-Quiz</span><h2 class="quiz-title" id="h-quiz">Fünf Fragen, täglich neu</h2><p class="quiz-lead">Testen Sie Ihr Börsenwissen: jeden Tag fünf neue Fragen zu Kennzahlen, Märkten und Anlageprodukten – mit kurzer Erklärung zu jeder Antwort.</p><p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p><p class="small muted quiz-note">Ihr Ergebnis bleibt nur in Ihrem Browser.</p></div>
+      <div class="quiz-stage">${body}</div>
+    </section>`;
+    return html`<section class="card quiz" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">${c.sectionTitle('Börsen-Quiz')}<p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p>${body}<p class="small muted" style="margin-top:12px">Fünf Fragen, täglich neu. Ihr Ergebnis bleibt nur in Ihrem Browser.</p></section>`;
+  };
 
   /* ---------- Börsengänge (Liste) ---------- */
   c.ipoList = (list) => html`<ul class="upcoming">${list.map(i => { const d = new Date(i.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what"><a href="/ipo/${i.slug}">${i.name}</a></div><div class="who">${i.sector} · ${i.market}${i.status === 'geplant' && i.priceRange && i.priceRange !== 'noch nicht festgelegt' ? html` · ${i.priceRange}` : ''}</div></div></li>`; })}</ul>`;

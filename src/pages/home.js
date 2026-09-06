@@ -72,6 +72,7 @@ module.exports = function (ctx) {
     ${c.sectionTitle('Börsenwissen', { href: '/wissen', more: 'Alle Ratgeber', id: 'h-wissen' })}
     <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
   </section>
+  ${c.quizBox({ wide: true })}
   <div class="layout no-sticky">
     <div class="stack">
       <section aria-labelledby="h-calc">
@@ -80,7 +81,6 @@ module.exports = function (ctx) {
       </section>
     </div>
     <aside>
-      ${c.quizBox()}
       ${c.pollBox()}
       ${c.newsletterBox({ compact: true })}
     </aside>
