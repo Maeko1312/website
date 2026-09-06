@@ -188,7 +188,51 @@ module.exports = function (ctx) {
     for (const p of ctx.content.blog.posts) out.push({ t: p.title, k: 'Blog · ' + p.topicObj.name, u: c.blogUrl(p), y: 'blog', w: 2, d: p.lead });
     for (const g of ctx.content.guides) out.push({ t: g.title, k: g.kicker, u: `/wissen/${g.slug}`, y: 'guide', w: 2, d: g.lead });
     for (const t of ctx.content.glossary) out.push({ t: t.term, k: t.short || '', u: `/wissen/boersenlexikon#${t.slug}`, y: 'term', w: 1, d: t.def.slice(0, 140) });
-    for (const p of ctx.content.searchablePages) out.push({ t: p.title, k: p.kicker || '', u: p.path, y: 'page', w: 2, d: p.description || '' });
+    // Such-Aliasse: englische und umgangssprachliche Begriffe, die direkt zu einer Seite führen (Marko liest die Seite oft übersetzt)
+    const aliases = {
+      '/werkzeuge': 'tools, tool, calculator, calculators, rechner, kalkulator, werkzeug, werkzeuge',
+      '/werkzeuge/zinseszinsrechner': 'compound interest, zinseszins, zinsrechner, interest calculator',
+      '/werkzeuge/sparplanrechner': 'savings plan, sparplan, sparrate, sparplan rechner',
+      '/werkzeuge/renditerechner': 'return calculator, rendite, yield, performance, cagr',
+      '/werkzeuge/dividendenrechner': 'dividend calculator, dividende, ausschüttung, passives einkommen',
+      '/werkzeuge/waehrungsrechner': 'currency converter, currency, umrechner, währung, wechselkurs, euro dollar, fx converter',
+      '/werkzeuge/positionsgroessenrechner': 'position size, positionsgröße, risiko, stop loss',
+      '/werkzeuge/inflationsrechner': 'inflation calculator, inflation, kaufkraft, purchasing power',
+      '/rankings': 'ranking, rankings, top, top 20, gewinner, verlierer, winners, losers, best stocks, top-listen',
+      '/blog': 'blog, beiträge, posts, artikel, ratgeber',
+      '/newsletter': 'newsletter, abo, abonnieren, subscribe, e-mail, email, briefing',
+      '/wissen': 'knowledge, wissen, lernen, learn, guides, ratgeber, education, börsenwissen',
+      '/wissen/boersenlexikon': 'glossary, glossar, lexikon, begriffe, definitions, dictionary',
+      '/maerkte': 'markets, märkte, kurse, prices, overview, marktüberblick, börse',
+      '/nachrichten': 'news, nachrichten, meldungen, aktuell',
+      '/analysen': 'analysis, analyses, analysen, chartanalyse, technical analysis',
+      '/indizes': 'indices, index, indizes',
+      '/aktien': 'stocks, shares, aktien, aktie, a-z',
+      '/rohstoffe': 'commodities, rohstoffe, oil, öl',
+      '/devisen': 'forex, fx, currencies, devisen, währungen',
+      '/krypto': 'crypto, krypto, kryptowährungen',
+      '/anleihen': 'bonds, anleihen, zinsen, yields, interest rates',
+      '/termine/wirtschaftskalender': 'calendar, kalender, termine, events, economic calendar, wirtschaftskalender, konjunkturdaten',
+      '/termine/unternehmen': 'earnings, quartalszahlen, company events, unternehmenstermine',
+      '/termine/dividenden': 'dividends, dividenden, dividendenkalender, ex-tag',
+      '/termine/hauptversammlungen': 'agm, hauptversammlung, hv, annual meeting',
+      '/termine/boersenfeiertage': 'holidays, feiertage, börsenfeiertage, trading holidays',
+      '/termine/ipos': 'ipo, ipos, börsengang, börsengänge, listing, neuemission',
+      '/merkliste': 'watchlist, merkliste, favoriten, favorites',
+      '/ueber-uns': 'about, über uns, kontakt, contact',
+      '/redaktion': 'team, redaktion, editorial, autoren, authors',
+      '/wissen/einsteiger': 'beginner, beginners, einsteiger, anfänger, erste schritte',
+      '/wissen/broker': 'broker, depot, neobroker, depotvergleich',
+      '/wissen/etf-sparplan': 'etf, etfs, msci world',
+      '/wissen/chartanalyse': 'chart, charts, trend, technical analysis',
+      '/wissen/strategien': 'strategy, strategies, strategien, buy and hold, value, momentum',
+      '/wissen/kennzahlen': 'kgv, kbv, kennzahlen, ratios, valuation, bewertung',
+      '/wissen/steuern': 'tax, taxes, steuern, abgeltungsteuer, freibetrag, vorabpauschale',
+      '/wissen/handelszeiten': 'trading hours, handelszeiten, öffnungszeiten, börsenzeiten',
+    };
+    const seen = new Set(out.map(o => o.u));
+    for (const p of ctx.content.searchablePages) { if (seen.has(p.path)) continue; seen.add(p.path); out.push({ t: p.title, k: p.kicker || '', u: p.path, y: 'page', w: 2, d: p.description || '' }); }
+    for (const o of out) if (aliases[o.u]) o.a = aliases[o.u];
     return out;
   };
   c.instrumentsJson = () => instruments.all.map(i => { const qq = q(i.slug) || {}; return { slug: i.slug, name: i.name, typeLabel: c.typeLabel(i), url: c.url(i), isin: qq.isin || i.isin || '', price: qq.price, digits: i.type === 'fx' ? 4 : i.type === 'bond' ? 3 : (qq.price >= 1000 ? 0 : 2), unit: c.unit(i), changePct: qq.changePct, perfYtd: qq.perf ? qq.perf.ytd : null }; });

@@ -98,10 +98,13 @@
     var scored = [];
     index.forEach(function (it) {
       var hay = norm(it.t + ' ' + (it.k || '') + ' ' + (it.d || ''));
+      var alist = it.a ? norm(it.a).split(/\s*,\s*/) : [], al = alist.join(', ');
       var score = 0;
       for (var i = 0; i < terms.length; i++) {
         var t = terms[i];
-        if (norm(it.t).indexOf(t) === 0) score += 6;
+        if (alist.length && (alist.indexOf(nq) >= 0 || alist.indexOf(t) >= 0)) score += 9;
+        else if (al && al.indexOf(t) >= 0) score += 5;
+        else if (norm(it.t).indexOf(t) === 0) score += 6;
         else if (norm(it.t).indexOf(t) >= 0) score += 4;
         else if ((it.k && norm(it.k).indexOf(t) >= 0)) score += 3;
         else if (hay.indexOf(t) >= 0) score += 1;
@@ -111,6 +114,17 @@
     });
     scored.sort(function (a, b) { return b.s - a.s; });
     return scored.slice(0, limit || 8).map(function (x) { return x.it; });
+  }
+  /* Exakter Alias- oder Titeltreffer: direkt zur Seite (z. B. „tools“ → /werkzeuge) */
+  function directHit(q) {
+    if (!index) return null;
+    var nq = norm(q).trim(); if (!nq) return null;
+    for (var i = 0; i < index.length; i++) {
+      var it = index[i];
+      if (it.a && norm(it.a).split(/\s*,\s*/).indexOf(nq) >= 0) return it;
+    }
+    for (var j = 0; j < index.length; j++) { if (norm(index[j].t) === nq) return index[j]; }
+    return null;
   }
   var typeLabel = { article: 'Nachricht', blog: 'Blog', stock: 'Aktie', index: 'Index', commodity: 'Rohstoff', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihe', term: 'Lexikon', page: 'Seite', guide: 'Wissen' };
   function closeSearch() { $$('[data-search-results]').forEach(function (r) { r.hidden = true; r.innerHTML = ''; }); }
@@ -134,8 +148,8 @@
       });
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var q = input.value.trim();
-        if (q) location.href = '/suche?q=' + encodeURIComponent(q);
+        var q = input.value.trim(); if (!q) return;
+        loadIndex().then(function () { var hit = directHit(q); location.href = hit ? hit.u : '/suche?q=' + encodeURIComponent(q); });
       });
       d.addEventListener('click', function (e) { if (!form.contains(e.target)) { results.hidden = true; } });
     });
@@ -161,7 +175,8 @@
         hits.forEach(function (h) { (groups[h.y] = groups[h.y] || []).push(h); });
         var order = ['stock', 'index', 'commodity', 'fx', 'crypto', 'bond', 'article', 'blog', 'guide', 'term', 'page'];
         var plural = { stock: 'Aktien', index: 'Indizes', commodity: 'Rohstoffe', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihen', article: 'Nachrichten', blog: 'Blog', guide: 'Wissen', term: 'Lexikon', page: 'Seiten' };
-        out.innerHTML = order.filter(function (k) { return groups[k]; }).map(function (k) {
+        var dh = directHit(query);
+        out.innerHTML = (dh ? '<p class="search-direct">Direkt zur Seite: <a href="' + dh.u + '">' + escapeHtml(dh.t) + '</a></p>' : '') + order.filter(function (k) { return groups[k]; }).map(function (k) {
           return '<section class="search-group"><h2 class="section-title"><span>' + (groups[k].length > 1 ? plural[k] : typeLabel[k]) + '</span></h2><ul class="result-list">' +
             groups[k].map(function (h) { return '<li><a href="' + h.u + '"><strong>' + escapeHtml(h.t) + '</strong>' + (h.k ? ' <span class="muted">· ' + escapeHtml(h.k) + '</span>' : '') + (h.d ? '<span class="result-desc">' + escapeHtml(h.d) + '</span>' : '') + '</a></li>'; }).join('') + '</ul></section>';
         }).join('');

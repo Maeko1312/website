@@ -177,6 +177,8 @@ td.nowrap .badge { margin-left: 6px; }
 .search-hit-title { font-weight: 600; font-size: 14px; }
 .search-hit-meta { grid-column: 2; font-size: 12px; color: var(--muted); }
 .search-hit-all { grid-template-columns: 1fr; color: var(--link); font-weight: 600; font-size: 13px; background: var(--surface-2); }
+.search-direct { margin: 0 0 20px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); font-size: 15px; }
+.search-direct a { font-weight: 600; }
 .head-meta { margin-left: auto; min-width: 222px; text-align: right; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .02em; color: var(--muted); line-height: 1.4; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .head-meta strong { display: block; color: var(--ink); font-weight: 500; }
 .market-status { display: inline-flex; align-items: center; gap: 6px; }
