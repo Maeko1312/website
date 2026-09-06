@@ -42,6 +42,8 @@ module.exports = function (ctx) {
   c.disclaimer = () => raw('<p class="disclaimer">Dieser Beitrag dient ausschließlich der Information und stellt keine Anlageberatung und keine Empfehlung zum Kauf oder Verkauf von Wertpapieren dar. Kursangaben ' + esc(c.asOf) + '. Frühere Wertentwicklungen sind kein verlässlicher Indikator für künftige Ergebnisse.</p>');
   // Tabellen in Fließtext scrollbar machen (mobil)
   c.wrapTables = (h) => String(h).replace(/<table(\s[^>]*)?>/g, (m) => `<div class="table-wrap">${m}`).replace(/<\/table>/g, '</table></div>');
+  c.summaryBox = (items) => items && items.length ? html`<aside class="summary"><span class="kicker">Das Wichtigste in Kürze</span><ul>${items.map(t => html`<li>${t}</li>`)}</ul></aside>` : '';
+  c.factsBox = (items) => items && items.length ? html`<dl class="facts">${items.map(([k, v, cls, sub]) => html`<div><dt>${k}</dt><dd class="${cls || ''}">${v}${sub ? html`<small>${sub}</small>` : ''}</dd></div>`)}</dl>` : '';
   c.takeaway = (text) => html`<aside class="takeaway"><span class="kicker">Das Wichtigste in einem Satz</span><p>${text}</p></aside>`;
 
   /* ---------- Kurse ---------- */
@@ -87,7 +89,7 @@ module.exports = function (ctx) {
   };
   c.perfGrid = (qq) => {
     const p = qq && qq.perf; if (!p) return '';
-    const items = [['1 Woche', p.w], ['1 Monat', p.m1], ['3 Monate', p.m3], ['6 Monate', p.m6], ['Seit Jahresbeginn', p.ytd], ['1 Jahr', p.y1]];
+    const items = [['1 Woche', p.w], ['1 Monat', p.m1], ['3 Monate', p.m3], ['6 Monate', p.m6], ['Seit 1.1.', p.ytd], ['1 Jahr', p.y1]];
     return html`<div class="perf-grid">${items.map(([l, v]) => html`<div class="perf-cell"><span>${l}</span><strong class="${dir(v)}">${pct(v)}</strong></div>`)}</div>`;
   };
 

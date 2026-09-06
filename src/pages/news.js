@@ -53,16 +53,18 @@ module.exports = function (ctx) {
             <div class="story-top"><span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>${a.kind === 'analysis' && a.direction ? html`<span class="badge ${a.direction === 'up' ? 'is-up' : 'is-down'}">${a.direction === 'up' ? 'Bullisch' : 'Bärisch'}</span>` : a.kind === 'analysis' ? html`<span class="badge">Neutral</span>` : ''}${a.generated ? html`<span class="badge" title="Aus offiziellen Kursdaten erzeugt und redaktionell geprüft">Datenbasiert</span>` : ''}</div>
             <h1>${a.title}</h1>
             <p class="deck">${a.deck}</p>
+            ${c.summaryBox(a.summary)}
             <div class="article-meta">
               <div class="author-line">${c.avatar(author)}<div><strong><a href="/redaktion#${author.slug}">${author.name}</a></strong><span>${author.role}</span></div></div>
               <span class="spacer"></span>
               <time datetime="${a.date.toISOString()}">${dateLong(a.date)}, ${time(a.date)} Uhr</time>
               <span>· ${a.readTime} Min. Lesezeit</span>
-              <button class="btn btn-ghost btn-sm" type="button" data-share>Teilen</button>
+              <button class="btn btn-ghost btn-sm" type="button" data-share><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Link teilen</button>
             </div>
           </header>
           <figure class="article-hero">${c.thumb(a.slug, { label: main ? main.short || main.name : cat.name })}<figcaption>${main ? html`${main.name} – Kursverlauf schematisch. Echte Charts auf der <a href="${c.url(main)}">Kursseite</a>.` : 'Symbolbild.'}</figcaption></figure>
           ${main ? html`<div class="instrument-box"><div><a href="${c.url(main)}">${main.name}</a><span class="muted small block">${c.typeLabel(main)}${main.isin ? ' · ' + main.isin : ''} · ${layout.asOfLabel}</span></div><div class="vals"><strong>${c.priceCell(main, ctx.quote(main.slug) || {})}</strong>${c.delta((ctx.quote(main.slug) || {}).changePct, { pill: true })}${c.watchButton(main.slug, true)}</div></div>` : ''}
+          ${c.factsBox(a.facts)}
           <div class="prose">${raw(c.injectAfterParagraph(c.wrapTables(a.body), c.nlInline(a.kind === 'analysis' ? 'Jeden Morgen die wichtigsten Marken – kostenlos' : undefined), 2))}</div>
           <footer class="article-foot">
             ${c.newsletterBox({ dark: true })}
