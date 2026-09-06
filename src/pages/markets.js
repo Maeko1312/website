@@ -12,9 +12,6 @@ module.exports = function (ctx) {
 
   // ---------- Marktüberblick ----------
   {
-    const sectors = {};
-    for (const s of instruments.stocks) { const x = q(s.slug); if (x.changePct == null) continue; (sectors[s.sector] = sectors[s.sector] || []).push(x.changePct); }
-    const sectorItems = Object.entries(sectors).filter(([, v]) => v.length >= 2).map(([k, v]) => ({ label: k.length > 14 ? k.slice(0, 13) + '…' : k, sub: `${v.length} Werte`, value: v.reduce((a, b) => a + b, 0) / v.length })).sort((a, b) => b.value - a.value).slice(0, 8);
     const m = c.movers(5);
     const up = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length, down = instruments.dax.filter(s => (q(s.slug).changePct || 0) < 0).length;
     const latestReport = content.articles.find(a => a.category === 'marktberichte');
@@ -32,7 +29,6 @@ module.exports = function (ctx) {
       <div class="layout no-sticky">
         <div class="stack">
           <section class="movers"><div class="card">${c.sectionTitle('Tagesgewinner', { href: '/rankings#gewinner', more: 'Ranking' })}${c.quoteTable(m.gainers, { cols: ['price', 'change', 'ytd'], compact: true, sortable: false })}</div><div class="card">${c.sectionTitle('Tagesverlierer', { href: '/rankings#verlierer', more: 'Ranking' })}${c.quoteTable(m.losers, { cols: ['price', 'change', 'ytd'], compact: true, sortable: false })}</div></section>
-          <section class="card">${c.sectionTitle('Branchen im DAX und MDAX heute')}<p class="section-sub">Durchschnittliche Tagesveränderung der Aktien je Branche (nur Branchen mit mindestens zwei Werten).</p>${charts.barChart(sectorItems, { w: 760, h: 240 })}</section>
           <section class="card">${c.sectionTitle('DAX-Werte', { href: '/aktien', more: 'Alle Aktien' })}${c.quoteTable(instruments.dax, { cols: ['price', 'change', 'ytd', 'mcap', 'spark'] })}</section>
         </div>
         <aside>

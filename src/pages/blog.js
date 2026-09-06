@@ -14,8 +14,8 @@ module.exports = function (ctx) {
       ${c.pageHead({ kicker: 'Blog', title, lead })}
       ${topicChips(current)}
       <div class="layout no-sticky"><div class="stack">
-        ${list.length ? html`<div class="post-grid">${c.postCard(first, { featured: true })}${others.slice(0, 1).map(p => c.postCard(p))}${others.slice(1, 7).map(p => c.postCard(p))}</div>
-        ${others.length > 7 ? html`<section class="card">${c.sectionTitle('Weitere Beiträge')}${c.postList(others.slice(7))}</section>` : ''}` : html`<div class="empty">Zu diesem Thema gibt es noch keine Beiträge.</div>`}
+        ${list.length ? html`<div class="post-grid">${c.postCard(first, { featured: true })}${others.slice(0, 8).map(p => c.postCard(p))}</div>
+        ${others.length > 8 ? html`<section class="card">${c.sectionTitle('Weitere Beiträge')}${c.postList(others.slice(8))}</section>` : ''}` : html`<div class="empty">Zu diesem Thema gibt es noch keine Beiträge.</div>`}
         ${c.nlInline('Kein Beitrag mehr verpassen')}
       </div><aside>
         ${c.newsletterBox({ compact: true })}
