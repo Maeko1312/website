@@ -124,6 +124,12 @@ module.exports = function (ctx) {
     const item = post || art;
     return html`<section class="card promo-card" aria-labelledby="promo-title"><div class="card-flag"><span class="badge is-accent">Im Fokus</span>${item.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</div><a href="${url}" aria-hidden="true" tabindex="-1">${c.thumb((post ? 'blog-' : '') + item.slug, { label })}</a><span class="kicker">${label}</span><h2 id="promo-title" class="promo-title"><a href="${url}">${item.title}</a></h2><p class="promo-lead">${post ? post.lead : art.deck}</p><a class="btn btn-dark btn-sm" href="${url}">Weiterlesen</a></section>`;
   };
+  // Hervorgehobener Beitrag als breite Feature-Karte über dem Raster (Bild links, Text rechts)
+  c.postFeature = (p) => {
+    if (!p) return '';
+    const author = ctx.content.authors.bySlug[p.author];
+    return html`<article class="post-feature" data-topic="${p.topic}"><a class="post-feature-media" href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div class="post-feature-body"><div class="card-flag"><span class="badge is-accent">Im Fokus</span>${p.sponsored ? html`<span class="badge">Anzeige</span>` : ''}<span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span></div><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p><div class="meta"><span>${author ? author.name : ''}${author ? ' · ' : ''}${p.minutes} Min. Lesezeit</span><a class="btn btn-dark btn-sm" href="${c.blogUrl(p)}">Weiterlesen</a></div></div></article>`;
+  };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);
