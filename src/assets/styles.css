@@ -1253,3 +1253,13 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .home-top { padding-bottom: 46px; }
 .home-top .nl-banner { margin-bottom: 0; }
 .poll-wide { margin-bottom: 8px; }
+
+/* Blog-Raster Startseite: hervorgehobener Beitrag als 2×2-Karte, rechts daneben zwei Karten, darunter drei je Zeile */
+[data-paged] > .post-card.is-promoted { grid-column: span 2; grid-row: span 2; }
+[data-paged] > .post-card.is-promoted .thumb { aspect-ratio: 5 / 4; }
+@media (max-width: 1024px) { [data-paged] > .post-card.is-promoted .thumb { aspect-ratio: 16 / 9; } }
+[data-paged] > .post-card.is-promoted h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(24px, 2.1vw, 30px); line-height: 1.12; letter-spacing: 0; text-wrap: balance; }
+[data-paged] > .post-card.is-promoted p { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-size: 16px; line-height: 25px; }
+[data-paged] > .post-card.is-promoted .card-flag { top: 34px; left: 34px; }
+@media (max-width: 1024px) { [data-paged] > .post-card.is-promoted { grid-row: span 1; } }
+@media (max-width: 560px) { [data-paged] > .post-card.is-promoted { grid-column: span 1; } }
