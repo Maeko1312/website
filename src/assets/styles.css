@@ -1066,3 +1066,42 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .nl-closing .newsletter label.check input { accent-color: var(--accent-dark); }
 @media (max-width: 860px) { .nl-closing-inner { grid-template-columns: minmax(0, 1fr); gap: 20px; } .nl-closing { padding: 30px 0; } }
 .nl-closing .newsletter input { background: #fff; color: #16132a; border-color: transparent; }
+
+/* Lesetipps: nummerierte Zeilen in zwei Spalten */
+.tips-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; border-top: 1px solid var(--line); }
+.tips-list li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.tips-num { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 30px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.tips-list .kicker { display: block; margin-bottom: 6px; }
+.tips-list .kicker a { color: var(--muted); }
+.tips-list h3 { font-family: var(--font-body); font-weight: 600; font-size: 17px; line-height: 24px; letter-spacing: -0.01em; margin-bottom: 6px; }
+.tips-list h3 a { color: var(--ink); }
+.tips-list h3 a:hover { color: var(--link); text-decoration: none; }
+.tips-list p { font-size: 14px; line-height: 20px; color: var(--body); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 860px) { .tips-list { grid-template-columns: minmax(0, 1fr); } }
+
+/* Umfrage als breite Sektion */
+.poll-wide { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.6fr); gap: 24px 44px; align-items: start; padding: 28px 32px; margin: 0 0 40px; border-top: 6px solid var(--surface-2); }
+.poll-wide .kicker { display: block; color: var(--accent); margin-bottom: 8px; }
+.poll-title { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(24px, 2.4vw, 30px); line-height: 1.12; color: var(--ink); margin-bottom: 10px; text-wrap: balance; }
+.poll-lead { font-size: 15px; line-height: 22px; color: var(--body); margin-bottom: 10px; }
+.poll-note { margin: 0; }
+.poll-wide .poll-options { gap: 10px; }
+.poll-wide .poll-option { padding: 12px 16px; font-size: 15px; line-height: 21px; }
+@media (max-width: 860px) { .poll-wide { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 22px; } }
+@media (max-width: 560px) { .poll-wide { padding: 18px; } }
+
+/* Hero füllt den ersten Bildschirm (Kopfzeile 153px + Seitenabstand) */
+.today-list .story-excerpt { display: none; }
+@media (min-width: 861px) {
+  .hero-main { min-height: calc(100vh - 201px); max-height: 880px; }
+  .hero-body { padding: 32px 36px 30px; }
+  .hero-body h2 { font-size: clamp(30px, 3.2vw, 44px); max-width: 24ch; }
+  .hero-body p { font-size: 16px; line-height: 24px; }
+  .today-list li { grid-template-columns: 150px minmax(0, 1fr); gap: 16px; }
+  .today-list .story-title { font-size: 16px; line-height: 22px; }
+  .today-list .story-excerpt { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 13.5px; line-height: 19px; color: var(--body); margin-top: 6px; }
+}
+@media (min-width: 861px) and (max-width: 1024px) {
+  .today-list li { grid-template-columns: 110px minmax(0, 1fr); }
+  .today-list .story-excerpt { display: none; }
+}

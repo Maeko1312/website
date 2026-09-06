@@ -73,17 +73,12 @@ module.exports = function (ctx) {
     <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
   </section>
   ${c.quizBox({ wide: true })}
-  <div class="layout no-sticky">
-    <div class="stack">
-      <section aria-labelledby="h-calc">
-        ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
-        ${c.calcTabs(content.tools, { id: 'home' })}
-      </section>
-    </div>
-    <aside>
-      ${c.pollBox()}
-    </aside>
-  </div>
+  <section aria-labelledby="h-calc" style="margin-bottom:32px">
+    ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
+    ${c.calcTabs(content.tools, { id: 'home' })}
+  </section>
+  ${c.postTips(posts)}
+  ${c.pollBox({ wide: true })}
 </div>
 ${c.nlClosing()}`;
 
