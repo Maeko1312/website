@@ -15,7 +15,9 @@ module.exports = function (ctx) {
   const daxUp = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length;
   const dax = q('dax'), daxInst = instruments.bySlug.dax, daxHist = ctx.hist('dax');
   const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)]; // hervorgehobene zuerst
-  const homePosts = posts.slice(0, 18); // Startseite: höchstens 18 Beiträge (3 Seiten à 6); das Archiv liegt unter /blog
+  const blogLead = posts.find(p => p.featured) || posts[0];
+  const blogList = posts.filter(p => p !== blogLead).slice(0, 4);
+  const homePosts = posts.filter(p => p !== blogLead && !blogList.includes(p)).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
   // Rankings kompakt (echte Daten)
   const stocksQ = instruments.stocks.filter(s => q(s.slug).price != null);
   const byKey = (fn, desc = true, n = 8) => stocksQ.map(s => ({ s, v: fn(q(s.slug)) })).filter(o => o.v != null && !Number.isNaN(o.v)).sort((a, b) => desc ? b.v - a.v : a.v - b.v).slice(0, n).map(o => o.s);
@@ -61,7 +63,8 @@ module.exports = function (ctx) {
 
   <section aria-labelledby="h-blog" style="margin-bottom:32px">
     ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
-    <div class="post-toolbar"><label class="select-wrap"><span>Thema</span><select data-post-filter aria-label="Thema wählen"><option value="all">Alle Themen</option>${content.blog.topics.filter(t => homePosts.some(p => p.topic === t.slug)).map(t => html`<option value="${t.slug}">${t.name}</option>`)}</select></label></div>
+    <div class="blog-lead">${c.postLead(blogLead)}<ul class="blog-list">${blogList.map(p => c.postRow(p))}</ul></div>
+    <div class="blog-sub"><h3>Weitere Beiträge</h3><label class="select-wrap"><span>Thema</span><select data-post-filter aria-label="Thema wählen"><option value="all">Alle Themen</option>${content.blog.topics.filter(t => homePosts.some(p => p.topic === t.slug)).map(t => html`<option value="${t.slug}">${t.name}</option>`)}</select></label></div>
     <div class="post-grid" data-paged="6">${homePosts.map(p => c.postCard(p))}</div>
     <nav class="pager" data-pager aria-label="Weitere Beiträge" hidden></nav>
   </section>

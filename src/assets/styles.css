@@ -1254,12 +1254,31 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .home-top .nl-banner { margin-bottom: 0; }
 .poll-wide { margin-bottom: 8px; }
 
-/* Blog-Raster Startseite: hervorgehobener Beitrag als 2×2-Karte, rechts daneben zwei Karten, darunter drei je Zeile */
-[data-paged] > .post-card.is-promoted { grid-column: span 2; grid-row: span 2; }
-[data-paged] > .post-card.is-promoted .thumb { aspect-ratio: 5 / 4; }
-@media (max-width: 1024px) { [data-paged] > .post-card.is-promoted .thumb { aspect-ratio: 16 / 9; } }
-[data-paged] > .post-card.is-promoted h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(24px, 2.1vw, 30px); line-height: 1.12; letter-spacing: 0; text-wrap: balance; }
-[data-paged] > .post-card.is-promoted p { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-size: 16px; line-height: 25px; }
-[data-paged] > .post-card.is-promoted .card-flag { top: 34px; left: 34px; }
-@media (max-width: 1024px) { [data-paged] > .post-card.is-promoted { grid-row: span 1; } }
-@media (max-width: 560px) { [data-paged] > .post-card.is-promoted { grid-column: span 1; } }
+
+/* Blog-Block Startseite: Lead-Karte links, kompakte Liste rechts, darunter „Weitere Beiträge“ mit Themenwahl */
+.blog-lead { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr); gap: 20px; align-items: stretch; margin: 0 0 26px; }
+.post-lead { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 16px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); transition: border-color .15s; }
+.post-lead:hover { border-color: var(--line-strong); border-top-color: var(--surface-2); }
+.post-lead.is-promoted { background: #f4f2fa; border-color: #cdc6ea; border-top-color: var(--accent); }
+.post-lead.is-promoted:hover { border-color: var(--accent); border-top-color: var(--accent); }
+.post-lead .card-flag { position: absolute; top: 34px; left: 34px; z-index: 2; }
+.post-lead .thumb { aspect-ratio: 16 / 9; }
+.post-lead > div { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.post-lead .kicker a { color: var(--muted); }
+.post-lead h3 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(22px, 1.9vw, 27px); line-height: 1.12; letter-spacing: 0; text-wrap: balance; }
+.post-lead h3 a { color: var(--ink); }
+.post-lead h3 a:hover { color: var(--link); text-decoration: none; }
+.post-lead p { font-size: 15px; line-height: 23px; color: var(--body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.blog-list { list-style: none; margin: 0; padding: 12px 22px; display: grid; grid-auto-rows: minmax(0, 1fr); background: var(--surface); border: 1px solid var(--line); border-top: 6px solid var(--surface-2); }
+.blog-list li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.blog-list li:last-child { border-bottom: 0; }
+.blog-list .thumb { aspect-ratio: 16 / 10; }
+.blog-list .kicker { display: block; margin-bottom: 4px; }
+.blog-list .kicker a { color: var(--muted); }
+.blog-list h3 { font-family: var(--font-body); font-weight: 600; font-size: 15px; line-height: 21px; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.blog-list h3 a { color: var(--ink); }
+.blog-list h3 a:hover { color: var(--link); text-decoration: none; }
+.blog-sub { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.blog-sub h3 { font-size: 12.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 860px) { .blog-lead { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .blog-list { padding: 8px 16px; } .blog-list li { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; } .blog-sub { align-items: stretch; flex-direction: column; } .post-lead { padding: 16px; } }
