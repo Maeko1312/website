@@ -1324,3 +1324,9 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 @media (max-width: 1024px) { .focus-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .focus-more { grid-column: 1 / -1; } }
 @media (max-width: 860px) { .engage { grid-template-columns: minmax(0, 1fr); } .nl-slim { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .focus-card { grid-template-columns: minmax(0, 1fr); padding: 18px; } .quiz.is-half .quiz-options { grid-template-columns: minmax(0, 1fr); } .nl-slim { padding: 16px; } .nl-slim .newsletter .row { flex-direction: column; } }
+
+/* Blog-Karten: „Weiterlesen“ am Kartenende */
+.post-card .read-more { margin-top: auto; padding-top: 14px; align-self: flex-start; font-size: 14px; font-weight: 600; color: var(--accent); }
+.post-card .read-more:hover { color: var(--ink); text-decoration: none; }
+.post-card .read-more span { display: inline-block; transition: transform .15s; }
+.post-card:hover .read-more span { transform: translateX(3px); }
