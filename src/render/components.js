@@ -159,15 +159,22 @@ module.exports = function (ctx) {
   };
 
   /* ---------- Rechner ---------- */
-  // Rechner: Einleitung + Eingaben links (kurze Felder paarweise, Zeilen per Subgrid ausgerichtet), Ergebnis rechts in gleicher Höhe; Ergebnis aktualisiert sich beim Tippen
+  // Rechner: Einleitung + Eingaben links (kurze Felder paarweise; Hinweise als eigene Zeile unter dem Feld bzw. dem Paar), Ergebnis rechts in gleicher Höhe; Ergebnis aktualisiert sich beim Tippen
   c.calcForm = (t, { id = 'x', framed = true, intro = false } = {}) => {
     const fid = (n) => `f-${id}-${t.calc}-${n}`;
     const wide = (fl) => fl.type === 'select' || !fl.suffix || fl.suffix === '€';
     const field = (fl) => fl.type === 'select'
-      ? html`<div class="field is-wide"><label for="${fid(fl.name)}">${fl.label}</label><div class="control"><select id="${fid(fl.name)}" name="${fl.name}">${fl.options.map(([v, l]) => html`<option value="${v}">${l}</option>`)}</select></div><span class="hint"></span></div>`
-      : html`<div class="field ${wide(fl) ? 'is-wide' : ''}"><label for="${fid(fl.name)}">${fl.label}</label><div class="control"><input id="${fid(fl.name)}" name="${fl.name}" type="text" inputmode="decimal" autocomplete="off" value="${fl.value}">${fl.suffix ? html`<span class="suffix">${fl.suffix}</span>` : ''}</div><span class="hint">${fl.hint || ''}</span></div>`;
+      ? html`<div class="field"><label for="${fid(fl.name)}">${fl.label}</label><div class="control"><select id="${fid(fl.name)}" name="${fl.name}">${fl.options.map(([v, l]) => html`<option value="${v}">${l}</option>`)}</select></div></div>`
+      : html`<div class="field"><label for="${fid(fl.name)}">${fl.label}</label><div class="control"><input id="${fid(fl.name)}" name="${fl.name}" type="text" inputmode="decimal" autocomplete="off" value="${fl.value}">${fl.suffix ? html`<span class="suffix">${fl.suffix}</span>` : ''}</div></div>`;
+    const hints = (fls) => fls.filter(fl => fl.hint).map(fl => html`<p class="calc-hint">${fls.length > 1 ? html`<strong>${fl.label}:</strong> ` : ''}${fl.hint}</p>`);
+    const rows = []; const fls = t.fields.slice();
+    while (fls.length) {
+      const a = fls.shift();
+      if (!wide(a) && fls.length && !wide(fls[0])) { const b = fls.shift(); rows.push(html`<div class="calc-pair">${field(a)}${field(b)}</div>${hints([a, b])}`); }
+      else rows.push(html`${field(a)}${hints([a])}`);
+    }
     const head = intro ? html`<div class="calc-intro"><p class="calc-lead">${t.lead} <a href="/werkzeuge/${t.slug}">Erklärung und Formel ›</a></p></div>` : '';
-    const form = html`<form class="calc" data-calc="${t.calc}" novalidate><div class="calc-form">${head}<div class="calc-grid">${t.fields.map(field)}</div><p class="calc-live"><span>Das Ergebnis aktualisiert sich beim Tippen.</span><button type="reset" class="link-btn">Zurücksetzen</button></p></div><div class="calc-out" data-calc-out aria-live="polite"></div></form>`;
+    const form = html`<form class="calc" data-calc="${t.calc}" novalidate><div class="calc-form">${head}<div class="calc-grid">${rows}</div><p class="calc-live"><span>Das Ergebnis aktualisiert sich beim Tippen.</span><button type="reset" class="link-btn">Zurücksetzen</button></p></div><div class="calc-out" data-calc-out aria-live="polite"></div></form>`;
     return framed ? html`<div class="calc-shell"><div class="calc-panel">${form}</div></div>` : form;
   };
   c.calcTabs = (tools, { id = 'calc' } = {}) => html`<div class="calc-shell"><div class="tabs calc-tabs" data-tabs="${id}-panels" role="tablist" aria-label="Rechner wählen">${tools.map((t, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${t.calc}">${t.tab}</button>`)}</div><div id="${id}-panels">${tools.map((t, i) => html`<div class="calc-panel" data-panel="${t.calc}"${i ? raw(' hidden') : ''}>${c.calcForm(t, { id, framed: false, intro: true })}</div>`)}</div></div>`;

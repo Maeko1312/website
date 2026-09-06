@@ -46,7 +46,7 @@ module.exports = function (ctx) {
   </section>`;
 
   const body = html`<h1 class="visually-hidden">Börsenblick – Börse verstehen. Märkte im Blick.</h1>
-<div class="container page">
+<div class="container page home-top">
   <div class="hero">
     ${c.heroStory(lead)}
     <div class="hero-side">

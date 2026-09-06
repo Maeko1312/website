@@ -1240,3 +1240,16 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .calc-legend i { width: 9px; height: 9px; align-self: center; }
 .calc-legend b { font-size: 14px; font-variant-numeric: tabular-nums; }
 @media (max-width: 860px) { .calc { grid-template-columns: minmax(0, 1fr); gap: 20px; } .calc-panel { padding: 16px; } .calc-tabs { padding: 0 6px; } .calc-tabs .tab { padding: 12px 10px; font-size: 13.5px; } }
+
+/* Rechner: Felder ohne Leerzeilen, Hinweise als eigene Zeile */
+.calc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.calc-grid .field { display: grid; grid-template-rows: auto auto; grid-row: auto; gap: 6px; }
+.calc-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.calc-hint { margin: -6px 0 0; font-size: 12px; line-height: 16px; color: var(--muted); }
+.calc-hint strong { font-weight: 600; color: var(--body); }
+@media (max-width: 560px) { .calc-pair { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+
+/* Startseite: Abstände zwischen Newsletter-Banner/Börsenwissen und Umfrage/Newsletter-Abschluss auf Sektionsrhythmus */
+.home-top { padding-bottom: 46px; }
+.home-top .nl-banner { margin-bottom: 0; }
+.poll-wide { margin-bottom: 8px; }
