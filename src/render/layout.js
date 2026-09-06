@@ -134,7 +134,7 @@ module.exports = function (ctx) {
         <a class="brand notranslate" translate="no" href="/" aria-label="${config.brand} – Startseite">Börsen<em>blick</em></a>
         ${searchForm('is-head')}
         <div class="head-meta"><strong data-clock>${util.DAYS_SHORT[ctx.now.getDay()]} ${dateShort(ctx.now)} · ${time(ctx.now)} Uhr</strong><span class="market-status" data-market-status data-holidays="${holidays}">Xetra</span></div>
-        <div class="head-actions"><a class="btn btn-teal head-nl" href="/newsletter">${raw(icons.mail)}Newsletter</a><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a>${langMenu()}</div>
+        <div class="head-actions"><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a>${langMenu()}</div>
       </div>
       ${mainNav(current)}
       ${marketStrip()}
