@@ -7,7 +7,7 @@ module.exports = function (ctx) {
   const analyses = content.articles.filter(a => a.kind === 'analysis');
   const lead = news.find(a => a.featured) || news[0];
   const rest = news.filter(a => a !== lead);
-  const todayCards = rest.slice(0, 3);
+  const todayCards = rest.slice(0, 4);
   const feed = rest.slice(3, 17);
   const m = c.movers(5);
   const upcoming = content.upcomingEvents(5);
@@ -57,7 +57,6 @@ module.exports = function (ctx) {
     </div>
   </div>
 
-  ${c.nlBanner()}
 
   <section aria-labelledby="h-blog" style="margin-bottom:32px">
     ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
@@ -65,6 +64,8 @@ module.exports = function (ctx) {
     <div class="post-grid" data-paged="6">${homePosts.map(p => c.postCard(p))}</div>
     <nav class="pager" data-pager aria-label="Weitere Beiträge" hidden></nav>
   </section>
+
+  ${c.nlBanner()}
 
 </div>
 
