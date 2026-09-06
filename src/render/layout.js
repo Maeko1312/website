@@ -34,9 +34,10 @@ module.exports = function (ctx) {
   ctx.fmtPrice = fmtPrice;
 
   // Marktleiste (10 Werte)
-  // Marktleiste: DAX plus die bekanntesten Aktien; Instrumente mit featured: true rücken nach vorn und werden hervorgehoben.
-  const stripBase = ['dax', 'sap', 'siemens', 'allianz', 'volkswagen', 'deutsche-telekom', 'rheinmetall', 'bmw', 'mercedes-benz', 'airbus', 'deutsche-bank', 'infineon'];
-  const stripSlugs = [...stripBase.filter(s => instruments.bySlug[s] && instruments.bySlug[s].featured), ...stripBase.filter(s => !(instruments.bySlug[s] && instruments.bySlug[s].featured))];
+  // Marktleiste: die meistbeachteten Märkte (Index, Gold, Euro/Dollar, Silber, Öl, Bitcoin …); hervorgehobene Instrumente (featured) stehen davor.
+  const stripBase = ['dax', 'gold', 'eur-usd', 'silber', 'brent', 'bitcoin', 'sp-500', 'nasdaq-100', 'mdax', 'euro-stoxx-50', 'bund-10j', 'platin'];
+  const featuredSlugs = instruments.all.filter(i => i.featured).map(i => i.slug);
+  const stripSlugs = [...featuredSlugs, ...stripBase.filter(s => !featuredSlugs.includes(s))];
   function marketStrip() {
     return html`<div class="market-strip" aria-label="Marktüberblick"><div class="container">
       <div class="strip-scroll">${stripSlugs.map(s => {
