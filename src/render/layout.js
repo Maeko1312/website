@@ -1,4 +1,8 @@
 'use strict';
+// Cache-Busting: Assets werden auf Vercel ein Jahr lang unveränderlich gecacht, daher Inhalts-Hash als Versionsparameter.
+const __fs = require('fs'), __path = require('path'), __crypto = require('crypto');
+const assetVersion = (f) => __crypto.createHash('md5').update(__fs.readFileSync(__path.join(__dirname, '..', 'assets', f))).digest('hex').slice(0, 8);
+const CSS_V = assetVersion('styles.css'), JS_V = assetVersion('app.js');
 // Seiten-Hülle: <head>, Kopfzeile (Marke, Suche, Navigation, Marktleiste), Mobilmenü, Fußzeile,
 // Newsletter-Leiste (Slide-in) und Newsletter-Dialog (Exit-Intent).
 module.exports = function (ctx) {
@@ -172,6 +176,7 @@ module.exports = function (ctx) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="content-language" content="de">
+<script>(function(h){if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(!("IntersectionObserver" in window))return;h.className+=" reveal-on";setTimeout(function(){if(!window.BB_MOTION)h.className=h.className.replace(" reveal-on","")},2500)})(document.documentElement)</script>
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}">
@@ -190,18 +195,19 @@ ${noindex ? '<meta name="robots" content="noindex, follow">' : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/assets/styles.css">
+<link rel="stylesheet" href="/assets/styles.css?v=${CSS_V}">
 ${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>` : ''}
 ${extraHead || ''}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}${reading ? ' data-reading' : ''}>
+<div class="bb-loader" aria-hidden="true"></div>
 <a class="skip" href="#main">Zum Inhalt springen</a>
 ${header(section)}
 <main id="main">
 ${body}
 </main>
 ${footer()}
-<script src="/assets/app.js" defer></script>
+<script src="/assets/app.js?v=${JS_V}" defer></script>
 </body>
 </html>
 `;

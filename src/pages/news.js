@@ -17,6 +17,7 @@ module.exports = function (ctx) {
         <div class="stack">
           ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.heroStory(first)}
           <section>${c.sectionTitle(section === 'analysen' ? 'Alle Analysen' : 'Weitere Meldungen', { tag: 'h2' })}${c.storyList(section === 'analysen' ? arts : others, { thumb: true, excerpt: true })}</section>` : html`<div class="empty">In diesem Ressort gibt es noch keine Beiträge.</div>`}
+          ${cat && arts.length < 8 ? (() => { const pool = content.articles.filter(x => (section === 'analysen' ? x.kind === 'analysis' : x.kind === 'news') && !arts.includes(x)).slice(0, Math.max(4, 10 - arts.length)); return pool.length ? html`<section>${c.sectionTitle(section === 'analysen' ? 'Weitere aktuelle Analysen' : 'Aktuelle Meldungen aus allen Ressorts', { tag: 'h2', href: section === 'analysen' ? '/analysen' : '/nachrichten', more: 'Alle' })}${c.storyList(pool, { thumb: true, excerpt: true })}</section>` : ''; })() : ''}
           ${cat ? html`<p class="small muted">Ressort „${cat.name}“: ${arts.length} ${arts.length === 1 ? 'Beitrag' : 'Beiträge'}. Neue Meldungen erscheinen oben; der <a href="/feed.xml">RSS-Feed</a> liefert alle Ressorts.</p>` : ''}
         </div>
         <aside>
@@ -57,7 +58,7 @@ module.exports = function (ctx) {
             <div class="article-meta">
               <div class="author-line">${c.avatar(author)}<div><strong><a href="/redaktion#${author.slug}">${author.name}</a></strong><span>${author.role}</span></div></div>
               <span class="spacer"></span>
-              <time datetime="${a.date.toISOString()}">${dateLong(a.date)}, ${time(a.date)} Uhr</time>
+              <time datetime="${a.date.toISOString()}" translate="no">${dateLong(a.date)}, ${time(a.date)} Uhr</time>
               <span>· ${a.readTime} Min. Lesezeit</span>
               <button class="btn btn-ghost btn-sm" type="button" data-share><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Link teilen</button>
             </div>

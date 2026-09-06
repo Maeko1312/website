@@ -103,7 +103,7 @@ function barChart(items, { w = 600, h = 220, unit = '%' } = {}) {
     const hgt = Math.abs(v) / span * ih;
     const cx = padL + i * bw + bw / 2;
     return `<rect x="${(cx - bw * 0.3).toFixed(1)}" y="${yTop.toFixed(1)}" width="${(bw * 0.6).toFixed(1)}" height="${Math.max(hgt, 1).toFixed(1)}" rx="3" class="bar ${v >= 0 ? 'is-up' : 'is-down'}"/>` +
-      `<text x="${cx.toFixed(1)}" y="${(v >= 0 ? yTop - 6 : yTop + hgt + 14).toFixed(1)}" text-anchor="middle" class="bar-value">${v > 0 ? '+' : ''}${num(v, 1)} ${unit}</text>` +
+      `<text x="${cx.toFixed(1)}" y="${(yTop - 6).toFixed(1)}" text-anchor="middle" class="bar-value">${v > 0 ? '+' : ''}${num(v, 1)} ${unit}</text>` +
       `<text x="${cx.toFixed(1)}" y="${h - 22}" text-anchor="middle" class="bar-label">${it.label}</text>` +
       (it.sub ? `<text x="${cx.toFixed(1)}" y="${h - 8}" text-anchor="middle" class="bar-sub">${it.sub}</text>` : '');
   }).join('');

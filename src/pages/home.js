@@ -44,7 +44,7 @@ module.exports = function (ctx) {
     <p class="small muted" style="margin-top:10px">DAX und MDAX · ${daxUp} von ${instruments.dax.length} DAX-Werten im Plus · <a href="/rankings">Alle Rankings ›</a></p>
   </section>`;
 
-  const body = html`
+  const body = html`<h1 class="visually-hidden">Börsenblick – Börse verstehen. Märkte im Blick.</h1>
 <div class="container page">
   <div class="hero">
     ${c.heroStory(lead)}

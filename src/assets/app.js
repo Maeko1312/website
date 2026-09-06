@@ -558,6 +558,87 @@
     });
   }
 
+  /* ---------- Bewegung: Ladebalken beim Seitenwechsel + Scroll-Reveal ---------- */
+  function motion() {
+    var root = d.documentElement;
+    window.BB_MOTION = true;
+    var leaveTimer;
+    function leaving() { root.classList.add('is-leaving'); clearTimeout(leaveTimer); leaveTimer = setTimeout(function () { root.classList.remove('is-leaving'); }, 8000); }
+    d.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest('a[href]') : null; if (!a) return;
+      if ((a.target && a.target !== '_self') || a.hasAttribute('download') || (a.getAttribute('href') || '').charAt(0) === '#') return;
+      var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+      if (u.origin !== location.origin) return;
+      if (u.pathname === location.pathname && u.search === location.search && u.hash) return;
+      leaving();
+    });
+    d.addEventListener('submit', function (e) { if (!e.defaultPrevented && e.target.method !== 'dialog') leaving(); });
+    window.addEventListener('pageshow', function () { root.classList.remove('is-leaving'); });
+    if (!root.classList.contains('reveal-on') || !('IntersectionObserver' in window)) return;
+    /* Liste identisch mit styles.css (Abschnitt "Bewegung") */
+    var sel = '.card, .post-card, .story-card, .guide-card, .tool-card, .board-item, .number-tile, .nl-banner, .facts, .summary, .article-hero, .post-list > li';
+    var excl = '.hero-side, .mega, .nav-panel, .nl-modal, .nl-bar, .search-results';
+    var els = [];
+    $$(sel).forEach(function (el) { if (el.closest(excl)) return; if (el.closest('[hidden]')) { el.classList.add('is-in'); el.classList.add('is-done'); return; } els.push(el); });
+    if (!els.length) return;
+    var io = new IntersectionObserver(function (entries) {
+      var batch = entries.filter(function (en) { return en.isIntersecting; }).sort(function (a, b) { return (a.boundingClientRect.top - b.boundingClientRect.top) || (a.boundingClientRect.left - b.boundingClientRect.left); });
+      batch.forEach(function (en, i) {
+        var el = en.target; io.unobserve(el);
+        el.style.transitionDelay = Math.min(i, 6) * 60 + 'ms';
+        el.classList.add('is-in');
+        var done = function (ev) { if (ev && ev.target !== el) return; el.classList.add('is-done'); el.style.transitionDelay = ''; el.removeEventListener('transitionend', done); };
+        el.addEventListener('transitionend', done);
+        setTimeout(done, 1300);
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+    els.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- Seitenleiste: folgt dem Scrollen; hohe Leisten laufen richtungsabhängig mit (kein Sprung) ---------- */
+  function stickyAside() {
+    var asides = $$('.layout > aside'); if (!asides.length) return;
+    var base = 64 + 44 + 45 + 16, lastY = window.scrollY || 0;
+    var state = asides.map(function (as) { return { el: as, top: base }; });
+    function update(delta) {
+      var avail = window.innerHeight - 16;
+      state.forEach(function (st) {
+        var minTop = avail - st.el.offsetHeight;
+        st.top = minTop >= base ? base : Math.max(minTop, Math.min(base, st.top - delta));
+        st.el.style.setProperty('--aside-top', st.top + 'px');
+      });
+    }
+    update(0);
+    window.addEventListener('scroll', function () { var y = window.scrollY || 0; update(y - lastY); lastY = y; }, { passive: true });
+    window.addEventListener('resize', function () { update(0); });
+    window.addEventListener('load', function () { update(0); });
+    if (window.ResizeObserver) { var ro = new ResizeObserver(function () { update(0); }); asides.forEach(function (as) { ro.observe(as); }); }
+  }
+
+  /* ---------- FAQ: weich auf- und zuklappen ---------- */
+  function faq() {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $$('.faq details').forEach(function (det) {
+      var sum = $('summary', det); if (!sum || !det.animate) return;
+      sum.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (e.detail) sum.blur();
+        if (det.getAttribute('data-anim')) return;
+        if (reduce) { det.open = !det.open; return; }
+        var h0 = det.getBoundingClientRect().height, h1;
+        det.setAttribute('data-anim', '1'); det.style.overflow = 'hidden';
+        if (det.open) { det.classList.add('is-closing'); h1 = sum.getBoundingClientRect().height + 1; }
+        else { det.open = true; h1 = det.getBoundingClientRect().height; }
+        var a = det.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 220, easing: 'ease' });
+        a.onfinish = a.oncancel = function () {
+          if (det.classList.contains('is-closing')) { det.open = false; det.classList.remove('is-closing'); }
+          det.style.overflow = ''; det.removeAttribute('data-anim');
+        };
+      });
+    });
+  }
+
   /* ---------- Sticky-Kopfzeile: Schatten ---------- */
   function headerShadow() {
     var h = $('.site-header'); if (!h) return;
@@ -578,6 +659,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); motion(); stickyAside(); headerShadow(); progress();
   });
 })();
