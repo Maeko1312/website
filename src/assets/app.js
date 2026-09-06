@@ -792,7 +792,7 @@
     $$('[data-lang]').forEach(function (box) {
       var btn = $('.lang-btn', box), menu = $('.lang-menu', box); if (!btn || !menu) return;
       function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
-      btn.addEventListener('click', function (e) { e.stopPropagation(); var open = menu.hidden; menu.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); if (open) { var first = $('a', menu); if (first) first.focus(); } });
+      btn.addEventListener('click', function (e) { e.stopPropagation(); var open = menu.hidden; menu.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); if (open) { var first = $('a', menu); if (first) { try { first.focus({ preventScroll: true }); } catch (x) { /* ältere Browser */ } } } });
       d.addEventListener('click', function (e) { if (!box.contains(e.target)) close(); });
       d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { close(); btn.focus(); } });
     });
