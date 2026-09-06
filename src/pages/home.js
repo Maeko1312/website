@@ -13,7 +13,7 @@ module.exports = function (ctx) {
   const upcoming = content.upcomingEvents(5);
   const daxUp = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length;
   const dax = q('dax'), daxInst = instruments.bySlug.dax, daxHist = ctx.hist('dax');
-  const posts = content.blog.posts;
+  const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)]; // hervorgehobene zuerst
   // Rankings kompakt (echte Daten)
   const stocksQ = instruments.stocks.filter(s => q(s.slug).price != null);
   const byKey = (fn, desc = true, n = 8) => stocksQ.map(s => ({ s, v: fn(q(s.slug)) })).filter(o => o.v != null && !Number.isNaN(o.v)).sort((a, b) => desc ? b.v - a.v : a.v - b.v).slice(0, n).map(o => o.s);

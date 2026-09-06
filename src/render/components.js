@@ -98,12 +98,12 @@ module.exports = function (ctx) {
   const instOf = (a) => a.instruments && a.instruments.length ? instruments.bySlug[a.instruments[0]] : null;
   c.storyTop = (a, { showDate = true } = {}) => {
     const cat = catOf(a); const inst = instOf(a); const qq = inst ? q(inst.slug) : null;
-    return html`<div class="story-top">${showDate ? html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>${qq ? c.delta(qq.changePct) : ''}` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
+    return html`<div class="story-top">${a.featured ? html`<span class="badge is-accent">Top</span>` : ''}${showDate ? html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>${qq ? c.delta(qq.changePct) : ''}` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
   };
   // Aufmacher (Startseite): großes Bild mit Textüberlagerung
   c.heroStory = (a) => {
     const inst = instOf(a); const qq = inst ? q(inst.slug) : null; const cat = catOf(a);
-    return html`<article class="hero-main">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}<div class="hero-body"><span class="kicker">${cat.name}</span><h2><a href="${c.articleUrl(a)}">${a.title}</a></h2><p>${a.deck}</p></div></article>`;
+    return html`<article class="hero-main">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}<div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Top-Thema</span>` : ''}${cat.name}</span><h2><a href="${c.articleUrl(a)}">${a.title}</a></h2><p>${a.deck}</p></div></article>`;
   };
   c.storyItem = (a, { thumb = false, excerpt = false } = {}) => {
     const inst = instOf(a); const cat = catOf(a);
@@ -114,6 +114,16 @@ module.exports = function (ctx) {
   c.analysisList = (arts) => html`<ul class="story-list is-dense analysis-list">${arts.map(a => { const inst = instOf(a); const dup = inst && [inst.short, inst.name].filter(Boolean).some(n => a.title.toLowerCase().startsWith(n.toLowerCase())); return html`<li><time datetime="${a.date.toISOString()}" translate="no">${util.dateDM(a.date)}</time><span class="dir ${a.direction || 'flat'}" title="${a.direction === 'up' ? 'Positive Einschätzung' : a.direction === 'down' ? 'Negative Einschätzung' : 'Neutral'}" aria-label="${a.direction === 'up' ? 'bullish' : a.direction === 'down' ? 'bearish' : 'neutral'}"></span><span class="story-title">${inst && !dup ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>` : ''} <a href="${c.articleUrl(a)}">${a.title}</a></span></li>`; })}</ul>`;
   // Kompakte Zeile für „Nachrichten des Tages“ neben dem Aufmacher
   c.todayItem = (a) => { const inst = instOf(a); const cat = catOf(a); return html`<li><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a><div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></div></li>`; };
+  // Promo-Karte für Seitenleisten: der hervorgehobene Beitrag (Blog bevorzugt, sonst Nachricht); ohne Flag nichts
+  c.featuredPromo = () => {
+    const post = ctx.content.blog.posts.find(p => p.featured);
+    const art = post ? null : ctx.content.articles.find(a => a.featured);
+    if (!post && !art) return '';
+    const url = post ? c.blogUrl(post) : c.articleUrl(art);
+    const label = post ? post.topicObj.name : catOf(art).name;
+    const item = post || art;
+    return html`<section class="card promo-card" aria-labelledby="promo-title"><div class="card-flag"><span class="badge is-accent">Im Fokus</span>${item.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</div><a href="${url}" aria-hidden="true" tabindex="-1">${c.thumb((post ? 'blog-' : '') + item.slug, { label })}</a><span class="kicker">${label}</span><h2 id="promo-title" class="promo-title"><a href="${url}">${item.title}</a></h2><p class="promo-lead">${post ? post.lead : art.deck}</p><a class="btn btn-dark btn-sm" href="${url}">Weiterlesen</a></section>`;
+  };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);
@@ -121,7 +131,7 @@ module.exports = function (ctx) {
   c.avatar = (author, lg = false) => html`<span class="avatar ${lg ? 'is-lg' : ''}" aria-hidden="true">${author.initials}</span>`;
 
   /* ---------- Blog ---------- */
-  c.postCard = (p, { featured = false } = {}) => html`<article class="post-card ${featured ? 'is-featured' : ''}" data-topic="${p.topic}"><a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p><div class="meta"><span>${ctx.content.authors.bySlug[p.author].name}</span><span>${p.minutes} Min. Lesezeit</span></div></div></article>`;
+  c.postCard = (p, { featured = false } = {}) => html`<article class="post-card ${featured ? 'is-featured' : ''} ${p.featured ? 'is-promoted' : ''}" data-topic="${p.topic}">${p.featured ? html`<span class="card-flag"><span class="badge is-accent">Im Fokus</span>${p.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</span>` : ''}<a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p><div class="meta"><span>${ctx.content.authors.bySlug[p.author].name}</span><span>${p.minutes} Min. Lesezeit</span></div></div></article>`;
   c.postList = (posts) => html`<ul class="post-list">${posts.map(p => html`<li><a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker">${p.topicObj.name} · ${p.minutes} Min.</span><h3 class="story-title"><a href="${c.blogUrl(p)}">${p.title}</a></h3></div></li>`)}</ul>`;
   c.sideBlog = (n = 5, exclude) => c.sideCard('Aus dem Blog', html`<ul class="side-list">${ctx.content.blog.posts.filter(p => p.slug !== exclude).slice(0, n).map(p => html`<li><a href="${c.blogUrl(p)}"><span class="kicker">${p.topicObj.name}</span><span>${p.title}</span></a></li>`)}</ul>`, { href: '/blog', more: 'Alle Beiträge' });
 

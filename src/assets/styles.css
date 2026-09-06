@@ -1093,9 +1093,11 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 /* Hero füllt den ersten Bildschirm (Kopfzeile 153px + Seitenabstand) */
 .today-list .story-excerpt { display: none; }
 @media (min-width: 861px) {
-  .hero-main { min-height: calc(100vh - 201px); max-height: 880px; }
+  .hero-main { min-height: clamp(520px, calc(100vh - 201px), 640px); max-height: 640px; }
+  .hero-side { align-content: stretch; grid-template-rows: minmax(0, 1fr); }
+  .hero-side .today { height: 100%; }
   .hero-body { padding: 32px 36px 30px; }
-  .hero-body h2 { font-size: clamp(30px, 3.2vw, 44px); max-width: 24ch; }
+  .hero-body h2 { font-size: clamp(28px, 2.9vw, 40px); max-width: 24ch; }
   .hero-body p { font-size: 16px; line-height: 24px; }
   .today-list li { grid-template-columns: 150px minmax(0, 1fr); gap: 16px; }
   .today-list .story-title { font-size: 16px; line-height: 22px; }
@@ -1105,3 +1107,24 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
   .today-list li { grid-template-columns: 110px minmax(0, 1fr); }
   .today-list .story-excerpt { display: none; }
 }
+
+/* Hervorgehobene Instrumente und Beiträge (CMS-Flag featured); ohne Flag sehen alle Elemente gleich aus */
+.strip-item.is-featured { flex: 1.35 1 0; background: var(--navy-3); box-shadow: inset 3px 0 0 var(--accent-dark); padding-left: 14px; }
+.strip-item.is-featured:first-child { padding-left: 14px; }
+.strip-item.is-featured .strip-name { color: var(--dark-text); }
+.strip-flag { display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: var(--radius-sm); background: var(--accent-dark); color: var(--navy); font-size: 9.5px; font-weight: 700; letter-spacing: .08em; vertical-align: 1px; }
+.hero-flag { margin-right: 10px; vertical-align: 1px; }
+.story-top .badge.is-accent { font-size: 10px; padding: 1px 6px; }
+.quote-flag { font-family: var(--font-body); font-stretch: 100%; font-size: 11px; vertical-align: middle; margin-left: 6px; }
+
+/* Hervorgehobene (bezahlte) Beiträge: Karten-Kennzeichnung und Promo-Karte */
+.card-flag { display: flex; gap: 6px; align-items: center; }
+.post-card.is-promoted { border-top-color: var(--accent); }
+.post-card .card-flag { margin-bottom: -6px; }
+.promo-card { border-top: 6px solid var(--accent); display: grid; gap: 10px; }
+.promo-card .thumb { aspect-ratio: 16 / 9; }
+.promo-title { font-family: var(--font-body); font-weight: 600; font-size: 17px; line-height: 24px; letter-spacing: -0.01em; }
+.promo-title a { color: var(--ink); }
+.promo-title a:hover { color: var(--link); text-decoration: none; }
+.promo-lead { font-size: 14px; line-height: 20px; color: var(--body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.promo-card .btn { justify-self: start; }

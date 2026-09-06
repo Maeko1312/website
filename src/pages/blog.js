@@ -8,6 +8,7 @@ module.exports = function (ctx) {
   const topicChips = (current) => html`<div class="chips topic-chips">${[['Alle Themen', '/blog'], ...topics.map(t => [t.name, c.topicUrl(t)])].map(([l, h]) => html`<a class="chip ${h === current ? 'is-active' : ''}" href="${h}">${l}</a>`)}</div>`;
 
   function hub({ path, title, lead, list, current, topic }) {
+    list = [...list.filter(p => p.featured), ...list.filter(p => !p.featured)]; // hervorgehobener Beitrag wird Aufmacher
     const [first, ...others] = list;
     const body = html`<div class="container page">
       ${c.breadcrumb(topic ? [['Blog', '/blog'], [topic.name, path]] : [['Blog', '/blog']])}
@@ -49,6 +50,7 @@ module.exports = function (ctx) {
           </footer>
         </article>
         <aside class="no-sticky">
+          ${c.featuredPromo()}
           ${c.newsletterBox({ compact: true })}
           ${c.sideBlog(5, p.slug)}
           ${c.sideTools()}

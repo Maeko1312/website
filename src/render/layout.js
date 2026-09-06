@@ -33,13 +33,15 @@ module.exports = function (ctx) {
   ctx.fmtPrice = fmtPrice;
 
   // Marktleiste (10 Werte)
-  const stripSlugs = ['dax', 'mdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'gold', 'brent', 'eur-usd', 'bitcoin', 'bund-10j'];
+  // Marktleiste: DAX plus die bekanntesten Aktien; Instrumente mit featured: true rücken nach vorn und werden hervorgehoben.
+  const stripBase = ['dax', 'sap', 'siemens', 'allianz', 'volkswagen', 'deutsche-telekom', 'rheinmetall', 'bmw', 'mercedes-benz', 'airbus', 'deutsche-bank', 'infineon'];
+  const stripSlugs = [...stripBase.filter(s => instruments.bySlug[s] && instruments.bySlug[s].featured), ...stripBase.filter(s => !(instruments.bySlug[s] && instruments.bySlug[s].featured))];
   function marketStrip() {
     return html`<div class="market-strip" aria-label="Marktüberblick"><div class="container">
       <div class="strip-scroll">${stripSlugs.map(s => {
         const inst = instruments.bySlug[s], qq = q(s); if (!inst || !qq) return '';
         const d = dir(qq.changePct);
-        const w = util.wkn(qq.isin || inst.isin); return html`<a class="strip-item" href="/kurs/${inst.slug}"><span class="strip-name notranslate" translate="no">${inst.short || inst.name}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
+        const w = util.wkn(qq.isin || inst.isin); return html`<a class="strip-item ${inst.featured ? 'is-featured' : ''}" href="/kurs/${inst.slug}"${inst.featured ? raw(' title="Im Fokus der Redaktion"') : ''}><span class="strip-name notranslate" translate="no">${inst.short || inst.name}${inst.featured ? html`<span class="strip-flag">Fokus</span>` : ''}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
       })}</div>
       <div class="strip-meta"><a href="/methodik" title="Kursdaten: Herkunft und Verzögerung">${asOfLabel} · Xetra 15 Min. verzögert</a></div>
     </div></div>`;

@@ -135,5 +135,8 @@ const bonds = [
 
 const all = [...indices, ...dax, ...mdax, ...commodities, ...fx, ...crypto, ...bonds];
 const bySlug = Object.fromEntries(all.map(i => [i.slug, i]));
+// CMS-Flag: hervorgehobene Unternehmen (Marktleiste vorn, Fokus-Kennzeichnung). Leer lassen, wenn nichts hervorgehoben werden soll.
+const FEATURED = ['sap'];
+for (const f of FEATURED) if (bySlug[f]) bySlug[f].featured = true;
 
 module.exports = { indices, dax, mdax, stocks: [...dax, ...mdax], commodities, fx, crypto, bonds, all, bySlug };

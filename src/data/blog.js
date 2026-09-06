@@ -36,7 +36,7 @@ module.exports = function (ctx) {
         { h: '10. Keinen Plan haben', html: `<p>Wofür investieren Sie, wie lange, wie viel Schwankung halten Sie aus? Wer diese drei Fragen schriftlich beantwortet hat, trifft in der Krise bessere Entscheidungen. Alles Weitere steht im Ratgeber <a href="/wissen/einsteiger">Börse für Einsteiger</a>.</p>` },
       ],
       takeaway: 'Streuen, Kosten niedrig halten, regelmäßig investieren, nicht auf Tipps hören – wer diese vier Regeln einhält, hat die häufigsten Fehler bereits ausgeschlossen.' },
-    { slug: 'etf-sparplan-starten-schritt-fuer-schritt', topic: 'etf-sparplan', author: 'sara-yilmaz', minutes: 8, daysAgo: 1,
+    { slug: 'etf-sparplan-starten-schritt-fuer-schritt', featured: true /* CMS: hervorgehoben (Startseite vorn, Promo-Karte in Seitenleisten); sponsored: true ergänzt die Kennzeichnung „Anzeige“ */, topic: 'etf-sparplan', author: 'sara-yilmaz', minutes: 8, daysAgo: 1,
       title: 'ETF-Sparplan starten: Die Schritt-für-Schritt-Anleitung für 2026',
       lead: 'Vom Depot bis zur ersten Ausführung in unter einer Stunde – mit konkreten Kriterien für ETF-Auswahl, Sparrate und Ausführungstag.',
       sections: [

@@ -77,6 +77,7 @@ module.exports = function (ctx) {
           </footer>
         </article>
         <aside>
+          ${c.featuredPromo()}
           ${main ? c.sideCard(main.name, html`${c.miniQuotes([main])}${c.perfGrid(ctx.quote(main.slug))}<p style="margin-top:12px"><a class="btn btn-dark btn-block" href="${c.url(main)}">Zur Kursseite mit Chart</a></p>`) : ''}
           ${related.length ? c.sideCard('Mehr zum Thema', c.storyList(related, { variant: 'is-compact' })) : ''}
           ${c.sideLatest(5, a.slug)}
