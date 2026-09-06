@@ -49,15 +49,12 @@ module.exports = function (ctx) {
   <div class="hero">
     ${c.heroStory(lead)}
     <div class="hero-side">
-      ${c.newsletterBox({ compact: true })}
-      ${moversCard}
+      <section class="today" aria-labelledby="h-today">
+        ${c.sectionTitle('Nachrichten des Tages', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-today' })}
+        <ul class="today-list">${todayCards.map(a => c.todayItem(a))}</ul>
+      </section>
     </div>
   </div>
-
-  <section aria-labelledby="h-today" style="margin-bottom:28px">
-    ${c.sectionTitle('Nachrichten des Tages', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-today' })}
-    ${c.storyCards(todayCards)}
-  </section>
 
   ${c.nlBanner()}
 
