@@ -103,7 +103,7 @@ module.exports = function (ctx) {
   // Aufmacher (Startseite): großes Bild mit Textüberlagerung
   c.heroStory = (a) => {
     const inst = instOf(a); const qq = inst ? q(inst.slug) : null; const cat = catOf(a);
-    return html`<article class="hero-main">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}<div class="hero-body"><span class="kicker">${cat.name}</span><h2><a href="${c.articleUrl(a)}">${a.title}</a></h2><p>${a.deck}</p><div class="story-meta"><time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}, ${time(a.date)} Uhr</time>${inst && qq ? html`<span>·</span><a href="${c.url(inst)}"><strong>${inst.short || inst.name}</strong></a> <strong>${c.priceCell(inst, qq)}</strong> <span class="delta ${dir(qq.changePct)}">${pct(qq.changePct)}</span>` : ''}<span>· ${a.readTime} Min. Lesezeit</span></div></div></article>`;
+    return html`<article class="hero-main">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}<div class="hero-body"><span class="kicker">${cat.name}</span><h2><a href="${c.articleUrl(a)}">${a.title}</a></h2><p>${a.deck}</p></div></article>`;
   };
   c.storyItem = (a, { thumb = false, excerpt = false } = {}) => {
     const inst = instOf(a); const cat = catOf(a);
