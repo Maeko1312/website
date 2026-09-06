@@ -67,7 +67,7 @@
 }
 
 /* Dunkle Bereiche: ein Geltungsbereich, der alle Token umstellt (Akzent nie violett auf Schwarz) */
-.mainnav, .mega, .market-strip, .hero-main, .card.is-dark, .nl-closing, .quote-hero, .calc-out, .day-head, .nl-bar, .toast, .site-footer {
+.mainnav, .mega, .market-strip, .hero-main, .card.is-dark, .nl-closing, .post-card.is-promoted, .promo-card, .quote-hero, .calc-out, .day-head, .nl-bar, .toast, .site-footer {
   --ink: var(--dark-text); --body: var(--dark-text); --muted: var(--dark-muted); --muted-2: var(--dark-muted);
   --line: var(--dark-line); --line-strong: var(--dark-line); --surface: var(--navy); --surface-2: var(--navy-2);
   --accent: var(--accent-dark); --link: var(--accent-dark); --link-hover: var(--dark-text);
@@ -1048,7 +1048,8 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .quiz-wide .quiz-progress { margin: 0 0 4px; }
 .quiz-note { margin: 0; }
 .quiz-wide .quiz-q { font-size: 19px; line-height: 26px; margin-bottom: 14px; }
-.quiz-wide .quiz-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.quiz-wide .quiz-options { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 10px; }
+.quiz-wide .quiz-option { min-height: 56px; }
 .quiz-wide .quiz-option { padding: 12px 14px; font-size: 15px; line-height: 21px; }
 .quiz-wide .quiz-expl { font-size: 14.5px; line-height: 21px; padding: 14px 16px; }
 .quiz-wide .quiz-result { font-size: 34px; line-height: 38px; }
@@ -1120,9 +1121,15 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 
 /* Hervorgehobene (bezahlte) Beiträge: Karten-Kennzeichnung und Promo-Karte */
 .card-flag { display: flex; gap: 6px; align-items: center; }
-.post-card.is-promoted { border-top-color: var(--accent); }
-.post-card .card-flag { margin-bottom: -6px; }
-.promo-card { border-top: 6px solid var(--accent); display: grid; gap: 10px; }
+.post-card.is-promoted { position: relative; border-color: var(--navy); border-top-color: var(--accent-dark); }
+.post-card.is-promoted .card-flag { position: absolute; top: 30px; left: 30px; z-index: 2; }
+.post-card.is-promoted .meta { border-top-color: var(--dark-line); }
+.post-card.is-promoted:hover { border-color: var(--navy-3); border-top-color: var(--accent-dark); }
+.promo-card { border: 1px solid var(--navy); border-top: 6px solid var(--accent-dark); display: grid; gap: 10px; }
+.post-card.is-promoted .badge.is-accent, .promo-card .badge.is-accent { background: var(--accent-dark); color: var(--navy); }
+.post-card.is-promoted .badge:not(.is-accent), .promo-card .badge:not(.is-accent) { background: var(--navy-3); color: var(--dark-text); border-color: var(--dark-line); }
+.promo-card .btn-dark { background: var(--accent-dark); color: var(--navy); }
+.promo-card .btn-dark:hover { background: #fff; color: var(--navy); }
 .promo-card .thumb { aspect-ratio: 16 / 9; }
 .promo-title { font-family: var(--font-body); font-weight: 600; font-size: 17px; line-height: 24px; letter-spacing: -0.01em; }
 .promo-title a { color: var(--ink); }
@@ -1171,3 +1178,5 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 
 /* Breite Bildschirme: zehn statt acht Werte in der Marktleiste */
 @media (min-width: 1400px) { .strip-item:nth-child(n+9) { display: flex; } .strip-item:nth-child(n+11) { display: none; } }
+
+.post-card.is-promoted { color: var(--dark-text); }
