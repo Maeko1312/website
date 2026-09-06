@@ -100,10 +100,22 @@ module.exports = function (ctx) {
   }
 
   // Sprachen: Deutsch ist das Original; andere Sprachen öffnen die Seite als automatische Übersetzung (Google Translate, translate.goog). Ziel-URLs setzt app.js (lang()).
-  const LANGS = [['de', 'Deutsch', 'DE'], ['en', 'English', 'EN'], ['fr', 'Français', 'FR'], ['es', 'Español', 'ES'], ['it', 'Italiano', 'IT'], ['tr', 'Türkçe', 'TR'], ['pl', 'Polski', 'PL']];
-  const langLink = ([code, name, short]) => html`<a role="menuitem" href="/" data-lang-code="${code}" hreflang="${code}"${code === 'de' ? raw(' aria-current="true"') : ''}><span class="lang-name">${name}</span><span class="lang-short">${short}</span></a>`;
+  // Sprachen: Deutsch ist das Original; andere Sprachen öffnen die Seite als automatische Übersetzung (Google Translate, translate.goog). Ziel-URLs setzt app.js (lang()).
+  // [Code, Sprache, Kürzel, Land]; Flaggen als kleine SVGs (Emoji-Flaggen werden unter Windows nicht dargestellt)
+  const LANGS = [['de', 'Deutsch', 'DE', 'Deutschland'], ['en', 'English', 'EN', 'Großbritannien'], ['fr', 'Français', 'FR', 'Frankreich'], ['es', 'Español', 'ES', 'Spanien'], ['it', 'Italiano', 'IT', 'Italien'], ['tr', 'Türkçe', 'TR', 'Türkei'], ['pl', 'Polski', 'PL', 'Polen']];
+  const FLAGS = {
+    de: '<svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#000"/><rect y=".667" width="3" height=".667" fill="#D00"/><rect y="1.333" width="3" height=".667" fill="#FFCE00"/></svg>',
+    en: '<svg viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>',
+    fr: '<svg viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>',
+    es: '<svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>',
+    it: '<svg viewBox="0 0 3 2" aria-hidden="true"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#CE2B37"/></svg>',
+    tr: '<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#E30A17"/><polygon points="17.6,7.9 18.5,9.5 20.3,9.8 19,11.1 19.3,12.9 17.6,12.1 16,12.9 16.3,11.1 15,9.8 16.8,9.5" fill="#fff"/></svg>',
+    pl: '<svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="1" fill="#fff"/><rect y="1" width="3" height="1" fill="#DC143C"/></svg>',
+  };
+  const flag = (code) => html`<span class="lang-flag">${raw(FLAGS[code] || '')}</span>`;
+  const langLink = ([code, name, short, country]) => html`<a role="menuitem" href="/" data-lang-code="${code}" hreflang="${code}"${code === 'de' ? raw(' aria-current="true"') : ''}>${flag(code)}<span class="lang-name">${country}</span><span class="lang-short">${name}</span></a>`;
   function langMenu() {
-    return html`<div class="lang" data-lang><button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen" translate="no">${raw(icons.globe)}<span class="lang-code">DE</span>${raw(icons.chevron)}</button><div class="lang-menu" role="menu" hidden translate="no"><ul>${LANGS.map(l => html`<li>${langLink(l)}</li>`)}</ul><p class="lang-note">Original: Deutsch. Andere Sprachen als automatische Übersetzung (Google Translate).</p></div></div>`;
+    return html`<div class="lang" data-lang><button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen" translate="no"><span class="lang-current" data-lang-current>${flag('de')}</span><span class="lang-code">DE</span>${raw(icons.chevron)}</button><div class="lang-menu" role="menu" hidden translate="no"><ul>${LANGS.map(l => html`<li>${langLink(l)}</li>`)}</ul><p class="lang-note">Original: Deutsch. Andere Sprachen als automatische Übersetzung (Google Translate).</p></div></div>`;
   }
   function mobilePanel() {
     return html`<div class="nav-panel" id="nav-panel" data-nav-panel>
@@ -111,7 +123,7 @@ module.exports = function (ctx) {
       ${nav.nav.map((item, i) => item.groups
         ? html`<div class="nav-group"><button class="nav-group-btn" type="button" data-acc aria-expanded="false" aria-controls="navg-${i}">${item.label}${raw(icons.chevron)}</button><div class="nav-group-body" id="navg-${i}" hidden>${item.groups.map(g => html`<h4>${g.title}</h4>${g.links.map(([l, h]) => html`<a href="${h}">${l}</a>`)}`)}</div></div>`
         : html`<div class="nav-group"><a class="nav-group-btn" href="${item.href}">${item.label}</a></div>`)}
-      <div class="nav-lang" translate="no"><span class="kicker">Sprache</span><div class="chips">${LANGS.map(([code, name]) => html`<a class="chip ${code === 'de' ? 'is-active' : ''}" href="/" data-lang-code="${code}" hreflang="${code}">${name}</a>`)}</div><p class="small muted">Deutsch ist das Original, andere Sprachen sind automatische Übersetzungen.</p></div>
+      <div class="nav-lang" translate="no"><span class="kicker">Sprache</span><div class="chips">${LANGS.map(([code, name, short, country]) => html`<a class="chip ${code === 'de' ? 'is-active' : ''}" href="/" data-lang-code="${code}" hreflang="${code}">${flag(code)}${country}</a>`)}</div><p class="small muted">Deutsch ist das Original, andere Sprachen sind automatische Übersetzungen.</p></div>
       <div class="nav-panel-foot"><a class="btn btn-teal btn-block" href="/newsletter">Newsletter abonnieren</a><a class="btn btn-ghost btn-block" href="/merkliste">Merkliste öffnen</a></div>
     </div>`;
   }

@@ -787,6 +787,8 @@
       if (a.classList.contains('chip')) a.classList.toggle('is-active', on); else if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
     });
     $$('.lang-code').forEach(function (el) { el.textContent = current.toUpperCase(); });
+    var curLink = links.filter(function (a) { return a.getAttribute('data-lang-code') === current && $('.lang-flag', a); })[0];
+    if (curLink) $$('[data-lang-current]').forEach(function (el) { el.innerHTML = $('.lang-flag', curLink).outerHTML; });
     $$('[data-lang]').forEach(function (box) {
       var btn = $('.lang-btn', box), menu = $('.lang-menu', box); if (!btn || !menu) return;
       function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
