@@ -1013,3 +1013,8 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
   .ichart { padding: 12px 12px 10px; }
   .ichart-last { font-size: 22px; line-height: 26px; }
 }
+
+/* Seitenleiste Gewinner & Verlierer: Gruppen klar getrennt */
+.movers-kicker { margin: 0 0 6px; }
+.movers-kicker.is-top { color: var(--up); }
+.movers-kicker.is-flop { color: var(--down); margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--line-strong); }
