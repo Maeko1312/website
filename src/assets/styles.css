@@ -1056,7 +1056,7 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 @media (max-width: 560px) { .quiz-wide .quiz-options { grid-template-columns: minmax(0, 1fr); } .quiz-wide { padding: 18px; } }
 
 /* Newsletter-Abschluss: dunkles Band am Seitenende */
-.nl-closing { background: var(--navy); color: var(--dark-text); padding: 44px 0; border-top: 1px solid var(--dark-line); }
+.nl-closing { background: var(--navy); color: var(--dark-text); padding: 40px 36px; margin: 0 0 40px; border: 1px solid var(--dark-line); }
 .nl-closing-inner { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr); gap: 28px 56px; align-items: center; }
 .nl-closing .kicker { display: block; color: var(--accent-dark); margin-bottom: 10px; }
 .nl-closing h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.1; color: var(--dark-text); margin-bottom: 12px; }
@@ -1064,7 +1064,7 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .nl-closing .newsletter p, .nl-closing .newsletter label.check { color: var(--dark-muted); }
 .nl-closing .newsletter a { color: var(--accent-dark); }
 .nl-closing .newsletter label.check input { accent-color: var(--accent-dark); }
-@media (max-width: 860px) { .nl-closing-inner { grid-template-columns: minmax(0, 1fr); gap: 20px; } .nl-closing { padding: 30px 0; } }
+@media (max-width: 860px) { .nl-closing-inner { grid-template-columns: minmax(0, 1fr); gap: 20px; } .nl-closing { padding: 26px 22px; margin-bottom: 32px; } }
 .nl-closing .newsletter input { background: #fff; color: #16132a; border-color: transparent; }
 
 /* Lesetipps: nummerierte Zeilen in zwei Spalten */
