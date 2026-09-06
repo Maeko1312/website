@@ -99,9 +99,7 @@ module.exports = function (ctx) {
     </form>`;
   }
 
-  // Sprachen: Deutsch ist das Original; andere Sprachen öffnen die Seite als automatische Übersetzung (Google Translate, translate.goog). Ziel-URLs setzt app.js (lang()).
-  // Sprachen: Deutsch ist das Original; andere Sprachen öffnen die Seite als automatische Übersetzung (Google Translate, translate.goog). Ziel-URLs setzt app.js (lang()).
-  // [Code, Sprache, Kürzel, Land]; Flaggen als kleine SVGs (Emoji-Flaggen werden unter Windows nicht dargestellt)
+  // Sprachmenü (nur Oberfläche): [Code, Sprache, Kürzel, Land]; Flaggen als kleine SVGs (Emoji-Flaggen werden unter Windows nicht dargestellt). Die Übersetzung wird separat angebunden (Ereignis "bb:lang" in app.js).
   const LANGS = [['de', 'Deutsch', 'DE', 'Deutschland'], ['en', 'English', 'EN', 'United Kingdom'], ['fr', 'Français', 'FR', 'France'], ['es', 'Español', 'ES', 'España'], ['it', 'Italiano', 'IT', 'Italia'], ['tr', 'Türkçe', 'TR', 'Türkiye'], ['pl', 'Polski', 'PL', 'Polska']];
   const FLAGS = {
     de: '<svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#000"/><rect y=".667" width="3" height=".667" fill="#D00"/><rect y="1.333" width="3" height=".667" fill="#FFCE00"/></svg>',
@@ -115,7 +113,7 @@ module.exports = function (ctx) {
   const flag = (code) => html`<span class="lang-flag">${raw(FLAGS[code] || '')}</span>`;
   const langLink = ([code, name, short, country]) => html`<a role="menuitem" href="/" data-lang-code="${code}" hreflang="${code}"${code === 'de' ? raw(' aria-current="true"') : ''}>${flag(code)}<span class="lang-name">${country}</span><span class="lang-short">${name}</span></a>`;
   function langMenu() {
-    return html`<div class="lang" data-lang><button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen" translate="no"><span class="lang-current" data-lang-current>${flag('de')}</span><span class="lang-code">DE</span>${raw(icons.chevron)}</button><div class="lang-menu" role="menu" hidden translate="no"><ul>${LANGS.map(l => html`<li>${langLink(l)}</li>`)}</ul><p class="lang-note">Deutsch ist das Original. Andere Sprachen werden in der Seite automatisch übersetzt (Google Translate, lädt erst nach Ihrer Auswahl).</p></div></div>`;
+    return html`<div class="lang" data-lang><button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen" translate="no"><span class="lang-current" data-lang-current>${flag('de')}</span><span class="lang-code">DE</span>${raw(icons.chevron)}</button><div class="lang-menu" role="menu" hidden translate="no"><ul>${LANGS.map(l => html`<li>${langLink(l)}</li>`)}</ul></div></div>`;
   }
   function mobilePanel() {
     return html`<div class="nav-panel" id="nav-panel" data-nav-panel>
@@ -123,7 +121,7 @@ module.exports = function (ctx) {
       ${nav.nav.map((item, i) => item.groups
         ? html`<div class="nav-group"><button class="nav-group-btn" type="button" data-acc aria-expanded="false" aria-controls="navg-${i}">${item.label}${raw(icons.chevron)}</button><div class="nav-group-body" id="navg-${i}" hidden>${item.groups.map(g => html`<h4>${g.title}</h4>${g.links.map(([l, h]) => html`<a href="${h}">${l}</a>`)}`)}</div></div>`
         : html`<div class="nav-group"><a class="nav-group-btn" href="${item.href}">${item.label}</a></div>`)}
-      <div class="nav-lang" translate="no"><span class="kicker">Sprache</span><div class="chips">${LANGS.map(([code, name, short, country]) => html`<a class="chip ${code === 'de' ? 'is-active' : ''}" href="/" data-lang-code="${code}" hreflang="${code}">${flag(code)}${country}</a>`)}</div><p class="small muted">Deutsch ist das Original. Andere Sprachen werden automatisch übersetzt (Google Translate, lädt erst nach Auswahl).</p></div>
+      <div class="nav-lang" translate="no"><span class="kicker">Sprache</span><div class="chips">${LANGS.map(([code, name, short, country]) => html`<a class="chip ${code === 'de' ? 'is-active' : ''}" href="/" data-lang-code="${code}" hreflang="${code}">${flag(code)}${country}</a>`)}</div></div>
       <div class="nav-panel-foot"><a class="btn btn-teal btn-block" href="/newsletter">Newsletter abonnieren</a><a class="btn btn-ghost btn-block" href="/merkliste">Merkliste öffnen</a></div>
     </div>`;
   }
