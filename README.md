@@ -21,7 +21,7 @@ Live: https://website-krule.vercel.app (Vercel-Projekt „website“ im Team kru
 vercel deploy --prod
 ```
 
-Mit installierter GitHub-App (github.com/apps/vercel → Maeko1312/website) löst jeder Push auf  den Deploy automatisch aus.
+Mit installierter GitHub-App (github.com/apps/vercel → Maeko1312/website) löst jeder Push auf den Branch main den Deploy automatisch aus.
 
 Repository importieren, fertig. `vercel.json` setzt Build-Kommando (`node build.js`) und Ausgabeordner (`dist`), aktiviert Clean-URLs (`/kurs/dax` statt `/kurs/dax.html`), lange Caching-Header für `/assets/` und ein paar Sicherheitsheader. `404.html` wird von Vercel automatisch für unbekannte Pfade ausgeliefert.
 
