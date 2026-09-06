@@ -747,22 +747,52 @@
           if (pages <= 1) { pager.hidden = true; pager.innerHTML = ''; }
           else {
             var h = '<button type="button" class="pager-btn" data-page="' + (page - 1) + '"' + (page === 1 ? ' disabled' : '') + ' aria-label="Vorherige Seite">‹</button>';
-            for (var p = 1; p <= pages; p++) h += '<button type="button" class="pager-btn' + (p === page ? ' is-active' : '') + '" data-page="' + p + '"' + (p === page ? ' aria-current="page"' : '') + '>' + p + '</button>';
+            var shown = []; for (var p = 1; p <= pages; p++) { if (p === 1 || p === pages || Math.abs(p - page) <= 1) shown.push(p); }
+            var lastShown = 0; shown.forEach(function (p) { if (p - lastShown > 1) h += '<span class="pager-gap">…</span>'; h += '<button type="button" class="pager-btn' + (p === page ? ' is-active' : '') + '" data-page="' + p + '"' + (p === page ? ' aria-current="page"' : '') + ' aria-label="Seite ' + p + '">' + p + '</button>'; lastShown = p; });
             h += '<button type="button" class="pager-btn" data-page="' + (page + 1) + '"' + (page === pages ? ' disabled' : '') + ' aria-label="Nächste Seite">›</button>';
-            h += '<span class="pager-info">Seite ' + page + ' von ' + pages + ' · ' + list.length + ' Beiträge</span>';
             pager.innerHTML = h; pager.hidden = false;
           }
         }
         if (focusFirst) { var first = list[(page - 1) * per]; if (first) { var top = section.getBoundingClientRect().top + window.scrollY - 120; if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' }); } }
       }
       if (pager) pager.addEventListener('click', function (e) { var b = e.target.closest('[data-page]'); if (!b || b.disabled) return; page = parseInt(b.getAttribute('data-page'), 10); render(true); });
-      if (filter) filter.addEventListener('click', function (e) {
+      if (filter && filter.tagName === 'SELECT') filter.addEventListener('change', function () { topic = filter.value || 'all'; page = 1; render(false); });
+      else if (filter) filter.addEventListener('click', function (e) {
         var b = e.target.closest('[data-topic]'); if (!b) return;
         topic = b.getAttribute('data-topic'); page = 1;
         $$('[data-topic]', filter).forEach(function (c) { var on = c === b; c.classList.toggle('is-active', on); c.setAttribute('aria-pressed', on ? 'true' : 'false'); });
         render(false);
       });
       render(false);
+    });
+  }
+
+  /* ---------- Sprache: Deutsch = Original, andere Sprachen über Google Translate (translate.goog) ---------- */
+  function lang() {
+    var links = $$('[data-lang-code]'); if (!links.length) return;
+    var host = location.hostname, onProxy = /\.translate\.goog$/.test(host);
+    function origHost() { if (!onProxy) return host; return host.replace(/\.translate\.goog$/, '').replace(/--/g, '\u0000').replace(/-/g, '.').replace(/\u0000/g, '-'); }
+    function proxyHost() { return origHost().replace(/-/g, '--').replace(/\./g, '-') + '.translate.goog'; }
+    var query = location.search.replace(/^\?/, '').split('&').filter(function (p) { return p && p.indexOf('_x_tr_') !== 0; }).join('&');
+    var pathQ = location.pathname + (query ? '?' + query : '');
+    function urlFor(code) {
+      if (code === 'de') return (onProxy ? location.protocol + '//' + origHost() : '') + pathQ + location.hash;
+      if (/^(localhost|127\.0\.0\.1)$/.test(host)) return '#';
+      return 'https://' + proxyHost() + pathQ + (query ? '&' : '?') + '_x_tr_sl=de&_x_tr_tl=' + code + '&_x_tr_hl=' + code + '&_x_tr_pto=wapp';
+    }
+    var current = 'de'; var m = /[?&]_x_tr_tl=([a-z]{2})/.exec(location.search); if (onProxy && m) current = m[1];
+    links.forEach(function (a) {
+      var code = a.getAttribute('data-lang-code'); a.setAttribute('href', urlFor(code));
+      var on = code === current;
+      if (a.classList.contains('chip')) a.classList.toggle('is-active', on); else if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    });
+    $$('.lang-code').forEach(function (el) { el.textContent = current.toUpperCase(); });
+    $$('[data-lang]').forEach(function (box) {
+      var btn = $('.lang-btn', box), menu = $('.lang-menu', box); if (!btn || !menu) return;
+      function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+      btn.addEventListener('click', function (e) { e.stopPropagation(); var open = menu.hidden; menu.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); if (open) { var first = $('a', menu); if (first) first.focus(); } });
+      d.addEventListener('click', function (e) { if (!box.contains(e.target)) close(); });
+      d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { close(); btn.focus(); } });
     });
   }
 
@@ -809,6 +839,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
   });
 })();

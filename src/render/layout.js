@@ -10,6 +10,7 @@ module.exports = function (ctx) {
   const { html, raw, esc, num, pct, dateShort, time, dateFull } = util;
 
   const icons = {
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
     burger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
     chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
@@ -97,12 +98,19 @@ module.exports = function (ctx) {
     </form>`;
   }
 
+  // Sprachen: Deutsch ist das Original; andere Sprachen öffnen die Seite als automatische Übersetzung (Google Translate, translate.goog). Ziel-URLs setzt app.js (lang()).
+  const LANGS = [['de', 'Deutsch', 'DE'], ['en', 'English', 'EN'], ['fr', 'Français', 'FR'], ['es', 'Español', 'ES'], ['it', 'Italiano', 'IT'], ['tr', 'Türkçe', 'TR'], ['pl', 'Polski', 'PL']];
+  const langLink = ([code, name, short]) => html`<a role="menuitem" href="/" data-lang-code="${code}" hreflang="${code}"${code === 'de' ? raw(' aria-current="true"') : ''}><span class="lang-name">${name}</span><span class="lang-short">${short}</span></a>`;
+  function langMenu() {
+    return html`<div class="lang" data-lang><button class="lang-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Sprache wählen" translate="no">${raw(icons.globe)}<span class="lang-code">DE</span>${raw(icons.chevron)}</button><div class="lang-menu" role="menu" hidden translate="no"><ul>${LANGS.map(l => html`<li>${langLink(l)}</li>`)}</ul><p class="lang-note">Original: Deutsch. Andere Sprachen als automatische Übersetzung (Google Translate).</p></div></div>`;
+  }
   function mobilePanel() {
     return html`<div class="nav-panel" id="nav-panel" data-nav-panel>
       ${searchForm('is-panel')}
       ${nav.nav.map((item, i) => item.groups
         ? html`<div class="nav-group"><button class="nav-group-btn" type="button" data-acc aria-expanded="false" aria-controls="navg-${i}">${item.label}${raw(icons.chevron)}</button><div class="nav-group-body" id="navg-${i}" hidden>${item.groups.map(g => html`<h4>${g.title}</h4>${g.links.map(([l, h]) => html`<a href="${h}">${l}</a>`)}`)}</div></div>`
         : html`<div class="nav-group"><a class="nav-group-btn" href="${item.href}">${item.label}</a></div>`)}
+      <div class="nav-lang" translate="no"><span class="kicker">Sprache</span><div class="chips">${LANGS.map(([code, name]) => html`<a class="chip ${code === 'de' ? 'is-active' : ''}" href="/" data-lang-code="${code}" hreflang="${code}">${name}</a>`)}</div><p class="small muted">Deutsch ist das Original, andere Sprachen sind automatische Übersetzungen.</p></div>
       <div class="nav-panel-foot"><a class="btn btn-teal btn-block" href="/newsletter">Newsletter abonnieren</a><a class="btn btn-ghost btn-block" href="/merkliste">Merkliste öffnen</a></div>
     </div>`;
   }
@@ -115,7 +123,7 @@ module.exports = function (ctx) {
         <a class="brand notranslate" translate="no" href="/" aria-label="${config.brand} – Startseite">Börsen<em>blick</em></a>
         ${searchForm('is-head')}
         <div class="head-meta"><strong data-clock>${util.DAYS_SHORT[ctx.now.getDay()]} ${dateShort(ctx.now)} · ${time(ctx.now)} Uhr</strong><span class="market-status" data-market-status data-holidays="${holidays}">Xetra</span></div>
-        <div class="head-actions"><a class="btn btn-teal head-nl" href="/newsletter">${raw(icons.mail)}Newsletter</a><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a></div>
+        <div class="head-actions"><a class="btn btn-teal head-nl" href="/newsletter">${raw(icons.mail)}Newsletter</a><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a>${langMenu()}</div>
       </div>
       ${mainNav(current)}
       ${marketStrip()}
