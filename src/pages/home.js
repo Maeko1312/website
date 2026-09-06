@@ -74,11 +74,6 @@ module.exports = function (ctx) {
   </section>
   <div class="layout no-sticky">
     <div class="stack">
-      <section aria-labelledby="h-rank">
-        ${c.sectionTitle('Rankings kompakt', { href: '/rankings', more: 'Alle Rankings', id: 'h-rank' })}
-        <div class="tabs" data-tabs="rank-home" role="tablist" aria-label="Ranking wählen">${rankSets.map((r, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${r.key}">${r.label}</button>`)}</div>
-        <div id="rank-home" class="card">${rankSets.map((r, i) => html`<div data-panel="${r.key}"${i ? raw(' hidden') : ''}>${c.quoteTable(r.rows, { cols: r.cols, compact: true, sortable: false })}<p class="small muted" style="margin-top:8px">${r.note}</p></div>`)}</div>
-      </section>
       <section aria-labelledby="h-calc">
         ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
         ${c.calcTabs(content.tools, { id: 'home' })}
