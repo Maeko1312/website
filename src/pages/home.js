@@ -10,13 +10,15 @@ module.exports = function (ctx) {
   const rest = news.filter(a => a !== lead);
   const todayCards = rest.slice(0, 4);
   // „Mehr Nachrichten“: hervorgehobene Nachricht zuerst, dann chronologisch (ohne Aufmacher und Tageszeilen)
-  const moreNews = [...news.filter(a => a.featured && a !== lead && !todayCards.includes(a)), ...news.filter(a => !a.featured && a !== lead && !todayCards.includes(a))].slice(0, 12);
   const feed = rest.slice(3, 17);
   const m = c.movers(5);
   const upcoming = content.upcomingEvents(5);
   const daxUp = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length;
   const dax = q('dax'), daxInst = instruments.bySlug.dax, daxHist = ctx.hist('dax');
   const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)]; // hervorgehobene zuerst
+  // Nachrichten und Blogbeiträge in einem Strom (Blog ist Teil der Nachrichten): hervorgehobene zuerst, dann nach Datum
+  const stream = [...news.filter(a => a !== lead && !todayCards.includes(a)), ...posts.filter(p => p !== lead)].sort((x, y) => y.date - x.date);
+  const moreNews = [...stream.filter(i => i.featured), ...stream.filter(i => !i.featured)].slice(0, 16);
   const heroPost = posts.find(p => p.featured) || null; // steht bereits im Hero
   const homePosts = posts.filter(p => p !== heroPost).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
   // Rankings kompakt (echte Daten)
@@ -62,8 +64,6 @@ module.exports = function (ctx) {
   </div>
 
 
-  <div class="snap-row" aria-label="Schnellübersicht">${c.marketToday()}${c.eventsCard(5)}${c.focusCard() || c.toolsCard()}</div>
-
   <section class="news-section" aria-labelledby="h-more">
     ${c.sectionTitle('Mehr Nachrichten', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-more' })}
     <div class="news-layout">
@@ -72,12 +72,6 @@ module.exports = function (ctx) {
     </div>
   </section>
 
-  <section aria-labelledby="h-blog" style="margin-bottom:32px">
-    ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
-    <div class="blog-sub"><h3>Neueste Beiträge</h3><label class="select-wrap"><span>Thema</span><select data-post-filter aria-label="Thema wählen"><option value="all">Alle Themen</option>${content.blog.topics.filter(t => homePosts.some(p => p.topic === t.slug)).map(t => html`<option value="${t.slug}">${t.name}</option>`)}</select></label></div>
-    <div class="post-grid" data-paged="6">${homePosts.map(p => c.postCard(p))}</div>
-    <nav class="pager" data-pager aria-label="Weitere Beiträge" hidden></nav>
-  </section>
 
 
 </div>
@@ -92,7 +86,6 @@ module.exports = function (ctx) {
     ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
     ${c.calcTabs(content.tools, { id: 'home' })}
   </section>
-  ${c.postTips(posts)}
 </div>
 ${c.nlClosing()}`;
 
