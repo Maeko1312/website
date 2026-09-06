@@ -434,13 +434,14 @@
       var read = function (n) { var el = form.elements[n]; if (!el) return NaN; return parseFloat(String(el.value).replace(/\./g, '').replace(',', '.')); };
       var row = function (l, v, big) { return '<div class="calc-row' + (big ? ' is-big' : '') + '"><span>' + l + '</span><strong>' + v + '</strong></div>'; };
       var eur = function (n) { return fmt.num(n, 2) + ' €'; };
+      var bar = function (parts) { var sum = parts.reduce(function (a, p) { return a + Math.max(0, p[1]); }, 0); if (!sum) return ''; return '<div class="calc-bar" aria-hidden="true">' + parts.map(function (p, i) { return '<span class="calc-bar-seg is-' + (i + 1) + '" style="width:' + (Math.max(0, p[1]) / sum * 100).toFixed(1) + '%"></span>'; }).join('') + '</div><div class="calc-legend">' + parts.map(function (p, i) { return '<span><i class="is-' + (i + 1) + '"></i>' + p[0] + ' <b>' + fmt.num(Math.max(0, p[1]) / sum * 100, 0) + ' %</b></span>'; }).join('') + '</div>'; };
       function run() {
         var html = '';
         if (type === 'zinseszins') {
           var start = read('start') || 0, rate = read('rate') || 0, yrs = read('years') || 0, r = (read('interest') || 0) / 100;
           var total = start * Math.pow(1 + r, yrs), paid = start;
           for (var i = 0; i < yrs * 12; i++) { var m = Math.pow(1 + r, 1 / 12) - 1; total += rate * Math.pow(1 + m, yrs * 12 - i - 1); paid += rate; }
-          html = row('Endkapital nach ' + yrs + ' Jahren', eur(total), true) + row('Eingezahlt', eur(paid)) + row('Davon Zinsen und Kursgewinne', eur(total - paid)) + row('Anteil der Erträge am Endkapital', fmt.num(total ? (total - paid) / total * 100 : 0, 1) + ' %');
+          html = row('Endkapital nach ' + yrs + ' Jahren', eur(total), true) + bar([['Eingezahlt', paid], ['Zinsen und Kursgewinne', total - paid]]) + row('Eingezahlt', eur(paid)) + row('Davon Zinsen und Kursgewinne', eur(total - paid)) + row('Anteil der Erträge am Endkapital', fmt.num(total ? (total - paid) / total * 100 : 0, 1) + ' %');
         } else if (type === 'rendite') {
           var buy = read('buy'), sell = read('sell'), qty = read('qty') || 1, fees = read('fees') || 0, hold = read('hold') || 1;
           var gross = (sell - buy) * qty, net = gross - fees, pct = buy ? net / (buy * qty) * 100 : 0;
@@ -450,7 +451,7 @@
           var price = read('price'), div = read('div'), shares = read('shares') || 1, growth = (read('growth') || 0) / 100, years = read('years') || 10;
           var yld = price ? div / price * 100 : 0, sum = 0, cur = div;
           for (var y = 0; y < years; y++) { sum += cur * shares; cur *= 1 + growth; }
-          html = row('Dividendenrendite', fmt.num(yld, 2) + ' %', true) + row('Jährliche Dividende (brutto)', eur(div * shares)) + row('Nach Abgeltungsteuer (26,375 %)', eur(div * shares * (1 - 0.26375))) + row('Summe über ' + years + ' Jahre bei ' + fmt.num(growth * 100, 1) + ' % Wachstum', eur(sum));
+          html = row('Dividendenrendite', fmt.num(yld, 2) + ' %', true) + bar([['Netto nach Steuer', div * shares * (1 - 0.26375)], ['Abgeltungsteuer', div * shares * 0.26375]]) + row('Jährliche Dividende (brutto)', eur(div * shares)) + row('Nach Abgeltungsteuer (26,375 %)', eur(div * shares * (1 - 0.26375))) + row('Summe über ' + years + ' Jahre bei ' + fmt.num(growth * 100, 1) + ' % Wachstum', eur(sum));
         } else if (type === 'waehrung') {
           var amt = read('amount') || 0, rate2 = read('rate') || 0, dir = form.elements['dir'] ? form.elements['dir'].value : 'eur2';
           var res = dir === 'eur2' ? amt * rate2 : (rate2 ? amt / rate2 : 0);
@@ -462,18 +463,19 @@
         } else if (type === 'inflation') {
           var amount = read('amount') || 0, infl = (read('inflation') || 0) / 100, yrs2 = read('years') || 0;
           var real = amount / Math.pow(1 + infl, yrs2);
-          html = row('Kaufkraft in ' + yrs2 + ' Jahren', eur(real), true) + row('Kaufkraftverlust', eur(amount - real)) + row('Verlust in Prozent', fmt.num(amount ? (1 - real / amount) * 100 : 0, 1) + ' %') + row('Nötiger Betrag für gleiche Kaufkraft', eur(amount * Math.pow(1 + infl, yrs2)));
+          html = row('Kaufkraft in ' + yrs2 + ' Jahren', eur(real), true) + bar([['Kaufkraft', real], ['Kaufkraftverlust', amount - real]]) + row('Kaufkraftverlust', eur(amount - real)) + row('Verlust in Prozent', fmt.num(amount ? (1 - real / amount) * 100 : 0, 1) + ' %') + row('Nötiger Betrag für gleiche Kaufkraft', eur(amount * Math.pow(1 + infl, yrs2)));
         } else if (type === 'sparplan') {
           var monthly = read('rate') || 0, yrs3 = read('years') || 0, ret = (read('return') || 0) / 100, cost = (read('cost') || 0) / 100;
           var m2 = Math.pow(1 + ret - cost, 1 / 12) - 1, val = 0;
           for (var k = 0; k < yrs3 * 12; k++) val = (val + monthly) * (1 + m2);
           var paid2 = monthly * yrs3 * 12;
-          html = row('Depotwert nach ' + yrs3 + ' Jahren', eur(val), true) + row('Eingezahlt', eur(paid2)) + row('Wertzuwachs', eur(val - paid2)) + row('Angenommene Rendite nach Kosten', fmt.num((ret - cost) * 100, 2) + ' % p. a.');
+          html = row('Depotwert nach ' + yrs3 + ' Jahren', eur(val), true) + bar([['Eingezahlt', paid2], ['Wertzuwachs', val - paid2]]) + row('Eingezahlt', eur(paid2)) + row('Wertzuwachs', eur(val - paid2)) + row('Angenommene Rendite nach Kosten', fmt.num((ret - cost) * 100, 2) + ' % p. a.');
         }
         out.innerHTML = html;
       }
       form.addEventListener('input', run);
       form.addEventListener('submit', function (e) { e.preventDefault(); run(); });
+      form.addEventListener('reset', function () { setTimeout(run, 0); });
       run();
     });
   }
@@ -767,28 +769,52 @@
     });
   }
 
-  /* ---------- Sprache: Deutsch = Original, andere Sprachen über Google Translate (translate.goog) ---------- */
+  /* ---------- Sprache: Deutsch = Original; andere Sprachen übersetzt Google Translate in der Seite (Skript lädt erst nach Auswahl, Wahl bleibt per googtrans-Cookie) ---------- */
   function lang() {
     var links = $$('[data-lang-code]'); if (!links.length) return;
-    var host = location.hostname, onProxy = /\.translate\.goog$/.test(host);
-    function origHost() { if (!onProxy) return host; return host.replace(/\.translate\.goog$/, '').replace(/--/g, '\u0000').replace(/-/g, '.').replace(/\u0000/g, '-'); }
-    function proxyHost() { return origHost().replace(/-/g, '--').replace(/\./g, '-') + '.translate.goog'; }
-    var query = location.search.replace(/^\?/, '').split('&').filter(function (p) { return p && p.indexOf('_x_tr_') !== 0; }).join('&');
-    var pathQ = location.pathname + (query ? '?' + query : '');
-    function urlFor(code) {
-      if (code === 'de') return (onProxy ? location.protocol + '//' + origHost() : '') + pathQ + location.hash;
-      if (/^(localhost|127\.0\.0\.1)$/.test(host)) return '#';
-      return 'https://' + proxyHost() + pathQ + (query ? '&' : '?') + '_x_tr_sl=de&_x_tr_tl=' + code + '&_x_tr_hl=' + code + '&_x_tr_pto=wapp';
+    var CODES = ['en', 'fr', 'es', 'it', 'tr', 'pl'];
+    function readCookie() { var m = /(?:^|; )googtrans=([^;]*)/.exec(d.cookie); if (!m) return 'de'; var parts = decodeURIComponent(m[1]).split('/'); var t = parts[parts.length - 1]; return CODES.indexOf(t) >= 0 ? t : 'de'; }
+    function writeCookie(code) {
+      var domain = location.hostname.replace(/^www\./, '');
+      var kill = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+      d.cookie = kill; d.cookie = kill + '; domain=' + domain; d.cookie = kill + '; domain=.' + domain;
+      if (code !== 'de') { d.cookie = 'googtrans=/de/' + code + '; path=/'; d.cookie = 'googtrans=/de/' + code + '; path=/; domain=' + domain; }
     }
-    var current = 'de'; var m = /[?&]_x_tr_tl=([a-z]{2})/.exec(location.search); if (onProxy && m) current = m[1];
+    var current = readCookie(), loading = false;
+    function mark(code) {
+      current = code;
+      links.forEach(function (a) { var on = a.getAttribute('data-lang-code') === code; if (a.classList.contains('chip')) a.classList.toggle('is-active', on); else if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+      $$('.lang-code').forEach(function (el) { el.textContent = code.toUpperCase(); });
+      var curLink = links.filter(function (a) { return a.getAttribute('data-lang-code') === code && $('.lang-flag', a); })[0];
+      if (curLink) $$('[data-lang-current]').forEach(function (el) { el.innerHTML = $('.lang-flag', curLink).outerHTML; });
+      d.documentElement.classList.toggle('is-translated', code !== 'de');
+    }
+    function applyCombo(code) {
+      var tries = 0; (function poke() { var combo = $('.goog-te-combo'); if (combo) { if (combo.value !== code) { combo.value = code; combo.dispatchEvent(new Event('change')); } return; } if (++tries < 40) setTimeout(poke, 250); })();
+    }
+    function loadWidget(code) {
+      if (window.google && window.google.translate && $('.goog-te-combo')) { applyCombo(code); return; }
+      if (loading) return; loading = true;
+      if (!$('#bb-translate')) { var host = d.createElement('div'); host.id = 'bb-translate'; host.className = 'notranslate'; d.body.appendChild(host); }
+      window.bbTranslateInit = function () {
+        try { new window.google.translate.TranslateElement({ pageLanguage: 'de', includedLanguages: CODES.join(','), autoDisplay: false }, 'bb-translate'); } catch (e) { loading = false; return; }
+        applyCombo(code);
+      };
+      var sc = d.createElement('script'); sc.src = 'https://translate.google.com/translate_a/element.js?cb=bbTranslateInit'; sc.async = true;
+      sc.onerror = function () { loading = false; toast('Übersetzung konnte nicht geladen werden.'); };
+      d.head.appendChild(sc);
+    }
+    function choose(code) {
+      writeCookie(code);
+      if (code === 'de') { location.reload(); return; }
+      mark(code); loadWidget(code);
+    }
     links.forEach(function (a) {
-      var code = a.getAttribute('data-lang-code'); a.setAttribute('href', urlFor(code));
-      var on = code === current;
-      if (a.classList.contains('chip')) a.classList.toggle('is-active', on); else if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      a.setAttribute('href', '#');
+      a.addEventListener('click', function (e) { e.preventDefault(); choose(a.getAttribute('data-lang-code')); $$('.lang-menu').forEach(function (m) { m.hidden = true; }); $$('.lang-btn').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); }); });
     });
-    $$('.lang-code').forEach(function (el) { el.textContent = current.toUpperCase(); });
-    var curLink = links.filter(function (a) { return a.getAttribute('data-lang-code') === current && $('.lang-flag', a); })[0];
-    if (curLink) $$('[data-lang-current]').forEach(function (el) { el.innerHTML = $('.lang-flag', curLink).outerHTML; });
+    mark(current);
+    if (current !== 'de') loadWidget(current);
     $$('[data-lang]').forEach(function (box) {
       var btn = $('.lang-btn', box), menu = $('.lang-menu', box); if (!btn || !menu) return;
       function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
