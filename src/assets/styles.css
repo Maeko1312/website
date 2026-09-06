@@ -1195,7 +1195,7 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .control { display: flex; align-items: stretch; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; transition: border-color .15s, box-shadow .15s; }
 .control:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .control input, .control select { flex: 1; min-width: 0; height: 44px; border: 0; padding: 0 12px; background: transparent; font: inherit; font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--ink); outline: none; }
-.control .suffix { display: grid; place-items: center; padding: 0 12px; min-width: 44px; background: var(--surface-2); border-left: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.control .suffix { display: grid; place-items: center; align-self: stretch; height: auto; padding: 0 12px; min-width: 44px; background: var(--surface-2); border-left: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
 .calc-live { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
 .link-btn { padding: 0; border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--link); cursor: pointer; }
 .link-btn:hover { text-decoration: underline; }
