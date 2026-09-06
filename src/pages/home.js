@@ -61,6 +61,7 @@ module.exports = function (ctx) {
   </div>
 
 
+  ${c.focusCompany()}
   <section aria-labelledby="h-blog" style="margin-bottom:32px">
     ${c.sectionTitle('Aus dem Blog', { href: '/blog', more: 'Alle Beiträge', id: 'h-blog' })}
     <div class="blog-lead">${c.postLead(blogLead)}<ul class="blog-list">${blogList.map(p => c.postRow(p))}</ul></div>
@@ -69,7 +70,7 @@ module.exports = function (ctx) {
     <nav class="pager" data-pager aria-label="Weitere Beiträge" hidden></nav>
   </section>
 
-  ${c.nlBanner()}
+  ${c.nlSlim()}
 
 </div>
 
@@ -78,13 +79,12 @@ module.exports = function (ctx) {
     ${c.sectionTitle('Börsenwissen', { href: '/wissen', more: 'Alle Ratgeber', id: 'h-wissen' })}
     <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
   </section>
-  ${c.quizBox({ wide: true })}
+  <div class="engage" aria-label="Mitmachen">${c.quizBox({ half: true })}${c.pollBox({ half: true })}</div>
   <section aria-labelledby="h-calc" style="margin-bottom:32px">
     ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
     ${c.calcTabs(content.tools, { id: 'home' })}
   </section>
   ${c.postTips(posts)}
-  ${c.pollBox({ wide: true })}
 </div>
 ${c.nlClosing()}`;
 

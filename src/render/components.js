@@ -132,6 +132,24 @@ module.exports = function (ctx) {
   // Blog-Block Startseite: Lead-Karte (hervorgehobener oder neuester Beitrag) + kompakte Liste
   c.postLead = (p) => html`<article class="post-lead ${p.featured ? 'is-promoted' : ''}" data-topic="${p.topic}">${p.featured ? html`<span class="card-flag"><span class="badge is-accent">Im Fokus</span>${p.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</span>` : ''}<a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p></div></article>`;
   c.postRow = (p) => html`<li data-topic="${p.topic}"><a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3></div></li>`;
+  // „Im Fokus“: hervorgehobenes Unternehmen (Instrument mit featured) – Kurs, Sparkline, Kennzahlen, jüngster Beitrag; ohne Flag nichts
+  c.focusCompany = () => {
+    const inst = instruments.all.find(i => i.featured); if (!inst) return '';
+    const qq = q(inst.slug) || {}; if (qq.price == null) return '';
+    const h = history[inst.slug];
+    const art = ctx.content.articles.find(a => (a.instruments || []).includes(inst.slug)) || null;
+    const w = util.wkn(qq.isin || inst.isin);
+    const facts = [['52-Wochen-Spanne', qq.low52w != null && qq.high52w != null ? `${num(qq.low52w)} – ${num(qq.high52w)} €` : null], ['KGV', qq.pe ? num(qq.pe, 1) : null], ['Dividendenrendite', qq.dividendYield ? num(qq.dividendYield, 2) + ' %' : null], ['Marktkapitalisierung', qq.marketCap ? bigEur(qq.marketCap) : null], ['Seit Jahresbeginn', qq.perf && qq.perf.ytd != null ? (qq.perf.ytd > 0 ? '+' : '') + num(qq.perf.ytd, 2) + ' %' : null], ['200-Tage-Linie', qq.sma200 ? num(qq.sma200) + ' €' : null]].filter(f => f[1]);
+    return html`<section class="focus-row" aria-labelledby="h-focus">
+      <div class="focus-card">
+        <div class="focus-head"><div class="card-flag"><span class="badge is-accent">Im Fokus</span>${inst.sponsored ? html`<span class="badge">Anzeige</span>` : ''}<span class="kicker">${c.typeLabel(inst)}${inst.index ? ' · ' + inst.index : ''}${inst.sector ? ' · ' + inst.sector : ''}</span></div><h2 id="h-focus" class="focus-name"><a href="${c.url(inst)}">${inst.name}</a></h2>${qq.isin || w ? html`<p class="focus-ids" translate="no">${[qq.isin || inst.isin, w ? 'WKN ' + w : null].filter(Boolean).join(' · ')}</p>` : ''}<div class="focus-price"><strong>${c.priceCell(inst, qq)}</strong>${c.delta(qq.changePct, { pill: true })}<span class="muted small">${ctx.layout.asOfLabel}</span></div>${h && h.points.length > 2 ? html`<div class="focus-spark">${charts.sparkline(h.points, { w: 260, h: 48, days: 66, id: 'fs-' + inst.slug })}<span class="small muted">3 Monate</span></div>` : ''}</div>
+        <dl class="focus-facts">${facts.map(([k, v]) => html`<div><dt>${k}</dt><dd>${v}</dd></div>`)}</dl>
+        <div class="focus-more">${art ? html`<span class="kicker">${catOf(art).name} · ${util.dateDM(art.date)}</span><h3 class="story-title"><a href="${c.articleUrl(art)}">${art.title}</a></h3><p class="story-excerpt">${art.deck}</p>` : html`<p class="story-excerpt">${inst.blurb || ''}</p>`}<div class="focus-actions"><a class="btn btn-dark btn-sm" href="${c.url(inst)}">Kursseite mit Chart</a>${c.watchButton(inst.slug, true)}</div></div>
+      </div>
+    </section>`;
+  };
+  // Schmale Newsletter-Leiste (eine Zeile) für die Seitenmitte
+  c.nlSlim = () => { const id = `nl-${++nlCounter}`; return html`<section class="nl-slim" aria-labelledby="nl-slim-title"><div class="nl-slim-text"><span class="kicker">Newsletter · kostenlos</span><h3 id="nl-slim-title">Börsenblick am Morgen – die Börse in zwei Minuten</h3><p>Jeden Handelstag um 7:30&nbsp;Uhr: Märkte, drei Termine, eine Meldung. Abmeldung jederzeit.</p></div>${nlForm({ id, cls: 'btn-teal', compactRow: true, fine: false })}</section>`; };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);
@@ -188,14 +206,14 @@ module.exports = function (ctx) {
   c.calcTabs = (tools, { id = 'calc' } = {}) => html`<div class="calc-shell"><div class="tabs calc-tabs" data-tabs="${id}-panels" role="tablist" aria-label="Rechner wählen">${tools.map((t, i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${t.calc}">${t.tab}</button>`)}</div><div id="${id}-panels">${tools.map((t, i) => html`<div class="calc-panel" data-panel="${t.calc}"${i ? raw(' hidden') : ''}>${c.calcForm(t, { id, framed: false, intro: true })}</div>`)}</div></div>`;
 
   /* ---------- Quiz ---------- */
-  c.quizBox = ({ wide = false } = {}) => {
+  c.quizBox = ({ wide = false, half = false } = {}) => {
     const z = ctx.content.quiz;
     const body = html`<div data-quiz-body><p class="quiz-q">${z.today[0].q}</p><div class="quiz-options">${z.today[0].o.map((o, i) => html`<button type="button" class="quiz-option" data-quiz-option="${i}"><span>${o}</span></button>`)}</div></div>`;
     if (wide) return html`<section class="card quiz quiz-wide" aria-labelledby="h-quiz" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">
       <div class="quiz-intro"><span class="kicker">Börsen-Quiz</span><h2 class="quiz-title" id="h-quiz">Fünf Fragen, täglich neu</h2><p class="quiz-lead">Testen Sie Ihr Börsenwissen: jeden Tag fünf neue Fragen zu Kennzahlen, Märkten und Anlageprodukten – mit kurzer Erklärung zu jeder Antwort.</p><p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p><p class="small muted quiz-note">Ihr Ergebnis bleibt nur in Ihrem Browser.</p></div>
       <div class="quiz-stage">${body}</div>
     </section>`;
-    return html`<section class="card quiz" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">${c.sectionTitle('Börsen-Quiz')}<p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p>${body}<p class="small muted" style="margin-top:12px">Fünf Fragen, täglich neu. Ihr Ergebnis bleibt nur in Ihrem Browser.</p></section>`;
+    return html`<section class="card quiz ${half ? 'is-half' : ''}" data-quiz="${z.id}" data-quiz-questions="${JSON.stringify(z.today)}">${c.sectionTitle('Börsen-Quiz')}<p class="quiz-progress mono" data-quiz-progress>Frage 1 von ${z.today.length}</p>${body}<p class="small muted" style="margin-top:12px">Fünf Fragen, täglich neu. Ihr Ergebnis bleibt nur in Ihrem Browser.</p></section>`;
   };
 
   /* ---------- Börsengänge (Liste) ---------- */
@@ -218,11 +236,11 @@ module.exports = function (ctx) {
     if (picks.length < 2) return '';
     return html`<section aria-labelledby="h-tipps" style="margin-bottom:32px">${c.sectionTitle('Lesetipps der Redaktion', { href: '/blog', more: 'Alle Beiträge', id: 'h-tipps' })}<ol class="tips-list">${picks.map((p, i) => html`<li><span class="tips-num" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a> · ${p.minutes} Min. Lesezeit</span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p></div></li>`)}</ol></section>`;
   };
-  c.pollBox = ({ wide = false } = {}) => {
+  c.pollBox = ({ wide = false, half = false } = {}) => {
     const p = ctx.content.poll;
     const options = html`<div class="poll-options">${p.options.map(o => html`<button type="button" class="poll-option" data-poll-option><span class="poll-bar"></span><span>${o}</span><span class="poll-pct">0 %</span></button>`)}</div>`;
     if (wide) return html`<section class="card poll-wide" aria-labelledby="h-poll" data-poll="${p.id}" data-poll-counts="${JSON.stringify(p.counts)}"><div class="poll-intro"><span class="kicker">Umfrage</span><h2 class="poll-title" id="h-poll">${p.question}</h2><p class="poll-lead">Eine Stimme je Browser, anonym. Das Ergebnis erscheint direkt nach Ihrer Antwort.</p><p class="small muted poll-note" data-poll-note hidden></p></div><div class="poll-stage">${options}</div></section>`;
-    return html`<section class="card" data-poll="${p.id}" data-poll-counts="${JSON.stringify(p.counts)}">${c.sectionTitle('Umfrage')}<p style="font-weight:600;margin-bottom:12px">${p.question}</p>${options}<p class="small muted" style="margin-top:10px" data-poll-note hidden></p></section>`;
+    return html`<section class="card poll ${half ? 'is-half' : ''}" data-poll="${p.id}" data-poll-counts="${JSON.stringify(p.counts)}">${c.sectionTitle('Umfrage')}<p class="poll-q">${p.question}</p>${options}<p class="small muted" style="margin-top:10px" data-poll-note hidden></p></section>`;
   };
 
   /* ---------- Feeds & Indizes für die Suche ---------- */
