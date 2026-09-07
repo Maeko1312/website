@@ -19,7 +19,7 @@ module.exports = function (ctx) {
   // Nachrichten und Blogbeiträge in einem Strom (Blog ist Teil der Nachrichten): hervorgehobene zuerst, dann nach Datum
   // Weitere hervorgehobene Beiträge (außer dem Aufmacher) für den Swiper; sie erscheinen nicht noch einmal im Strom
   const featuredItems = [...news.filter(a => a.featured), ...posts.filter(p => p.featured)].filter(x => x !== lead).sort((x, y) => y.date - x.date);
-  const stream = [...news.filter(a => a !== lead && !todayCards.includes(a) && !featuredItems.includes(a)), ...posts.filter(p => p !== lead && !featuredItems.includes(p))].sort((x, y) => y.date - x.date);
+  const stream = [...news.filter(a => a !== lead && !todayCards.includes(a)), ...posts.filter(p => p !== lead)].sort((x, y) => y.date - x.date);
   const moreNews = [...stream.filter(i => i.featured), ...stream.filter(i => !i.featured)].slice(0, 16);
   const heroPost = posts.find(p => p.featured) || null; // steht bereits im Hero
   const homePosts = posts.filter(p => p !== heroPost).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
@@ -73,8 +73,6 @@ module.exports = function (ctx) {
       <aside class="news-aside">${c.newsletterBox({ compact: true })}${c.pollBox()}${c.sideAnalysis(6)}</aside>
     </div>
   </section>
-
-  ${c.focusSwiper(featuredItems)}
 
 
 
