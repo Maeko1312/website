@@ -1502,3 +1502,15 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .news-row-media { display: block; position: relative; align-self: stretch; min-height: 94px; }
 .news-row-media .thumb { position: absolute; inset: 0; height: 100%; aspect-ratio: auto; }
 .news-row-media .thumb img, .news-row-media .thumb svg { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- Hero: Text unter dem Foto statt darüber; Block bleibt gleich hoch, das Foto füllt den Rest ---------- */
+.hero-main { display: flex; flex-direction: column; }
+.hero-main::after, .hero-main .thumb.is-photo::after { display: none; }
+.hero-main .thumb, .hero-main .thumb.is-photo { position: relative; inset: auto; flex: 1 1 auto; min-height: 220px; height: auto; aspect-ratio: auto; overflow: hidden; }
+.hero-main .thumb.is-photo img, .hero-main .thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-main:has(.thumb.is-photo) .hero-body h2, .hero-main:has(.thumb.is-photo) .hero-body p { text-shadow: none; }
+.hero-body { flex: 0 0 auto; align-self: auto; padding: 18px 26px 22px; }
+.hero-body h2 { font-size: clamp(24px, 2.2vw, 32px); line-height: 1.12; margin: 8px 0 10px; max-width: none; text-wrap: pretty; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hero-body p { max-width: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (min-width: 1100px) { .hero-body { padding: 20px 28px 24px; } .hero-body h2 { font-size: clamp(26px, 2.3vw, 34px); max-width: none; } }
+@media (max-width: 860px) { .hero-main { min-height: 0; max-height: none; } .hero-main .thumb.is-photo { flex: 0 0 auto; min-height: 0; aspect-ratio: 16 / 9; } .hero-body { padding: 16px 18px 18px; } }
