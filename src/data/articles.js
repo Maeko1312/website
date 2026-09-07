@@ -289,7 +289,7 @@ module.exports = function (ctx) {
 
   // ---------- Nachbearbeitung ----------
   // CMS-Flag: hervorgehobene (gesponserte) Nachrichten – Beispiele; sponsored: true ergänzt die Kennzeichnung „Anzeige“
-  const FEATURED_ARTICLES = ['sap-aktie-im-check', 'ezb-zinsentscheid-was-anleger-wissen-muessen', 'bundrendite-zinsstruktur-aktuell', 'fed-zinsentscheid-fomc-erklaert'];
+  const FEATURED_ARTICLES = []; // z. B. ['sap-aktie-im-check']
   for (const a of articles) if (FEATURED_ARTICLES.includes(a.slug)) a.featured = true;
   for (const a of articles) { a.readTime = readTime(a.body); if (a.date > now) a.date = new Date(now.getTime() - 15 * 60000); }
   articles.sort((a, b) => b.date - a.date);
