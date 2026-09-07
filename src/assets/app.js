@@ -801,6 +801,19 @@
     });
   }
 
+  /* ---------- Swiper (Scroll-Snap): Pfeile scrollen um eine Karte; Wischen nativ ---------- */
+  function swiper() {
+    $$('[data-swiper]').forEach(function (host) {
+      var track = $('[data-swiper-track]', host), prev = $('[data-swiper-prev]', host), next = $('[data-swiper-next]', host); if (!track) return;
+      function step() { var card = track.firstElementChild; return card ? card.getBoundingClientRect().width + 20 : track.clientWidth; }
+      function update() { if (prev) prev.disabled = track.scrollLeft <= 2; if (next) next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2; }
+      if (prev) prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      if (next) next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', update, { passive: true }); window.addEventListener('resize', update); update();
+      track.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { e.preventDefault(); track.scrollBy({ left: step(), behavior: 'smooth' }); } if (e.key === 'ArrowLeft') { e.preventDefault(); track.scrollBy({ left: -step(), behavior: 'smooth' }); } });
+    });
+  }
+
   /* ---------- FAQ: weich auf- und zuklappen ---------- */
   function faq() {
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -844,6 +857,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); swiper(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
   });
 })();

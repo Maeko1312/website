@@ -192,6 +192,16 @@ module.exports = function (ctx) {
     const more = [1, 2, 3].map(k => g[(i + k) % g.length]);
     return html`<section class="card snap-card term-card" aria-labelledby="h-term">${c.sectionTitle('Begriff des Tages', { href: '/wissen/boersenlexikon', more: 'Börsenlexikon', id: 'h-term' })}<h3 class="term-name"><a href="/wissen/boersenlexikon#${t.slug}">${t.term}</a></h3>${t.short ? html`<p class="term-short">${t.short}</p>` : ''}<p class="term-def">${t.def}</p><a class="read-more" href="/wissen/boersenlexikon#${t.slug}">Im Lexikon lesen<span aria-hidden="true"> ›</span></a><p class="term-more"><span class="kicker">Weitere Begriffe</span>${more.map(m => html`<a href="/wissen/boersenlexikon#${m.slug}">${m.term}</a>`)}</p></section>`;
   };
+  // „Im Fokus“-Swiper: alle weiteren hervorgehobenen Beiträge (Nachrichten und Ratgeber), horizontal wischbar
+  c.focusSwiper = (items) => {
+    if (!items || !items.length) return '';
+    const card = (a) => { const isPost = !!a.topicObj; const inst = isPost ? null : instOf(a); const cat = isPost ? null : catOf(a); const url = isPost ? c.blogUrl(a) : c.articleUrl(a); const label = isPost ? a.topicObj.name : cat.name;
+      return html`<article class="swipe-card"><a class="card-link" href="${url}" aria-label="${a.title}"></a>${c.thumb((isPost ? 'blog-' : '') + a.slug, { label: inst ? inst.short || inst.name : label, image: a.image })}<div class="swipe-body"><div class="card-flag"><span class="badge is-accent">Im Fokus</span>${a.sponsored ? html`<span class="badge">Anzeige</span>` : ''}<span class="kicker">${label} · ${util.dateDM(a.date)}</span></div><h3>${a.title}</h3><p>${isPost ? a.lead : a.deck}</p><span class="read-more">Weiterlesen<span aria-hidden="true"> ›</span></span></div></article>`; };
+    return html`<section class="focus-swiper" aria-labelledby="h-focus-news" data-swiper>
+      <div class="section-title"><h2 id="h-focus-news">Im Fokus</h2><div class="swiper-nav"><button type="button" class="swiper-btn" data-swiper-prev aria-label="Zurück">‹</button><button type="button" class="swiper-btn" data-swiper-next aria-label="Weiter">›</button></div></div>
+      <div class="swiper-track" data-swiper-track tabindex="0" aria-label="Hervorgehobene Beiträge, horizontal scrollbar">${items.map(card)}</div>
+    </section>`;
+  };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);
