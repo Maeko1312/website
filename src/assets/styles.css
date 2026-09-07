@@ -1482,3 +1482,14 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 
 /* Ratgeber-Karten ohne Nummerierung */
 .guide-card .num { display: none; }
+
+/* Nachrichten-Zeilen: einheitliche Höhe – Titel immer zwei Zeilen, Teaser immer zwei Zeilen (mit Auslassung) */
+.news-row .story-title { min-height: 44px; }
+.news-row .story-excerpt { min-height: 40px; }
+.news-row .story-top { min-height: 18px; }
+.news-row { align-items: start; }
+
+/* Nachrichten-Zeilen: alle gleich hoch – gleiche Innenabstände in jeder Zeile, Metazeile einzeilig */
+.news-row, .news-row:nth-child(-n+2), .news-rows.is-full .news-row:nth-child(-n+3), .news-rows.is-full .news-row:first-child { padding: 14px 0; }
+.news-row .story-top { display: flex; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; min-height: 18px; }
+.news-row .story-top .tag { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
