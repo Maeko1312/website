@@ -24,11 +24,11 @@ module.exports = function (ctx) {
   // Nachrichten nach Ressort: bevorzugt Beiträge, die oben noch nicht stehen; Ressorts mit zu wenig Rest werden mit den neuesten aufgefüllt
   const shownSet = new Set([lead, ...todayCards, ...moreNews]);
   const remaining = stream.filter(i => !shownSet.has(i));
-  const catPanels = [['alle', 'Alle', remaining.slice(0, 6)]];
-  for (const k of content.categories.news) { let items = remaining.filter(i => !i.topicObj && i.category === k.slug); if (items.length < 3) items = news.filter(a => a.category === k.slug); items = items.slice(0, 6); if (items.length) catPanels.push([k.slug, k.name, items]); }
-  { let items = remaining.filter(i => i.topicObj); if (items.length < 3) items = posts; catPanels.push(['ratgeber', 'Ratgeber', items.slice(0, 6)]); }
-  catPanels.push(['analysen', 'Analysen', analyses.slice(0, 6)]);
-  catPanels.push(['wissen', 'Wissen', content.guides.slice(0, 6)]);
+  const catPanels = [['alle', 'Alle', remaining.slice(0, 12)]];
+  for (const k of content.categories.news) { let items = remaining.filter(i => !i.topicObj && i.category === k.slug); if (items.length < 6) items = news.filter(a => a.category === k.slug); items = items.slice(0, 12); if (items.length) catPanels.push([k.slug, k.name, items]); }
+  { let items = remaining.filter(i => i.topicObj); if (items.length < 6) items = posts; catPanels.push(['ratgeber', 'Ratgeber', items.slice(0, 12)]); }
+  catPanels.push(['analysen', 'Analysen', analyses.slice(0, 12)]);
+  catPanels.push(['wissen', 'Wissen', content.guides.slice(0, 12)]);
   const heroPost = posts.find(p => p.featured) || null; // steht bereits im Hero
   const homePosts = posts.filter(p => p !== heroPost).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
   // Rankings kompakt (echte Daten)
