@@ -21,6 +21,13 @@ module.exports = function (ctx) {
   const featuredItems = [...news.filter(a => a.featured), ...posts.filter(p => p.featured)].filter(x => x !== lead).sort((x, y) => y.date - x.date);
   const stream = [...news.filter(a => a !== lead && !todayCards.includes(a)), ...posts.filter(p => p !== lead)].sort((x, y) => y.date - x.date);
   const moreNews = [...stream.filter(i => i.featured), ...stream.filter(i => !i.featured)].slice(0, 16);
+  // Nachrichten nach Ressort: bevorzugt Beiträge, die oben noch nicht stehen; Ressorts mit zu wenig Rest werden mit den neuesten aufgefüllt
+  const shownSet = new Set([lead, ...todayCards, ...moreNews]);
+  const remaining = stream.filter(i => !shownSet.has(i));
+  const catPanels = [['alle', 'Alle', remaining.slice(0, 6)]];
+  for (const k of content.categories.news) { let items = remaining.filter(i => !i.topicObj && i.category === k.slug); if (items.length < 3) items = news.filter(a => a.category === k.slug); items = items.slice(0, 6); if (items.length) catPanels.push([k.slug, k.name, items]); }
+  { let items = remaining.filter(i => i.topicObj); if (items.length < 3) items = posts; catPanels.push(['ratgeber', 'Ratgeber', items.slice(0, 6)]); }
+  catPanels.push(['analysen', 'Analysen', analyses.slice(0, 6)]);
   const heroPost = posts.find(p => p.featured) || null; // steht bereits im Hero
   const homePosts = posts.filter(p => p !== heroPost).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
   // Rankings kompakt (echte Daten)
@@ -86,6 +93,12 @@ module.exports = function (ctx) {
     <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
   </section>
   ${c.quizBox({ wide: true })}
+
+  <section class="news-section" aria-labelledby="h-cats">
+    ${c.sectionTitle('Nachrichten nach Ressort', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-cats' })}
+    <div class="tabs" data-tabs="cat-panels" role="tablist" aria-label="Ressort wählen">${catPanels.map(([k, l], i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${k}">${l}</button>`)}</div>
+    <div id="cat-panels">${catPanels.map(([k, l, items], i) => html`<div data-panel="${k}"${i ? raw(' hidden') : ''}><div class="news-rows is-full">${items.map(a => c.newsRow(a))}</div></div>`)}</div>
+  </section>
   <section aria-labelledby="h-calc" style="margin-bottom:32px">
     ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
     ${c.calcTabs(content.tools, { id: 'home' })}

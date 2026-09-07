@@ -1470,3 +1470,9 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .day-brief-nums dd strong { font-weight: 500; }
 @media (max-width: 1024px) { .day-brief-body { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .day-brief { padding: 16px; } .day-brief-nums { grid-template-columns: minmax(0, 1fr); } }
+
+/* Nachrichten nach Ressort: drei Spalten ohne Seitenleiste */
+.news-rows.is-full { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 28px; }
+.news-rows.is-full .news-row:nth-child(-n+3) { padding-top: 0; }
+@media (max-width: 1024px) { .news-rows.is-full { grid-template-columns: repeat(2, minmax(0, 1fr)); } .news-rows.is-full .news-row:nth-child(3) { padding-top: 16px; } }
+@media (max-width: 860px) { .news-rows.is-full { grid-template-columns: minmax(0, 1fr); } .news-rows.is-full .news-row:nth-child(-n+3) { padding-top: 16px; } .news-rows.is-full .news-row:first-child { padding-top: 0; } }
