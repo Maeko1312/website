@@ -202,6 +202,29 @@ module.exports = function (ctx) {
       <div class="swiper-track" data-swiper-track tabindex="0" aria-label="Hervorgehobene Beiträge, horizontal scrollbar">${items.map(card)}</div>
     </section>`;
   };
+  // „Der Tag in Kürze“: Tagesüberblick aus den Daten – Marktbericht-Kernaussagen, Rohstoffe/Devisen/Krypto, nächster Termin; rechts die Kennzahlen des Tages
+  c.dayBrief = () => {
+    const report = ctx.content.articles.find(a => a.category === 'marktberichte');
+    const bullets = [];
+    if (report && Array.isArray(report.summary)) bullets.push(...report.summary.slice(0, 2).map(t => ({ text: t, url: c.articleUrl(report) })));
+    const sg = (v) => (v >= 0 ? '+' : '−') + num(Math.abs(v), 2) + ' %';
+    const mv = (slug, name, digits) => { const x = q(slug); return x && x.price != null && x.changePct != null ? `${name} ${sg(x.changePct)} auf ${num(x.price, digits)}` : null; };
+    const line = [mv('gold', 'Gold', 0), mv('brent', 'Brent', 2), mv('bitcoin', 'Bitcoin', 0)].filter(Boolean).join(', ');
+    if (line) bullets.push({ text: 'Rohstoffe und Krypto: ' + line + ' (US-$).', url: '/rohstoffe' });
+    const fx = q('eur-usd'), bund = q('bund-10j');
+    if (fx && fx.price != null) bullets.push({ text: `Euro/Dollar bei ${num(fx.price, 4)} (${sg(fx.changePct)})${bund && bund.price != null ? `, zehnjährige Bundrendite ${num(bund.price, 2)} %` : ''}.`, url: '/devisen' });
+    const ev = ctx.content.upcomingEvents(1)[0];
+    if (ev) { const d = new Date(ev.date + 'T00:00:00'); bullets.push({ text: `Als Nächstes: ${ev.title}, ${util.dateWeekday(d)} um ${ev.time} Uhr (${ev.countryName}).`, url: '/termine/wirtschaftskalender' }); }
+    if (bullets.length < 3) return '';
+    const nums = ['dax', 'mdax', 'euro-stoxx-50', 'sp-500', 'eur-usd', 'gold', 'brent', 'bitcoin'].map(s => instruments.bySlug[s]).filter(Boolean).map(i => ({ i, x: q(i.slug) || {} })).filter(o => o.x.price != null);
+    return html`<section class="day-brief" aria-labelledby="h-brief">
+      <div class="day-brief-head"><h2 id="h-brief">Der Tag in Kürze</h2><span class="day-brief-date" translate="no">${util.dateWeekday(now)}${now.getFullYear()} · ${ctx.layout.asOfLabel}</span></div>
+      <div class="day-brief-body">
+        <ul class="day-brief-list">${bullets.slice(0, 5).map(b => html`<li><a href="${b.url}">${b.text}</a></li>`)}</ul>
+        <dl class="day-brief-nums">${nums.map(({ i, x }) => html`<div><dt><a href="${c.url(i)}">${i.short || i.name}</a></dt><dd><strong>${c.priceCell(i, x)}</strong>${c.delta(x.changePct)}</dd></div>`)}</dl>
+      </div>
+    </section>`;
+  };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);

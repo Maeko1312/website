@@ -1451,3 +1451,22 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .swipe-body .read-more { margin-top: auto; padding-top: 8px; font-size: 14px; font-weight: 600; color: var(--accent); }
 @media (max-width: 1024px) { .swiper-track { grid-auto-columns: calc((100% - 20px) / 2); } }
 @media (max-width: 640px) { .swiper-track { grid-auto-columns: 86%; gap: 12px; } .swiper-nav { display: none; } }
+
+/* ---------- Der Tag in Kürze ---------- */
+.day-brief { margin: 0 0 32px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--ink); padding: 18px 24px 20px; }
+.day-brief-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-bottom: 12px; }
+.day-brief-head h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 22px; line-height: 1.1; letter-spacing: 0; }
+.day-brief-date { font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em; color: var(--muted); }
+.day-brief-body { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr); gap: 16px 40px; align-items: start; }
+.day-brief-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.day-brief-list li { position: relative; padding-left: 16px; font-size: 15px; line-height: 22px; }
+.day-brief-list li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; background: var(--accent); }
+.day-brief-list a { color: var(--body); }
+.day-brief-list a:hover { color: var(--link); text-decoration: none; }
+.day-brief-nums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 0; }
+.day-brief-nums > div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.day-brief-nums dt a { color: var(--ink); font-weight: 600; }
+.day-brief-nums dd { margin: 0; display: flex; gap: 8px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.day-brief-nums dd strong { font-weight: 500; }
+@media (max-width: 1024px) { .day-brief-body { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .day-brief { padding: 16px; } .day-brief-nums { grid-template-columns: minmax(0, 1fr); } }
