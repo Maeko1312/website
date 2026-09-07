@@ -28,6 +28,7 @@ module.exports = function (ctx) {
   for (const k of content.categories.news) { let items = remaining.filter(i => !i.topicObj && i.category === k.slug); if (items.length < 3) items = news.filter(a => a.category === k.slug); items = items.slice(0, 6); if (items.length) catPanels.push([k.slug, k.name, items]); }
   { let items = remaining.filter(i => i.topicObj); if (items.length < 3) items = posts; catPanels.push(['ratgeber', 'Ratgeber', items.slice(0, 6)]); }
   catPanels.push(['analysen', 'Analysen', analyses.slice(0, 6)]);
+  catPanels.push(['wissen', 'Wissen', content.guides.slice(0, 6)]);
   const heroPost = posts.find(p => p.featured) || null; // steht bereits im Hero
   const homePosts = posts.filter(p => p !== heroPost).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
   // Rankings kompakt (echte Daten)
@@ -86,10 +87,6 @@ module.exports = function (ctx) {
 </div>
 
 <div class="container" style="padding-bottom:40px">
-  <section aria-labelledby="h-wissen" style="margin-bottom:32px">
-    ${c.sectionTitle('Börsenwissen', { href: '/wissen', more: 'Alle Ratgeber', id: 'h-wissen' })}
-    <div class="guide-cards">${content.guides.slice(0, 3).map((g, i) => html`<a class="guide-card" href="/wissen/${g.slug}"><span class="num">0${i + 1}</span><h3>${g.title}</h3><p>${g.lead}</p><span class="meta">${g.kicker} · ${g.minutes} Min. Lesezeit</span></a>`)}</div>
-  </section>
   ${c.quizBox({ wide: true })}
 
   <section class="news-section" aria-labelledby="h-cats">

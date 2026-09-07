@@ -1479,3 +1479,6 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 
 /* Kopfzeile: Suche mittig zwischen Marke und Aktionen */
 .masthead .search.is-head { margin: 0 auto; flex: 0 1 480px; max-width: 480px; }
+
+/* Ratgeber-Karten ohne Nummerierung */
+.guide-card .num { display: none; }
