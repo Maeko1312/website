@@ -528,12 +528,13 @@
     $$('[data-quiz]').forEach(function (host) {
       var qs; try { qs = JSON.parse(host.getAttribute('data-quiz-questions')); } catch (e) { return; }
       var key = 'bb.quiz.' + host.getAttribute('data-quiz');
-      var body = $('[data-quiz-body]', host), prog = $('[data-quiz-progress]', host);
+      var body = $('[data-quiz-body]', host), prog = $('[data-quiz-progress]', host), segs = $$('[data-quiz-seg]', host);
+      function steps(n, all) { segs.forEach(function (s, k) { s.classList.toggle('is-done', all || k < n); s.classList.toggle('is-current', !all && k === n); }); }
       var i = 0, score = 0, done = store.get(key, null);
       function esc(s) { return escapeHtml(s); }
       function render() {
         var q = qs[i];
-        prog.textContent = 'Frage ' + (i + 1) + ' von ' + qs.length;
+        prog.textContent = 'Frage ' + (i + 1) + ' von ' + qs.length; steps(i, false);
         body.innerHTML = '<p class="quiz-q">' + esc(q.q) + '</p><div class="quiz-options">' + q.o.map(function (o, k) { return '<button type="button" class="quiz-option" data-quiz-option="' + k + '"><span>' + esc(o) + '</span></button>'; }).join('') + '</div>';
         $$('[data-quiz-option]', body).forEach(function (b) { b.addEventListener('click', function () { answer(parseInt(b.getAttribute('data-quiz-option'), 10)); }); });
       }
@@ -547,7 +548,7 @@
       }
       function finish() {
         store.set(key, score);
-        prog.textContent = 'Ergebnis';
+        prog.textContent = 'Ergebnis'; steps(qs.length, true);
         var msg = score === qs.length ? 'Alle richtig – Sie kennen die Börse.' : score >= 3 ? 'Solide. Die Lücken schließt das Börsenlexikon.' : 'Ein guter Anlass für die Einsteiger-Ratgeber.';
         body.innerHTML = '<p class="quiz-result"><strong>' + score + ' von ' + qs.length + '</strong> richtig</p><p class="quiz-msg">' + msg + '</p><div class="quiz-actions"><a class="btn btn-teal btn-sm" href="/newsletter">Jeden Morgen dazulernen</a><button type="button" class="btn btn-ghost btn-sm" data-quiz-restart>Nochmal</button><a class="btn btn-ghost btn-sm" href="/wissen/boersenlexikon">Lexikon</a></div>';
         $('[data-quiz-restart]', body).addEventListener('click', function () { i = 0; score = 0; render(); });

@@ -1412,3 +1412,9 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 
 .snap-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 860px) { .snap-row { grid-template-columns: minmax(0, 1fr); } }
+
+/* Quiz: Fortschrittssegmente */
+.quiz-steps { display: flex; gap: 4px; margin: 6px 0 10px; max-width: 220px; }
+.quiz-steps span { flex: 1; height: 4px; background: var(--line); transition: background-color .2s; }
+.quiz-steps span.is-current { background: var(--accent-dark); }
+.quiz-steps span.is-done { background: var(--accent); }
