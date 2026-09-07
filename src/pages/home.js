@@ -66,8 +66,6 @@ module.exports = function (ctx) {
   </div>
 
 
-  ${c.focusSwiper(featuredItems)}
-
   <section class="news-section" aria-labelledby="h-more">
     ${c.sectionTitle('Mehr Nachrichten', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-more' })}
     <div class="news-layout">
@@ -75,6 +73,8 @@ module.exports = function (ctx) {
       <aside class="news-aside">${c.newsletterBox({ compact: true })}${c.pollBox()}${c.sideAnalysis(6)}</aside>
     </div>
   </section>
+
+  ${c.focusSwiper(featuredItems)}
 
 
 
