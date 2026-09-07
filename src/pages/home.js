@@ -73,8 +73,6 @@ module.exports = function (ctx) {
   </div>
 
 
-  ${c.dayBrief()}
-
   <section class="news-section" aria-labelledby="h-more">
     ${c.sectionTitle('Mehr Nachrichten', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-more' })}
     <div class="news-layout">
