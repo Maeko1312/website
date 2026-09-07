@@ -1476,3 +1476,6 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .news-rows.is-full .news-row:nth-child(-n+3) { padding-top: 0; }
 @media (max-width: 1024px) { .news-rows.is-full { grid-template-columns: repeat(2, minmax(0, 1fr)); } .news-rows.is-full .news-row:nth-child(3) { padding-top: 16px; } }
 @media (max-width: 860px) { .news-rows.is-full { grid-template-columns: minmax(0, 1fr); } .news-rows.is-full .news-row:nth-child(-n+3) { padding-top: 16px; } .news-rows.is-full .news-row:first-child { padding-top: 0; } }
+
+/* Kopfzeile: Suche mittig zwischen Marke und Aktionen */
+.masthead .search.is-head { margin: 0 auto; flex: 0 1 480px; max-width: 480px; }
