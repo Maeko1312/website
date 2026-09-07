@@ -1094,7 +1094,7 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 /* Hero füllt den ersten Bildschirm (Kopfzeile 153px + Seitenabstand) */
 .today-list .story-excerpt { display: none; }
 @media (min-width: 861px) {
-  .hero-main { min-height: clamp(520px, calc(100vh - 201px), 640px); max-height: 640px; }
+  .hero-main { min-height: clamp(460px, calc(100vh - 260px), 560px); max-height: 560px; }
   .hero-side { align-content: stretch; grid-template-rows: minmax(0, 1fr); }
   .hero-side .today { height: 100%; }
   .hero-body { padding: 32px 36px 30px; }
@@ -1418,3 +1418,12 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .quiz-steps span { flex: 1; height: 4px; background: var(--line); transition: background-color .2s; }
 .quiz-steps span.is-current { background: var(--accent-dark); }
 .quiz-steps span.is-done { background: var(--accent); }
+
+/* Hero: ganze Fläche klickbar */
+.hero-link { position: absolute; inset: 0; z-index: 2; }
+.hero-link:focus { outline: none; }
+.hero-link:focus-visible { outline: 2px solid var(--accent-dark); outline-offset: -4px; }
+.hero-main:hover .hero-body h2 a { color: var(--accent-dark); }
+.hero-main:hover .thumb.is-photo img { transform: scale(1.02); }
+.hero-main .thumb.is-photo img { transition: transform .6s ease; }
+.today-list li { padding: 6px 0; }

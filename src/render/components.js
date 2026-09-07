@@ -118,7 +118,7 @@ module.exports = function (ctx) {
     const url = isPost ? c.blogUrl(a) : c.articleUrl(a);
     const kicker = isPost ? a.topicObj.name : cat.name;
     const label = inst ? inst.short || inst.name : kicker;
-    return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image, eager: true })}<div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
+    return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image, eager: true })}<a class="hero-link" href="${url}" aria-label="${a.title}"></a><div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
   };
   c.storyItem = (a, { thumb = false, excerpt = false } = {}) => {
     const inst = instOf(a); const cat = catOf(a);
