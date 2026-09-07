@@ -830,7 +830,7 @@ html.nlbar-open .toast { bottom: 100px; }
 .footer-legal { display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .footer-legal a { color: var(--dark-text); }
 .footer-legal a:hover { color: var(--accent-dark); }
-.footer-bottom p { max-width: 110ch; line-height: 1.5; }
+.footer-bottom p { max-width: none; line-height: 1.55; }
 .footer-bottom strong { color: var(--dark-text); }
 
 /* ---------- Startseite: weitere ---------- */
