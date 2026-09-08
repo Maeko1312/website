@@ -251,6 +251,14 @@ module.exports = function (ctx) {
     articles.push({ slug: e.slug, title: e.title, deck: e.deck, category: e.category, kind: e.kind || 'news', author: e.author, direction: null, date: at(addDays(now, -e.daysAgo), e.hour, e.min), instruments: e.instruments, body: e.body, summary: e.summary, facts: e.facts, investorContext: e.investorContext || editorialContext[e.slug] || null });
   });
 
+  // ---------- Redaktionelle Nachrichten (echte Ereignisse, eigene Texte, Quellen am Ende) ----------
+  // Datei src/data/news-2026-09.js (und künftige news-YYYY-MM.js): absolute Datumsangaben, Quellenliste wird angehängt
+  const realNewsFiles = ['./news-2026-09'];
+  for (const file of realNewsFiles) for (const e of require(file)) {
+    const sources = e.sources && e.sources.length ? `<h2>Quellen</h2><ul class="sources">${e.sources.map(([l, u]) => `<li><a href="${u}" rel="noopener" target="_blank">${l}</a></li>`).join('')}</ul>` : '';
+    articles.push({ slug: e.slug, title: e.title, deck: e.deck, category: e.category, kind: e.kind || 'news', author: e.author || 'redaktion', direction: null, date: new Date(e.date), instruments: e.instruments || [], body: e.body + sources, summary: e.summary || null, facts: e.facts || null, investorContext: e.investorContext || null, image: e.image || null, sponsored: !!e.sponsored, featured: !!e.featured });
+  }
+
   // ---------- Nachbearbeitung ----------
   // CMS-Flag: hervorgehobene (gesponserte) Nachrichten – Beispiele; sponsored: true ergänzt die Kennzeichnung „Anzeige“
   const FEATURED_ARTICLES = []; // z. B. ['sap-aktie-im-check']
