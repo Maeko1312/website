@@ -1937,3 +1937,22 @@ html.nav-open .market-strip { display: none; }
 .brand { min-height: 40px; }
 @media (max-width: 480px) { .hero-main .hero-body h2, .hero-main .hero-body h3 { font-size: 26px; line-height: 1.15; } .hero-main .hero-body p { font-size: 16px; line-height: 24px; } }
 @media (max-width: 860px) { .nl-closing-inner { grid-template-columns: minmax(0, 1fr); } } /* späte Zweispalten-Regel überschreibt sonst die Mobilregel */
+/* Briefing: Termine als ruhige Zeilen statt grauer Datumskacheln; Punkte sauber in Spalten ausgerichtet */
+.brief-events { gap: 0; }
+.brief-events li { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 11px 0; border-top: 1px solid var(--line); }
+.brief-events li:first-child { border-top: 0; padding-top: 2px; }
+.brief-when { display: flex; flex-direction: column; gap: 2px; font-family: var(--font-mono); line-height: 1.2; white-space: nowrap; }
+.brief-when b { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .01em; }
+.brief-when span { font-size: 12px; color: var(--muted); }
+.brief-ev { font-size: 15px; line-height: 21px; font-weight: 600; color: var(--ink); }
+.brief-ev small { display: block; font-weight: 400; font-size: 12.5px; line-height: 18px; color: var(--muted); margin-top: 1px; }
+.brief-side .kicker { margin-bottom: 4px; }
+.brief-list { gap: 14px; }
+.brief-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 12px; align-items: start; padding-left: 0; }
+.brief-list li::before { position: static; margin-top: 1px; }
+.brief-list li a { display: block; }
+.brief-src { margin-top: 4px; }
+/* Hervorgehobene Meldungen: nur das TOP-Abzeichen, keine seitliche Linie mehr */
+.ressort-lead.is-promoted { background: transparent; box-shadow: none; padding: 0 0 12px; margin-left: 0; }
+.ressort-list li.is-promoted { background: transparent; box-shadow: none; padding-left: 0; margin-left: 0; }
+.news-row.is-promoted { box-shadow: none; padding-left: 0; margin-left: 0; background: transparent; }
