@@ -1806,3 +1806,9 @@ body.is-fokus .nl-bar { display: none; }
 .fokus-risk-list li { counter-increment: risk; position: relative; padding: 14px 18px 14px 56px; background: var(--surface); border: 1px solid var(--line); font-size: 15.5px; line-height: 24px; color: var(--body); }
 .fokus-risk-list li::before { content: counter(risk, lower-alpha); position: absolute; left: 16px; top: 13px; width: 26px; height: 26px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-weight: 700; font-size: 14px; border-radius: 4px; }
 @media (max-width: 560px) { .fokus-risk-list li { padding: 12px 14px 12px 48px; font-size: 15px; line-height: 23px; } .fokus-risk-list li::before { left: 12px; top: 11px; } }
+
+/* Risikofaktoren: nur die Buchstaben fett, keine Kästen */
+.fokus-risk-list { gap: 12px; margin-top: 14px; }
+.fokus-risk-list li { padding: 0 0 0 40px; background: transparent; border: 0; }
+.fokus-risk-list li::before { content: counter(risk, lower-alpha) "."; position: absolute; left: 0; top: 0; width: auto; height: auto; display: block; background: transparent; border-radius: 0; color: var(--ink); font-family: var(--font-body); font-weight: 700; font-size: 16px; line-height: 24px; }
+@media (max-width: 560px) { .fokus-risk-list li { padding: 0 0 0 34px; } .fokus-risk-list li::before { left: 0; top: 0; } }
