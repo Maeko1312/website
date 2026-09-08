@@ -595,7 +595,7 @@
     window.BB_MOTION = true;
     if (!root.classList.contains('reveal-on') || !('IntersectionObserver' in window)) return;
     /* Liste identisch mit styles.css (Abschnitt "Bewegung") */
-    var sel = '.card, .post-card, .story-card, .guide-card, .tool-card, .board-item, .number-tile, .nl-banner, .facts, .summary, .article-hero, .post-list > li';
+    var sel = '.card, .post-card, .story-card, .guide-card, .tool-card, .board-item, .number-tile, .nl-banner, .facts, .summary, .article-hero, .post-list > li, .ressort';
     var excl = '.hero-side, .mega, .nav-panel, .nl-modal, .nl-bar, .search-results';
     var els = [];
     $$(sel).forEach(function (el) { if (el.closest(excl)) return; if (el.closest('[hidden]')) { el.classList.add('is-in'); el.classList.add('is-done'); return; } els.push(el); });

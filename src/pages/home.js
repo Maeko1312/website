@@ -1,66 +1,28 @@
 'use strict';
 module.exports = function (ctx) {
-  const { c, layout, util, instruments, content, config } = ctx;
-  const { html, raw, num, pct, dateWeekday } = util;
-  const q = (s) => ctx.quote(s) || {};
+  const { c, layout, util, content, config } = ctx;
+  const { html } = util;
   const news = content.articles.filter(a => a.kind === 'news');
-  const analyses = content.articles.filter(a => a.kind === 'analysis');
   // Aufmacher: hervorgehobener Blogbeitrag > hervorgehobene Nachricht > neueste Meldung
   const lead = content.blog.posts.find(p => p.featured) || news.find(a => a.featured) || news[0];
   const rest = news.filter(a => a !== lead);
   const todayCards = rest.slice(0, 4);
-  // „Mehr Nachrichten“: hervorgehobene Nachricht zuerst, dann chronologisch (ohne Aufmacher und Tageszeilen)
-  const feed = rest.slice(3, 17);
-  const m = c.movers(5);
-  const upcoming = content.upcomingEvents(5);
-  const daxUp = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length;
-  const dax = q('dax'), daxInst = instruments.bySlug.dax, daxHist = ctx.hist('dax');
   const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)]; // hervorgehobene zuerst
   // Nachrichten und Blogbeiträge in einem Strom (Blog ist Teil der Nachrichten): hervorgehobene zuerst, dann nach Datum
-  // Weitere hervorgehobene Beiträge (außer dem Aufmacher) für den Swiper; sie erscheinen nicht noch einmal im Strom
-  const featuredItems = [...news.filter(a => a.featured), ...posts.filter(p => p.featured)].filter(x => x !== lead).sort((x, y) => y.date - x.date);
   const stream = [...news.filter(a => a !== lead && !todayCards.includes(a)), ...posts.filter(p => p !== lead)].sort((x, y) => y.date - x.date);
-  const moreNews = [...stream.filter(i => i.featured), ...stream.filter(i => !i.featured)].slice(0, 16);
-  // Nachrichten nach Ressort: bevorzugt Beiträge, die oben noch nicht stehen; Ressorts mit zu wenig Rest werden mit den neuesten aufgefüllt
-  const shownSet = new Set([lead, ...todayCards, ...moreNews]);
-  const remaining = stream.filter(i => !shownSet.has(i));
-  const catPanels = [['alle', 'Alle', remaining.slice(0, 12)]];
-  for (const k of content.categories.news) { let items = remaining.filter(i => !i.topicObj && i.category === k.slug); if (items.length < 6) items = news.filter(a => a.category === k.slug); items = items.slice(0, 12); if (items.length) catPanels.push([k.slug, k.name, items]); }
-  { let items = remaining.filter(i => i.topicObj); if (items.length < 6) items = posts; catPanels.push(['ratgeber', 'Ratgeber', items.slice(0, 12)]); }
-  catPanels.push(['analysen', 'Analysen', analyses.slice(0, 12)]);
-  catPanels.push(['wissen', 'Wissen', content.guides.slice(0, 12)]);
-  const heroPost = posts.find(p => p.featured) || null; // steht bereits im Hero
-  const homePosts = posts.filter(p => p !== heroPost).slice(0, 18); // Weitere Beiträge: höchstens 18 (3 Seiten à 6); das Archiv liegt unter /blog
-  // Rankings kompakt (echte Daten)
-  const stocksQ = instruments.stocks.filter(s => q(s.slug).price != null);
-  const byKey = (fn, desc = true, n = 8) => stocksQ.map(s => ({ s, v: fn(q(s.slug)) })).filter(o => o.v != null && !Number.isNaN(o.v)).sort((a, b) => desc ? b.v - a.v : a.v - b.v).slice(0, n).map(o => o.s);
-  const rankSets = [
-    { key: 'gewinner', label: 'Tagesgewinner', rows: byKey(x => x.changePct), cols: ['price', 'change', 'ytd'], note: 'Größte Kursgewinne gegenüber dem Vortag.' },
-    { key: 'verlierer', label: 'Tagesverlierer', rows: byKey(x => x.changePct, false), cols: ['price', 'change', 'ytd'], note: 'Größte Kursverluste gegenüber dem Vortag.' },
-    { key: 'ytd', label: 'Seit Jahresbeginn', rows: byKey(x => x.perf && x.perf.ytd), cols: ['price', 'ytd', 'y1'], note: 'Beste Kursentwicklung seit dem Jahreswechsel.' },
-    { key: 'dividende', label: 'Dividendenrendite', rows: byKey(x => x.dividendYield), cols: ['price', 'dy', 'pe'], note: 'Ausschüttung der letzten zwölf Monate im Verhältnis zum Kurs.' },
-  ];
-
-  const tabsFeed = html`
-    <div class="tabs" data-tabs="feed-panels" role="tablist" aria-label="Nachrichten filtern">
-      <button class="tab is-active" type="button" role="tab" data-tab="alle">Alle</button>
-      <button class="tab" type="button" role="tab" data-tab="unternehmen">Unternehmen</button>
-      <button class="tab" type="button" role="tab" data-tab="maerkte">Märkte & Konjunktur</button>
-      <button class="tab" type="button" role="tab" data-tab="rohstoffe">Rohstoffe & Krypto</button>
-    </div>
-    <div id="feed-panels">
-      <div data-panel="alle">${c.denseList(feed)}</div>
-      <div data-panel="unternehmen" hidden>${c.denseList(news.filter(a => ['unternehmen', 'analystenstimmen'].includes(a.category)).slice(0, 10))}</div>
-      <div data-panel="maerkte" hidden>${c.denseList(news.filter(a => ['marktberichte', 'wirtschaft', 'zentralbanken'].includes(a.category)).slice(0, 10))}</div>
-      <div data-panel="rohstoffe" hidden>${c.denseList(news.filter(a => ['rohstoffe', 'krypto'].includes(a.category)).slice(0, 10))}</div>
-    </div>`;
-
-  const moversCard = html`<section class="card" aria-labelledby="h-mv">
-    <div class="section-title"><h2 id="h-mv">Gewinner & Verlierer</h2><span class="stand">${layout.asOfLabel}</span></div>
-    <div class="movers-mini"><div><span class="kicker up">▲ Gewinner</span>${c.miniQuotes(m.gainers.slice(0, 3))}</div><div><span class="kicker down">▼ Verlierer</span>${c.miniQuotes(m.losers.slice(0, 3))}</div></div>
-    <p class="small muted" style="margin-top:10px">DAX und MDAX · ${daxUp} von ${instruments.dax.length} DAX-Werten im Plus · <a href="/rankings">Alle Rankings ›</a></p>
-  </section>`;
-
+  // Nachrichten nach Ressort: vier Ressorts als Spalten (Aufmacher + fünf Schlagzeilen), nur Beiträge, die oben noch nicht stehen;
+  // gezeigt werden die vier Ressorts mit den meisten verfügbaren Beiträgen (bei Gleichstand in Ressort-Reihenfolge)
+  const RESSORT_COLS = 4, RESSORT_ROWS = 5;
+  const ressortCols = content.categories.news
+    .map((cat, order) => { const all = stream.filter(i => !i.topicObj && i.category === cat.slug); return { cat, order, avail: all.length, items: [...all.filter(i => i.featured), ...all.filter(i => !i.featured)].slice(0, 1 + RESSORT_ROWS) }; }) // hervorgehobene Meldung wird Aufmacher der Spalte
+    .filter(r => r.items.length >= 2)
+    .sort((a, b) => b.avail - a.avail || a.order - b.order)
+    .slice(0, RESSORT_COLS)
+    .sort((a, b) => a.order - b.order);
+  const inRessorts = new Set(ressortCols.flatMap(r => r.items));
+  // „Mehr Nachrichten“: alles Weitere, hervorgehobene zuerst, dann chronologisch (ohne Aufmacher, Tageszeilen und Ressortspalten)
+  const restStream = stream.filter(i => !inRessorts.has(i));
+  const moreNews = [...restStream.filter(i => i.featured), ...restStream.filter(i => !i.featured)].slice(0, 12);
   const body = html`<h1 class="visually-hidden">Börsenblick – Börse verstehen. Märkte im Blick.</h1>
 <div class="container page home-top">
   <div class="hero">
@@ -74,25 +36,21 @@ module.exports = function (ctx) {
   </div>
 
 
+  ${ressortCols.length ? html`<section class="news-section ressorts" aria-labelledby="h-ressorts">
+    ${c.sectionTitle('Nachrichten nach Ressort', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-ressorts' })}
+    <div class="ressort-grid" style="--n:${ressortCols.length}">${ressortCols.map(r => c.ressortColumn(r.cat, r.items))}</div>
+  </section>` : ''}
+</div>
+
+<div class="container" style="padding-bottom:40px">
+  ${c.quizBox({ wide: true })}
+
   <section class="news-section" aria-labelledby="h-more">
     ${c.sectionTitle('Mehr Nachrichten', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-more' })}
     <div class="news-layout">
       <div class="news-rows">${moreNews.map(a => c.newsRow(a))}</div>
       <aside class="news-aside">${c.newsletterBox({ compact: true })}${c.pollBox()}${c.sideAnalysis(6)}</aside>
     </div>
-  </section>
-
-
-
-</div>
-
-<div class="container" style="padding-bottom:40px">
-  ${c.quizBox({ wide: true })}
-
-  <section class="news-section" aria-labelledby="h-cats">
-    ${c.sectionTitle('Nachrichten nach Ressort', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-cats' })}
-    <div class="tabs" data-tabs="cat-panels" role="tablist" aria-label="Ressort wählen">${catPanels.map(([k, l], i) => html`<button class="tab ${i === 0 ? 'is-active' : ''}" type="button" role="tab" data-tab="${k}">${l}</button>`)}</div>
-    <div id="cat-panels">${catPanels.map(([k, l, items], i) => html`<div data-panel="${k}"${i ? raw(' hidden') : ''}><div class="news-rows is-full">${items.map(a => c.newsRow(a))}</div></div>`)}</div>
   </section>
   <section aria-labelledby="h-calc" style="margin-bottom:32px">
     ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}

@@ -33,7 +33,7 @@ module.exports = function (ctx) {
 
   /* ---------- Struktur ---------- */
   c.sectionTitle = (title, { href, more = 'Alle anzeigen', tag = 'h2', id, stand } = {}) =>
-    html`<div class="section-title"${id ? raw(` id="${id}"`) : ''}>${raw(`<${tag}>`)}${title}${raw(`</${tag}>`)}${href ? html`<a class="more" href="${href}">${more}</a>` : stand ? html`<span class="stand">${c.asOf}</span>` : ''}</div>`;
+    html`<div class="section-title">${raw(`<${tag}${id ? ` id="${id}"` : ''}>`)}${title}${raw(`</${tag}>`)}${href ? html`<a class="more" href="${href}">${more}</a>` : stand ? html`<span class="stand">${c.asOf}</span>` : ''}</div>`;
   c.breadcrumb = (items) => html`<nav aria-label="Brotkrumen"><ol class="breadcrumb"><li><a href="/">Start</a></li>${items.map(([l, h], i) => i < items.length - 1 ? html`<li><a href="${h}">${l}</a></li>` : html`<li aria-current="page">${l}</li>`)}</ol></nav>`;
   c.pageHead = ({ kicker, title, lead, extra }) => html`<div class="page-head">${kicker ? html`<span class="kicker">${kicker}</span>` : ''}<h1>${title}</h1>${lead ? html`<p class="lead">${lead}</p>` : ''}${extra || ''}</div>`;
   c.subnav = (items, current) => html`<ul class="subnav">${items.map(([l, h]) => html`<li><a href="${h}"${h === current ? raw(' class="is-current" aria-current="page"') : ''}>${l}</a></li>`)}</ul>`;
@@ -224,6 +224,16 @@ module.exports = function (ctx) {
         <dl class="day-brief-nums">${nums.map(({ i, x }) => html`<div><dt><a href="${c.url(i)}">${i.short || i.name}</a></dt><dd><strong>${c.priceCell(i, x)}</strong>${c.delta(x.changePct)}</dd></div>`)}</dl>
       </div>
     </section>`;
+  };
+  // Ressort-Spalte (Startseite): Banner mit Ressortname, ein Aufmacher mit Foto, darunter Schlagzeilen in Zeilen
+  c.ressortColumn = (cat, items) => {
+    const [lead, ...rows] = items; const inst = instOf(lead);
+    const when = (a) => html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>`;
+    return html`<div class="ressort">
+      <h3 class="ressort-head" id="h-r-${cat.slug}"><a href="${c.catUrl(cat)}">${cat.name}<span class="chev" aria-hidden="true">›</span></a></h3>
+      <article class="ressort-lead ${lead.featured ? 'is-promoted' : ''}"><a class="card-link" href="${c.articleUrl(lead)}" aria-label="${lead.title}"></a>${c.thumb(lead.slug, { label: inst ? inst.short || inst.name : cat.name, image: lead.image })}<div class="ressort-lead-body"><div class="story-top">${lead.featured ? html`<span class="badge is-accent">Top</span>` : ''}${when(lead)}</div><h4 class="story-title">${lead.title}</h4><p class="story-excerpt">${lead.deck}</p></div></article>
+      <ul class="ressort-list">${rows.map(a => html`<li class="${a.featured ? 'is-promoted' : ''}"><a href="${c.articleUrl(a)}">${a.title}</a></li>`)}</ul>
+    </div>`;
   };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
