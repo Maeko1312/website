@@ -46,33 +46,6 @@ const nav = [
     feature: 'latest',
   },
   {
-    label: 'Analysen', href: '/analysen', key: 'analysen', cols: 2,
-    groups: [
-      { title: 'Technische Analyse', links: [
-        ['Alle Analysen', '/analysen'],
-        ['Indizes', '/analysen/indizes'],
-        ['Rohstoffe & Devisen', '/analysen/rohstoffe-devisen'],
-      ] },
-      { title: 'Produkte & Strategie', links: [
-        ['ETF', '/analysen/etf'],
-        ['Hebelprodukte', '/analysen/hebelprodukte'],
-        ['Chartanalyse lernen', '/wissen/chartanalyse'],
-        ['Anlagestrategien', '/wissen/strategien'],
-      ] },
-    ],
-    feature: 'analysis',
-  },
-  {
-    label: 'Termine', href: '/termine/wirtschaftskalender', key: 'termine', cols: 1,
-    groups: [
-      { title: 'Kalender', links: [
-        ['Wirtschaftskalender', '/termine/wirtschaftskalender'],
-        ['Börsenfeiertage', '/termine/boersenfeiertage'],
-      ] },
-    ],
-    feature: 'events',
-  },
-  {
     label: 'Wissen', href: '/wissen', key: 'wissen', cols: 3,
     groups: [
       { title: 'Einstieg', links: [
@@ -116,8 +89,8 @@ const nav = [
 
 const footer = [
   { title: 'Märkte', links: [['Marktüberblick', '/maerkte'], ['DAX', '/kurs/dax'], ['Indizes', '/indizes'], ['Rohstoffe', '/rohstoffe'], ['Devisen', '/devisen'], ['Krypto', '/krypto'], ['Anleihen & Zinsen', '/anleihen'], ['Gold', '/kurs/gold']] },
-  { title: 'Nachrichten', links: [['Alle Nachrichten', '/nachrichten'], ['Marktberichte', '/nachrichten/marktberichte'], ['Unternehmen', '/nachrichten/unternehmen'], ['Analysen', '/analysen'], ['Ratgeber', '/nachrichten/ratgeber'], ['Newsletter', '/newsletter'], ['RSS-Feed', '/feed.xml']] },
-  { title: 'Termine & Wissen', links: [['Wirtschaftskalender', '/termine/wirtschaftskalender'], ['Börsenfeiertage', '/termine/boersenfeiertage'], ['Börse für Einsteiger', '/wissen/einsteiger'], ['Börsenlexikon', '/wissen/boersenlexikon'], ['Rechner', '/werkzeuge'], ['Merkliste', '/merkliste']] },
+  { title: 'Nachrichten', links: [['Alle Nachrichten', '/nachrichten'], ['Marktberichte', '/nachrichten/marktberichte'], ['Unternehmen', '/nachrichten/unternehmen'], ['Analysen', '/nachrichten/analysen'], ['Ratgeber', '/nachrichten/ratgeber'], ['Newsletter', '/newsletter'], ['RSS-Feed', '/feed.xml']] },
+  { title: 'Wissen & Werkzeuge', links: [['Börse für Einsteiger', '/wissen/einsteiger'], ['Börsenlexikon', '/wissen/boersenlexikon'], ['Rechner', '/werkzeuge'], ['Merkliste', '/merkliste']] },
   { title: 'Über uns', links: [['Über Börsenblick', '/ueber-uns'], ['Redaktion', '/redaktion'], ['Redaktionelle Leitlinien', '/redaktionelle-leitlinien'], ['Methodik & Datenquellen', '/methodik'], ['Kontakt', '/kontakt'], ['Werben', '/werben'], ['Impressum', '/impressum'], ['Datenschutz', '/datenschutz']] },
 ];
 

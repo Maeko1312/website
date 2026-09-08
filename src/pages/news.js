@@ -5,7 +5,6 @@ module.exports = function (ctx) {
   const pages = [];
   const cats = content.categories;
   const newsSubnav = [['Alle', '/nachrichten'], ...cats.news.map(k => [k.name, `/nachrichten/${k.slug}`]), ['Ratgeber', '/nachrichten/ratgeber']];
-  const anaSubnav = [['Alle', '/analysen'], ...cats.analysis.map(k => [k.name, c.catUrl(k)])];
 
   function listPage({ path, title, lead, kicker, arts, subnav, section, crumbs, cat }) {
     // Keine doppelten Motive auf einer Listenseite: Doppelgänger erhalten ein hier noch ungenutztes Foto
@@ -19,7 +18,7 @@ module.exports = function (ctx) {
         <div class="stack">
           ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.heroStory(first)}
           <section>${c.sectionTitle(section === 'analysen' ? 'Alle Analysen' : 'Weitere Meldungen', { tag: 'h2' })}${c.storyList(section === 'analysen' ? arts : others, { thumb: true, excerpt: true })}</section>` : html`<div class="empty">In diesem Ressort gibt es noch keine Beiträge.</div>`}
-          ${cat && arts.length < 8 ? (() => { const pool = content.articles.filter(x => (section === 'analysen' ? x.kind === 'analysis' : x.kind === 'news') && !arts.includes(x)).slice(0, Math.max(4, 10 - arts.length)); return pool.length ? html`<section>${c.sectionTitle(section === 'analysen' ? 'Weitere aktuelle Analysen' : 'Aktuelle Meldungen aus allen Ressorts', { tag: 'h2', href: section === 'analysen' ? '/analysen' : '/nachrichten', more: 'Alle' })}${c.storyList(pool, { thumb: true, excerpt: true })}</section>` : ''; })() : ''}
+          ${cat && arts.length < 8 ? (() => { const pool = content.articles.filter(x => !arts.includes(x)).slice(0, Math.max(4, 10 - arts.length)); return pool.length ? html`<section>${c.sectionTitle(section === 'analysen' ? 'Weitere aktuelle Analysen' : 'Aktuelle Meldungen aus allen Ressorts', { tag: 'h2', href: section === 'analysen' ? '/analysen' : '/nachrichten', more: 'Alle' })}${c.storyList(pool, { thumb: true, excerpt: true })}</section>` : ''; })() : ''}
           ${cat ? html`<p class="small muted">Ressort „${cat.name}“: ${arts.length} ${arts.length === 1 ? 'Beitrag' : 'Beiträge'}. Neue Meldungen erscheinen oben; der <a href="/feed.xml">RSS-Feed</a> liefert alle Ressorts.</p>` : ''}
         </div>
         <aside>
@@ -32,7 +31,7 @@ module.exports = function (ctx) {
     return { path, html: layout.page({ title, description: lead, path, body, section }) };
   }
 
-  const news = content.articles.filter(a => a.kind === 'news');
+  const news = content.articles; // alle Beitragsarten (Nachrichten und Analysen) laufen als Nachrichten
   // Ratgeber (ehemals Blog) sind Teil der Nachrichten: hervorgehobene zuerst, dann nach Datum
   const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)];
   const newsAndPosts = [...news, ...content.blog.posts].sort((x, y) => y.date - x.date);
@@ -40,8 +39,6 @@ module.exports = function (ctx) {
   pages.push(listPage({ path: '/nachrichten', title: 'Alle Nachrichten', kicker: 'Nachrichten', lead: 'Marktberichte mit den echten Schlusskursen, Aktien-Checks, Konjunktur, Zentralbanken, Rohstoffe und Krypto – chronologisch, ohne Klickstrecken.', arts: newsAndPosts, subnav: newsSubnav, section: 'nachrichten', crumbs: [['Nachrichten', '/nachrichten']] }));
   pages.push(listPage({ path: '/nachrichten/ratgeber', title: 'Ratgeber', kicker: 'Nachrichten', lead: 'Praxisnahe Anleitungen für Anlegerinnen und Anleger – vom ersten Sparplan bis zur Dividendenstrategie. Konkrete Zahlen, keine Produktwerbung.', arts: posts, subnav: newsSubnav, section: 'nachrichten', crumbs: [['Nachrichten', '/nachrichten'], ['Ratgeber', '/nachrichten/ratgeber']], cat: { name: 'Ratgeber', slug: 'ratgeber' } }));
   for (const k of cats.news) pages.push(listPage({ path: `/nachrichten/${k.slug}`, title: k.name, kicker: 'Nachrichten', lead: k.description, arts: news.filter(a => a.category === k.slug), subnav: newsSubnav, section: 'nachrichten', crumbs: [['Nachrichten', '/nachrichten'], [k.name, `/nachrichten/${k.slug}`]], cat: k }));
-  pages.push(listPage({ path: '/analysen', title: 'Analysen', kicker: 'Technische Analyse & Produkte', lead: 'Chartanalysen zu Indizes, Aktien, Rohstoffen und Devisen auf Basis der Tagesschlusskurse – mit klar benannten Marken, Trendrichtung und Szenarien. Dazu Grundlagen zu ETFs und Hebelprodukten.', arts: analyses, subnav: anaSubnav, section: 'analysen', crumbs: [['Analysen', '/analysen']] }));
-  for (const k of cats.analysis) pages.push(listPage({ path: c.catUrl(k), title: `Analysen: ${k.name}`, kicker: 'Analysen', lead: k.description, arts: analyses.filter(a => a.category === k.slug), subnav: anaSubnav, section: 'analysen', crumbs: [['Analysen', '/analysen'], [k.name, c.catUrl(k)]], cat: k }));
 
   // ---------- Artikelseiten ----------
   for (const a of content.articles) {

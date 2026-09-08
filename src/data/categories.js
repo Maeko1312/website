@@ -6,10 +6,7 @@ const list = [
   { slug: 'zentralbanken', name: 'Zentralbanken & Zinsen', kind: 'news', description: 'EZB, Fed, Anleiherenditen und Leitzinsen – klar erklärt.' },
   { slug: 'rohstoffe', name: 'Rohstoffe & Energie', kind: 'news', description: 'Gold, Öl, Kupfer und Erdgas: Preise, Treiber und Hintergründe.' },
   { slug: 'krypto', name: 'Kryptowährungen', kind: 'news', description: 'Bitcoin, Ethereum und Co.: Kurse, Marktstruktur und Regulierung.' },
+  { slug: 'analysen', name: 'Analysen', kind: 'news', description: 'Chartanalysen zu Indizes, Rohstoffen und Devisen sowie Einordnungen zu ETF und Hebelprodukten – mit klaren Marken und ohne Kaufempfehlung.' },
   { slug: 'analystenstimmen', name: 'Analystenstimmen', kind: 'news', description: 'Kursziele, Einstufungen und wie man Analystenschätzungen richtig liest.' },
-  { slug: 'analysen-indizes', name: 'Indizes', kind: 'analysis', description: 'Technische Analysen zu DAX, MDAX, EURO STOXX 50, S&P 500 und Nasdaq 100.' },
-  { slug: 'analysen-rohstoffe-devisen', name: 'Rohstoffe & Devisen', kind: 'analysis', description: 'Gold, Öl, EUR/USD und Bitcoin aus charttechnischer Sicht.' },
-  { slug: 'analysen-etf', name: 'ETF', kind: 'analysis', description: 'Indexfonds im Fokus: Auswahl, Kosten und Strategien.' },
-  { slug: 'analysen-hebelprodukte', name: 'Hebelprodukte', kind: 'analysis', description: 'Optionsscheine, Knock-outs und Faktor-Zertifikate: Chancen, Risiken, Funktionsweise.' },
 ];
 module.exports = { list, bySlug: Object.fromEntries(list.map(c => [c.slug, c])), news: list.filter(c => c.kind === 'news'), analysis: list.filter(c => c.kind === 'analysis') };

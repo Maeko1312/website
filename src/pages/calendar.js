@@ -3,8 +3,8 @@ module.exports = function (ctx) {
   const { c, layout, util, instruments, content, now } = ctx;
   const { html, raw, num, pct, isoDate, addDays, startOfWeek, dateShort, dateLong, dateWeekday, DAYS, MONTHS, MONTHS_SHORT, pad } = util;
   const pages = [];
-  const sub = [['Wirtschaftskalender', '/termine/wirtschaftskalender'], ['Börsenfeiertage', '/termine/boersenfeiertage']];
-  const crumbs = (t, p) => [['Termine', '/termine/wirtschaftskalender'], [t, p]];
+  const sub = [];
+  const crumbs = (t, p) => [[t, p]];
   const add = (path, title, description, body, noindex) => { content.searchablePages.push({ title, path, kicker: 'Termine', description }); pages.push({ path, html: layout.page({ title, description, path, body, section: 'termine', noindex }) }); };
   const today = isoDate(now);
   const D = (iso) => new Date(iso + 'T00:00:00');

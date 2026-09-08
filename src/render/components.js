@@ -301,7 +301,7 @@ module.exports = function (ctx) {
   /* ---------- Sidebar-Bausteine ---------- */
   c.sideCard = (title, body, { href, more } = {}) => html`<section class="card">${c.sectionTitle(title, { href, more, tag: 'h2' })}${body}</section>`;
   c.sideIndices = () => c.sideCard('Indizes', c.miniQuotes(['dax', 'mdax', 'sdax', 'tecdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'nikkei-225'].map(s => instruments.bySlug[s])), { href: '/indizes', more: 'Alle Indizes' });
-  c.sideAnalysis = (n = 5) => c.sideCard('Neueste Analysen', c.analysisList(ctx.content.articles.filter(a => a.kind === 'analysis').slice(0, n)), { href: '/analysen', more: 'Alle Analysen' });
+  c.sideAnalysis = (n = 5) => c.sideCard('Neueste Analysen', c.analysisList(ctx.content.articles.filter(a => a.kind === 'analysis').slice(0, n)), { href: '/nachrichten/analysen', more: 'Alle Analysen' });
   c.sideLatest = (n = 6, exclude) => c.sideCard('Aktuelle Nachrichten', c.storyList(ctx.content.articles.filter(a => a.kind === 'news' && a.slug !== exclude).slice(0, n), { variant: 'is-compact' }), { href: '/nachrichten', more: 'Alle Nachrichten' });
   c.sideUpcoming = (n = 5) => { const ev = ctx.content.upcomingEvents(n); return c.sideCard('Nächste Termine', html`<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>`, { href: '/termine/wirtschaftskalender', more: 'Kalender' }); };
   c.sideRecent = () => html`<section class="card" data-recent hidden>${c.sectionTitle('Zuletzt gelesen')}<ul class="side-list" data-recent-list></ul><p class="small muted" style="margin-top:8px">Wird nur lokal in Ihrem Browser gespeichert.</p></section>`;
@@ -428,14 +428,12 @@ module.exports = function (ctx) {
       '/wissen/boersenlexikon': 'glossary, glossar, lexikon, begriffe, definitions, dictionary',
       '/maerkte': 'markets, märkte, kurse, prices, overview, marktüberblick, börse',
       '/nachrichten': 'news, nachrichten, meldungen, aktuell',
-      '/analysen': 'analysis, analyses, analysen, chartanalyse, technical analysis',
+      '/nachrichten/analysen': 'analysis, analyses, analysen, chartanalyse, technical analysis',
       '/indizes': 'indices, index, indizes',
       '/rohstoffe': 'commodities, rohstoffe, oil, öl',
       '/devisen': 'forex, fx, currencies, devisen, währungen',
       '/krypto': 'crypto, krypto, kryptowährungen',
       '/anleihen': 'bonds, anleihen, zinsen, yields, interest rates',
-      '/termine/wirtschaftskalender': 'calendar, kalender, termine, events, economic calendar, wirtschaftskalender, konjunkturdaten',
-      '/termine/boersenfeiertage': 'holidays, feiertage, börsenfeiertage, trading holidays',
       '/merkliste': 'watchlist, merkliste, favoriten, favorites',
       '/ueber-uns': 'about, über uns, kontakt, contact',
       '/redaktion': 'team, redaktion, editorial, autoren, authors',

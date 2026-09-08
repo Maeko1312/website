@@ -50,6 +50,26 @@
       "source": "/blog",
       "destination": "/nachrichten/ratgeber",
       "permanent": true
+    },
+    {
+      "source": "/analysen/:cat",
+      "destination": "/nachrichten/analysen",
+      "permanent": true
+    },
+    {
+      "source": "/analysen",
+      "destination": "/nachrichten/analysen",
+      "permanent": true
+    },
+    {
+      "source": "/termine/:page",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/termine",
+      "destination": "/",
+      "permanent": true
     }
   ]
 }
