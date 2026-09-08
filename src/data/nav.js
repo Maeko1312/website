@@ -122,6 +122,6 @@ const footer = [
   { title: 'Über uns', links: [['Über Börsenblick', '/ueber-uns'], ['Redaktion', '/redaktion'], ['Redaktionelle Leitlinien', '/redaktionelle-leitlinien'], ['Methodik & Datenquellen', '/methodik'], ['Kontakt', '/kontakt'], ['Werben', '/werben'], ['Impressum', '/impressum'], ['Datenschutz', '/datenschutz']] },
 ];
 
-const legal = [['Impressum', '/impressum'], ['Datenschutz', '/datenschutz'], ['Nutzungsbedingungen', '/nutzungsbedingungen'], ['Cookie-Einstellungen', '/cookie-einstellungen'], ['Kontakt', '/kontakt']];
+const legal = [['Impressum', '/impressum'], ['Datenschutz', '/datenschutz'], ['Nutzungsbedingungen', '/nutzungsbedingungen'], ['Bildnachweise', '/bildnachweise'], ['Cookie-Einstellungen', '/cookie-einstellungen'], ['Kontakt', '/kontakt']];
 
 module.exports = { nav, footer, legal };

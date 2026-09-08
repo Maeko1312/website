@@ -141,5 +141,17 @@ module.exports = function (ctx) {
     const body = html`<div class="container notfound"><p class="kicker">Fehler 404</p><h1>Seite nicht gefunden</h1><p>Diese Adresse gibt es nicht oder nicht mehr. Vielleicht hilft die Suche – oder einer dieser Einstiege.</p><form class="filter-bar" role="search" action="/suche" method="get" style="max-width:520px;margin:0 auto 20px"><label class="visually-hidden" for="q-404">Suche</label><div class="control" style="flex:1"><input id="q-404" type="search" name="q" placeholder="Aktie, Index, Begriff …"></div><button class="btn btn-dark" type="submit">Suchen</button></form><div class="chips" style="justify-content:center"><a class="chip" href="/">Startseite</a><a class="chip" href="/nachrichten">Nachrichten</a><a class="chip" href="/kurs/dax">DAX</a><a class="chip" href="/kurs/gold">Gold</a><a class="chip" href="/termine/wirtschaftskalender">Wirtschaftskalender</a><a class="chip" href="/wissen">Börsenwissen</a></div></div>`;
     pages.push({ path: '/404', html: layout.page({ title: 'Seite nicht gefunden', description: 'Die angeforderte Seite existiert nicht.', path: '/404', body, noindex: true }) });
   }
+  // ---------- Bildnachweise ----------
+  {
+    const list = content.photos.all();
+    const body = html`<div class="container page">
+      ${c.breadcrumb([['Bildnachweise', '/bildnachweise']])}
+      ${c.pageHead({ kicker: 'Rechtliches', title: 'Bildnachweise', lead: 'Die Fotos auf dieser Website stammen, soweit nicht anders angegeben, von Wikimedia Commons und stehen unter freien Lizenzen (Public Domain, CC0, CC BY, CC BY-SA). Urheber und Lizenz je Bild:' })}
+      <div class="layout no-sticky"><div class="card"><ul class="credits">${list.map(p => html`<li><img src="${p.file}" alt="" loading="lazy" width="120" height="75"><div><strong>${p.title}</strong><br><span class="small muted">${p.artist} · <a href="${p.page}" rel="noopener" target="_blank">Wikimedia Commons</a> · ${p.license}</span></div></li>`)}</ul></div>
+      <aside>${c.sideCard('Hinweis', html`<p class="small">Bilder aus Kampagnen im Bereich „Im Fokus“ stellt der jeweilige Auftraggeber bereit; der Nachweis steht direkt unter dem Bild.</p>`)}</aside></div>
+    </div>`;
+    content.searchablePages.push({ title: 'Bildnachweise', path: '/bildnachweise', kicker: 'Rechtliches', description: 'Urheber und Lizenzen der verwendeten Fotos.' });
+    pages.push({ path: '/bildnachweise', html: layout.page({ title: 'Bildnachweise', description: 'Urheber und Lizenzen der auf Börsenblick verwendeten Fotos.', path: '/bildnachweise', body, section: null }) });
+  }
   return pages;
 };

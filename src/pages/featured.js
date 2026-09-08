@@ -64,8 +64,20 @@ module.exports = function (ctx) {
       <h1>${f.title}</h1>
       <p class="deck">${f.lead}</p>
       <div class="fokus-meta"><span>Lesezeit ${rt} Min.</span><span>${f.sources.length} Quellen</span><span>Kurse ${c.delayLabel(x)}</span></div>
-      <div class="fokus-cta"><a class="btn btn-primary" href="${f.presentation}" target="_blank" rel="noopener">Investorenpräsentation (PDF)</a><a class="btn btn-ghost" href="${f.website}" target="_blank" rel="noopener">Unternehmenswebsite</a><a class="btn btn-ghost" href="#kurs">Kurs und Chart</a></div>
+      <div class="fokus-cta"><a class="btn btn-primary" href="${f.presentation}" target="_blank" rel="noopener">Investorenpräsentation (PDF)</a><a class="btn btn-ghost" href="${f.website}" target="_blank" rel="noopener">Unternehmenswebsite</a><a class="btn btn-ghost" href="#kurs">Kurs und Chart</a><a class="btn btn-ghost" href="#updates">E-Mail-Updates</a></div>
     </div>
+  </header>
+  <figure class="fokus-hero"><img src="${f.image}" alt="${f.imageAlt}" loading="eager" fetchpriority="high" decoding="async" width="1600" height="900"><figcaption>${f.imageAlt}. Bild: ${f.sponsor}</figcaption></figure>
+  <div class="layout">
+    <article class="article fokus-article" data-article="${f.title}" data-article-cat="Im Fokus">
+      <section class="fokus-kpis" aria-label="Kennzahlen auf einen Blick"><div class="number-tiles">${f.kpis.map(([l, v, s, d]) => html`<div class="number-tile"><span>${l}</span><strong class="${d || ''}">${v}</strong><small>${s}</small></div>`)}</div></section>
+      <div class="prose fokus-prose">${f.sections.map(sectionHtml)}</div>
+      <footer class="article-foot" id="updates">
+        ${c.newsletterBox({ dark: true })}
+        ${c.disclaimer()}
+      </footer>
+    </article>
+    <aside>
     <aside class="fokus-ticker card" aria-labelledby="h-ticker">
       <span class="kicker">Die Aktie</span>
       <h2 id="h-ticker">${inst.name}</h2>
@@ -80,21 +92,7 @@ module.exports = function (ctx) {
       </dl>
       <a class="btn btn-teal fokus-ticker-cta" href="#updates">Updates zu ${f.short} per E-Mail</a>
     </aside>
-  </header>
-  <figure class="fokus-hero"><img src="${f.image}" alt="${f.imageAlt}" loading="eager" fetchpriority="high" decoding="async" width="1600" height="900"><figcaption>${f.imageAlt}. Bild: ${f.sponsor}</figcaption></figure>
-  <div class="layout">
-    <article class="article fokus-article" data-article="${f.title}" data-article-cat="Im Fokus">
-      <section class="fokus-kpis" aria-label="Kennzahlen auf einen Blick"><div class="number-tiles">${f.kpis.map(([l, v, s, d]) => html`<div class="number-tile"><span>${l}</span><strong class="${d || ''}">${v}</strong><small>${s}</small></div>`)}</div></section>
-      <div class="prose fokus-prose">${f.sections.map(sectionHtml)}</div>
-      <footer class="article-foot" id="updates">
-        ${c.newsletterBox({ dark: true })}
-        ${c.disclaimer()}
-      </footer>
-    </article>
-    <aside>
-      <section class="card fokus-toc" aria-labelledby="h-toc"><h2 id="h-toc" class="kicker">Inhalt</h2><ol>${tocItems.map(([id, t]) => html`<li><a href="#${id}">${t}</a></li>`)}</ol></section>
-      ${c.newsletterBox({ compact: true })}
-      ${c.sideLatest(5)}
+      <details class="card fokus-toc"><summary><span class="kicker">Inhalt</span><span class="small muted">${tocItems.length} Abschnitte</span></summary><ol>${tocItems.map(([id, t]) => html`<li><a href="#${id}">${t}</a></li>`)}</ol></details>
     </aside>
   </div>
 </div>`;
