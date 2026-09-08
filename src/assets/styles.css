@@ -1756,3 +1756,35 @@ body.is-fokus .nl-bar { display: none; }
 .fokus-listing .copy-btn { width: 22px; height: 22px; font-size: 12px; }
 .fokus-ticker .kicker { color: var(--accent); }
 .fokus-ticker > .small.muted { margin-bottom: 4px; }
+
+/* Im Fokus: Aktionen als Icon-Buttons in der Ticker-Karte */
+.fokus-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 14px 0 6px; }
+.fokus-action { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13.5px; line-height: 17px; font-weight: 600; text-decoration: none; transition: border-color .15s, background-color .15s, color .15s; min-width: 0; }
+.fokus-action svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.fokus-action span { display: flex; flex-direction: column; min-width: 0; }
+.fokus-action small { font-weight: 400; font-size: 11.5px; line-height: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fokus-action:hover { border-color: var(--ink); text-decoration: none; }
+.fokus-action.is-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.fokus-action.is-primary small { color: var(--accent-ink); opacity: .8; }
+.fokus-action.is-primary:hover { background: var(--cta-hover, #3a2d85); border-color: var(--cta-hover, #3a2d85); }
+.fokus-meta { margin-bottom: 0; }
+@media (max-width: 420px) { .fokus-actions { grid-template-columns: minmax(0, 1fr); } }
+
+/* Im Fokus: Ticker-Karte als saubere Tabelle */
+.fokus-ticker { padding: 22px 24px 22px; }
+.fokus-ticker h2 { margin: 6px 0 14px; }
+.fokus-price { margin-bottom: 8px; }
+.fokus-price strong { font-size: 44px; }
+.fokus-ticker-meta { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; line-height: 18px; color: var(--muted); font-family: var(--font-mono); letter-spacing: .01em; margin: 0 0 14px; }
+.fokus-kv { margin: 0 0 16px; border-top: 1px solid var(--line); }
+.fokus-kv > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 9px 0; font-size: 14.5px; }
+.fokus-kv dt { color: var(--muted); white-space: nowrap; }
+.fokus-kv dd { display: flex; justify-content: flex-end; align-items: center; min-height: 24px; }
+.fokus-kv dd:not(:has(.copy-btn)) { padding-right: 32px; font-weight: 600; }
+.fokus-kv .copy-wrap { display: grid; grid-template-columns: auto 24px; align-items: center; gap: 8px; }
+.fokus-kv .copy-wrap code { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; letter-spacing: .02em; color: var(--ink); text-align: right; }
+.fokus-kv .is-wide { display: block; padding: 12px 0 6px; }
+.fokus-kv .is-wide dt { margin-bottom: 4px; }
+.fokus-kv .is-wide dd { display: block; padding-right: 0; font-weight: 400; }
+.fokus-listings { display: none; }
+.fokus-actions { margin: 0; }

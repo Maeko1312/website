@@ -64,7 +64,6 @@ module.exports = function (ctx) {
       <h1>${f.title}</h1>
       <p class="deck">${f.lead}</p>
       <div class="fokus-meta"><span>Lesezeit ${rt} Min.</span><span>${f.sources.length} Quellen</span><span>Kurse ${c.delayLabel(x)}</span></div>
-      <div class="fokus-cta"><a class="btn btn-primary" href="${f.presentation}" target="_blank" rel="noopener">Investorenpräsentation (PDF)</a><a class="btn btn-ghost" href="${f.website}" target="_blank" rel="noopener">Unternehmenswebsite</a><a class="btn btn-ghost" href="#kurs">Kurs und Chart</a><a class="btn btn-ghost" href="#updates">E-Mail-Updates</a></div>
     </div>
   </header>
   <figure class="fokus-hero"><img src="${f.image}" alt="${f.imageAlt}" loading="eager" fetchpriority="high" decoding="async" width="1600" height="900"><figcaption>${f.imageAlt}. Bild: ${f.sponsor}</figcaption></figure>
@@ -82,15 +81,15 @@ module.exports = function (ctx) {
       <span class="kicker">Die Aktie</span>
       <h2 id="h-ticker">${inst.name}</h2>
       <div class="fokus-price">${price != null ? html`<strong>${num(price, 2)} <small>${inst.currency}</small></strong>${c.delta(chg, { pill: true })}` : html`<span class="muted">Kurs folgt</span>`}</div>
-      <p class="small muted">${inst.exchange} · ${c.delayLabel(x)} · ${layout.asOfLabel}</p>
-      <div class="fokus-listings">${inst.listings.map(([ex, sym]) => html`<span class="fokus-listing"><span class="fokus-listing-ex">${ex.replace(' Exchange', '').replace(' Venture Market', '')}</span><code translate="no">${sym}</code><button type="button" class="copy-btn" data-copy="${sym}" aria-label="${sym} kopieren" title="Kopieren">⧉</button></span>`)}</div>
+      <p class="fokus-ticker-meta"><span>${inst.exchange} · ${c.delayLabel(x)}</span><span>${layout.asOfLabel}</span></p>
+      <div class="fokus-actions"><a class="fokus-action is-primary" href="${f.presentation}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Präsentation<small>PDF für Investoren</small></span></a><a class="fokus-action" href="${f.website}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>Website<small>${new URL(f.website).host}</small></span></a><a class="fokus-action" href="#kurs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"/></svg><span>Kurs und Chart<small>Verlauf, Kennzahlen</small></span></a><a class="fokus-action" href="#updates"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>E-Mail-Updates<small>zu ${f.short}</small></span></a></div>
       <dl class="kv is-compact fokus-kv">
+        ${inst.listings.map(([ex, sym]) => html`<div><dt>${ex.replace(' Exchange', '').replace(' Venture Market', '')}</dt><dd>${copy(sym)}</dd></div>`)}
         <div><dt>ISIN</dt><dd>${copy(inst.isin)}</dd></div>
         <div><dt>WKN</dt><dd>${copy(inst.wkn)}</dd></div>
         <div><dt>Marktkapitalisierung</dt><dd>${mcapLive != null ? fmtMio(mcapLive) : f.shareInfo.mcapRef}</dd></div>
         ${x.low52w != null && x.high52w != null ? html`<div class="is-wide"><dt>52-Wochen-Spanne</dt><dd>${charts.rangeBar(x.low52w, x.high52w, price)}<span class="range-labels"><span>${num(x.low52w, 2)}</span><span>${num(x.high52w, 2)}</span></span></dd></div>` : ''}
       </dl>
-      <a class="btn btn-teal fokus-ticker-cta" href="#updates">Updates zu ${f.short} per E-Mail</a>
     </aside>
       <details class="card fokus-toc"><summary><span class="kicker">Inhalt</span><span class="small muted">${tocItems.length} Abschnitte</span></summary><ol>${tocItems.map(([id, t]) => html`<li><a href="#${id}">${t}</a></li>`)}</ol></details>
     </aside>
