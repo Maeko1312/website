@@ -23,10 +23,8 @@ module.exports = function (ctx) {
           ${cat ? html`<p class="small muted">Ressort „${cat.name}“: ${arts.length} ${arts.length === 1 ? 'Beitrag' : 'Beiträge'}. Neue Meldungen erscheinen oben; der <a href="/feed.xml">RSS-Feed</a> liefert alle Ressorts.</p>` : ''}
         </div>
         <aside>
-          ${c.sideIndices()}
-          ${section === 'analysen' ? c.sideLatest(6) : c.sideAnalysis(5)}
+          ${c.featuredPromo()}
           ${c.newsletterBox({ compact: true })}
-          ${c.sideUpcoming(4)}
         </aside>
       </div>
     </div>`;
