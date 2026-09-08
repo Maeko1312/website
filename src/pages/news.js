@@ -8,6 +8,8 @@ module.exports = function (ctx) {
   const anaSubnav = [['Alle', '/analysen'], ...cats.analysis.map(k => [k.name, c.catUrl(k)])];
 
   function listPage({ path, title, lead, kicker, arts, subnav, section, crumbs, cat }) {
+    // Keine doppelten Motive auf einer Listenseite: Doppelgänger erhalten ein hier noch ungenutztes Foto
+    { const seenImg = new Set(); for (const it of arts) { if (!it.image) continue; if (seenImg.has(it.image)) { const alt = content.photos.alternative(it, seenImg); if (alt) { it.image = alt.file; it.imageAlt = alt.alt; it.imageCredit = content.photos.credit(alt); } } seenImg.add(it.image); } }
     const [first, ...others] = arts;
     const body = html`<div class="container page">
       ${c.breadcrumb(crumbs)}

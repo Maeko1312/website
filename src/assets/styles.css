@@ -1711,3 +1711,48 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .fokus-toc[open] summary::after { content: "–"; }
 .fokus-toc ol { margin-top: 12px; }
 @media (max-width: 1100px) { .fokus .layout { display: flex; flex-direction: column; } .fokus .layout > aside { order: -1; position: static; } }
+
+/* Im Fokus: Kopfbereich in voller Breite wie das Bild */
+.fokus-head { max-width: none; }
+.fokus-head h1 { max-width: none; text-wrap: pretty; }
+.fokus-head .deck { max-width: none; }
+
+/* Im Fokus: Zeilen statt schmaler Karten, Porträts, Bewertung, Rechtliches, Zeitleiste */
+.fokus-rows { display: grid; gap: 14px; margin: 22px 0 28px; }
+.fokus-row { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 10px 28px; padding: 20px 24px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); }
+.fokus-row-head h3 { font-family: var(--font-body); font-weight: 600; font-size: 18px; line-height: 25px; margin: 4px 0 0; }
+.fokus-row-head .kicker { color: var(--accent); }
+.fokus-row > p { margin: 0; font-size: 15.5px; line-height: 24px; color: var(--body); align-self: center; }
+.fokus-row .fokus-patent-no { display: block; margin-top: 8px; padding-top: 0; }
+.fokus-team { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.fokus-person { grid-template-columns: 160px minmax(0, 1fr); gap: 22px; padding: 22px 24px; align-items: start; }
+.fokus-portrait { width: 160px; height: 160px; overflow: hidden; background: var(--surface-2); }
+.fokus-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; transform: scale(1.45); transform-origin: 50% 60%; }
+.fokus-portrait .avatar.is-lg { width: 160px; height: 160px; font-size: 34px; }
+.fokus-person h3 { font-size: 19px; line-height: 26px; }
+.fokus-person .kicker { margin-bottom: 8px; }
+.fokus-person p { font-size: 15.5px; line-height: 24px; max-width: 70ch; }
+.fokus-valuation .number-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.fokus-valuation .number-tile { padding: 20px 22px; }
+.fokus-valuation .number-tile span { font-size: 13px; }
+.fokus-valuation .number-tile strong { font-size: 30px; line-height: 36px; margin-top: 6px; }
+.fokus-valuation .number-tile small { font-size: 13px; line-height: 18px; margin-top: 6px; }
+.fokus-timeline { padding-left: 22px; border-left: 2px solid var(--line-strong); gap: 18px; margin: 18px 0 0 6px; }
+.fokus-timeline li { grid-template-columns: 140px minmax(0, 1fr); gap: 14px; font-size: 16px; line-height: 24px; }
+.fokus-timeline li::before { left: -29px; top: 7px; width: 12px; height: 12px; }
+.fokus-timeline-date { font-size: 13px; padding-top: 3px; color: var(--ink); font-weight: 600; }
+.fokus-legal .kv { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.fokus-legal .kv > div { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; padding: 10px 0; }
+.fokus-legal .kv dt { font-weight: 600; color: var(--ink); }
+.fokus-legal .kv dd { text-align: left; font-weight: 400; color: var(--body); }
+body.is-fokus .nl-bar { display: none; }
+@media (max-width: 760px) { .fokus-row { grid-template-columns: minmax(0, 1fr); } .fokus-person { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; padding: 16px; } .fokus-portrait, .fokus-portrait .avatar.is-lg { width: 96px; height: 96px; } .fokus-valuation .number-tiles { grid-template-columns: minmax(0, 1fr); } .fokus-legal .kv > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } .fokus-timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* Im Fokus: Börsenplätze als Chips in der Ticker-Karte */
+.fokus-listings { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+.fokus-listing { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px 6px 10px; background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; line-height: 18px; }
+.fokus-listing-ex { color: var(--muted); }
+.fokus-listing code { font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--ink); }
+.fokus-listing .copy-btn { width: 22px; height: 22px; font-size: 12px; }
+.fokus-ticker .kicker { color: var(--accent); }
+.fokus-ticker > .small.muted { margin-bottom: 4px; }

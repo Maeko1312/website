@@ -24,6 +24,8 @@ module.exports = function (ctx) {
   // „Mehr Nachrichten“: alles Weitere, hervorgehobene zuerst, dann chronologisch (ohne Aufmacher, Tageszeilen und Ressortspalten)
   const restStream = stream.filter(i => !inRessorts.has(i));
   const moreNews = [...restStream.filter(i => i.featured), ...restStream.filter(i => !i.featured)].slice(0, 24);
+  // Keine doppelten Motive auf der Startseite: Doppelgänger erhalten ein hier noch ungenutztes Foto
+  { const visible = [lead, ...todayCards, ...ressortCols.map(r => r.items[0]), ...moreNews]; const seenImg = new Set(); for (const it of visible) { if (!it || !it.image) continue; if (seenImg.has(it.image)) { const alt = content.photos.alternative(it, seenImg); if (alt) { it.image = alt.file; it.imageAlt = alt.alt; it.imageCredit = content.photos.credit(alt); } } seenImg.add(it.image); } }
   const body = html`<h1 class="visually-hidden">Börsenblick – Börse verstehen. Märkte im Blick.</h1>
 <div class="container page home-top">
   <div class="hero">

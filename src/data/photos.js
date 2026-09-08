@@ -36,6 +36,34 @@ const photos = {
   banknoten: P('banknoten', 'Euro banknotes', 'Misko3', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Bundza_penazi_money_Euro_banknotes.jpg', 'Euro-Banknoten in einer Hand'),
   sparen: P('sparen', 'Piggy bank, coins in a jar', 'stevepb', 'CC0', 'https://commons.wikimedia.org/wiki/File:Piggy-bank-968302.jpg', 'Münzen und ein Geldschein in einem Sparglas'),
   kurstafel: P('kurstafel', 'Electronic stock board in Yaesu, Tokyo', 'nappa', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Electronic_stock_board_in_Yaesu,_Tokyo_2007.jpg', 'Elektronische Kurstafel mit Aktienkursen'),
+  skyline2: P('skyline2', 'Frankfurt Skyline at night (Unsplash)', 'Mathias Konrath konni', 'CC0', 'https://commons.wikimedia.org/wiki/File:Frankfurt_Skyline_at_night_(Unsplash).jpg', 'Frankfurter Skyline bei Nacht am Main'),
+  skyline3: P('skyline3', 'Untermainbrücke 2010', 'uggboy', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Untermainbr%C3%BCcke_2010.jpg', 'Frankfurter Bankentürme'),
+  bundestag: P('bundestag', 'Berlin Reichstag BW 2', 'Berthold Werner', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Berlin_Reichstag_BW_2.jpg', 'Das Reichstagsgebäude in Berlin'),
+  finanzministerium: P('finanzministerium', 'Haus-der-Ministerien-Berlin', 'Bettenburg', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Haus-der-Ministerien-Berlin.jpg', 'Das Bundesfinanzministerium in Berlin'),
+  geldautomat: P('geldautomat', 'ATM - Cash Dispenser in Platanos - panoramio', 'We_have_been_there_i…', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:ATM_-_Cash_Dispenser_in_Platanos_-_panoramio.jpg', 'Ein Geldautomat'),
+  nyse: P('nyse', 'Wall Street - New York Stock Exchange', 'Carlos Delgado', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Wall_Street_-_New_York_Stock_Exchange.jpg', 'Die New York Stock Exchange'),
+  london: P('london', 'City of London skyline from London City Hall - Oct 2008', 'Diliff', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:City_of_London_skyline_from_London_City_Hall_-_Oct_2008.jpg', 'Die Skyline der City of London'),
+  pumpjack: P('pumpjack', 'Pump Jack at the Lost Hills Oil Field In Central California', 'Richard Masoner / Cyclelicious', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Pump_Jack_at_the_Lost_Hills_Oil_Field_In_Central_California.jpg', 'Eine Ölpumpe auf einem Ölfeld'),
+  oelplattform: P('oelplattform', 'Offshore-plattform hg', 'Hannes Grobe (talk)', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Offshore-plattform_hg.jpg', 'Eine Ölplattform in der Nordsee'),
+  gasflamme: P('gasflamme', 'Portable propane butane burner-head-03', 'Lilly_M', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Portable_propane_butane_burner-head-03.jpg', 'Gasflamme eines Herds'),
+  windrad: P('windrad', 'Middelgrunden wind farm 2009-07-01 edit filtered', 'Photo by Kim Hansen. Postprocessing (crop, rotation, color a', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Middelgrunden_wind_farm_2009-07-01_edit_filtered.jpg', 'Windräder auf einem Feld'),
+  solar: P('solar', 'Field of Solar Panels near Ogwell', 'Partonez', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Field_of_Solar_Panels_near_Ogwell.jpg', 'Solaranlage'),
+  weizen: P('weizen', 'Wheat harvest, Raisen district, Madhya Pradesh, India', 'Yann (talk)', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Wheat_harvest,_Raisen_district,_Madhya_Pradesh,_India.jpg', 'Ein Weizenfeld vor der Ernte'),
+  goldmuenzen: P('goldmuenzen', 'Anlagegold weiß', 'Apollo2005', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Anlagegold_wei%C3%9F.JPG', 'Goldmünzen'),
+  silbermuenzen: P('silbermuenzen', '2010 olympics hockey coin', 'Eric Golub', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:2010_olympics_hockey_coin.jpg', 'Silbermünzen'),
+  chip: P('chip', 'AMD3101E', 'Mister rf', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:AMD3101E.jpg', 'Ein Halbleiter-Wafer'),
+  hafen: P('hafen', 'Hamburg Hafen Containerterminal', 'Raimond Spekking', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Hamburg_Hafen_Containerterminal.jpg', 'Containerterminal im Hamburger Hafen'),
+  gueterzug: P('gueterzug', 'Freight Train Cars and Containers - Spokane 7', '298YGH20', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Freight_Train_Cars_and_Containers_-_Spokane_7.jpg', 'Ein Güterzug mit Containern'),
+  flugzeug: P('flugzeug', 'Lufthansa Airbus A320-211 D-AIQT 01', 'Julian Herzog (Website)', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Lufthansa_Airbus_A320-211_D-AIQT_01.jpg', 'Ein Verkehrsflugzeug'),
+  bankgebaeude: P('bankgebaeude', 'Deutsche Bank neue Fassade', 'Thomas Wolf (Der Wolf im Wald)', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Deutsche_Bank_neue_Fassade.jpg', 'Die Zwillingstürme der Deutschen Bank'),
+  baustelle: P('baustelle', 'Crane and building site - geograph.org.uk - 5284660', 'M J Richardson', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Crane_and_building_site_-_geograph.org.uk_-_5284660.jpg', 'Baustelle mit Kran'),
+  einkaufswagen: P('einkaufswagen', 'Shopping cart of Prisma shop', 'Dmitry G', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Shopping_cart_of_Prisma_shop.JPG', 'Einkaufswagen im Supermarkt'),
+  tankstelle: P('tankstelle', '$4.06 Gas Prices, Lewiston, Maine, Cumberland Farms', 'Micov', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:$4.06_Gas_Prices,_Lewiston,_Maine,_Cumberland_Farms.JPG', 'Zapfsäule an einer Tankstelle'),
+  kohle: P('kohle', 'Coal power plant Knepper 1', 'Arnoldius', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Coal_power_plant_Knepper_1.jpg', 'Ein Kohlekraftwerk'),
+  atomkraft: P('atomkraft', 'Bell Bend Nuclear Power Plant cooling towers from the east', 'Jakec', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Bell_Bend_Nuclear_Power_Plant_cooling_towers_from_the_east.JPG', 'Kühltürme eines Kernkraftwerks'),
+  blockchain: P('blockchain', '10elqpi', 'The original uploader was Ladislav Mecir at English Wikipedi', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:10elqpi.jpg', 'Eine Hardware-Wallet'),
+  fed2: P('fed2', '2013 Federal Reserve Bank of New York from west', 'Beyond My Ken', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:2013_Federal_Reserve_Bank_of_New_York_from_west.jpg', 'Die Federal Reserve Bank of New York'),
+  schiff: P('schiff', 'Cargo ship at dusk (15953825200)', 'Ian Gratton from Sutton-n-Craven, North Yorkshire, England', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Cargo_ship_at_dusk_(15953825200).jpg', 'Ein Frachtschiff auf See'),
 };
 
 // Feste Zuordnung je Slug (redaktionelle Beiträge und Erklärstücke)
@@ -45,7 +73,9 @@ const bySlug = {
   'us-arbeitsmarkt-august-2026-162000-stellen-quote-4-1-prozent': 'jobs', 'china-exporte-august-2026-plus-25-prozent-handelsueberschuss': 'china', 'oelpreis-brent-96-dollar-hormus-opec-plus-haelt-foerderziele': 'oel',
   'gaspreis-ttf-ueber-70-euro-drittel-teurer-in-drei-wochen': 'gas', 'gold-4400-dollar-notenbanken-kaufen-privatanleger-auf-14-monats-hoch': 'gold', 'bitcoin-79000-dollar-nach-plus-25-prozent-im-august-77000-als-schluesselmarke': 'bitcoin',
   'ethereum-2450-dollar-etf-zufluesse-lassen-nach-2550-als-widerstand': 'ethereum', 'volkswagen-aufsichtsrat-beschliesst-abbau-von-50000-stellen-bis-2030': 'vw', 'nvidia-rekordquartal-96-milliarden-dollar-umsatz-ki-rally-haelt': 'nvidia',
-  'wochenausblick-ezb-entscheid-us-inflation-oracle-dax-26000': 'bulle', 'dax-prognosen-banken-sehen-jahresende-um-26000-punkte-mehr-schwankung': 'kurstafel',
+  'wochenausblick-ezb-entscheid-us-inflation-oracle-dax-26000': 'bulle',
+  'us-verbraucherpreise-11-september-was-die-fed-sehen-will': 'fed2', 'oracle-adobe-quartalszahlen-10-september-test-fuer-die-ki-nachfrage': 'chip', 'deutsche-autobauer-erstes-halbjahr-2026-absatz-unter-weltmarkt-china-bricht-ein': 'airbus',
+  'silber-66-dollar-gold-silber-verhaeltnis-67-industriemetall-mit-hebel': 'silbermuenzen', 'kupfer-dr-copper-chinas-exportboom-und-die-nachfrage-aus-der-elektrifizierung': 'kupfer', 'festgeld-und-tagesgeld-nach-der-zinswende-was-sparer-jetzt-bekommen': 'geldautomat', 'dax-prognosen-banken-sehen-jahresende-um-26000-punkte-mehr-schwankung': 'kurstafel',
 };
 const bySlugSoft = {
   'ezb-zinsentscheid-was-anleger-wissen-muessen': 'ezb', 'fed-zinsentscheid-fomc-erklaert': 'fed', 'ifo-index-erklaert': 'airbus', 'inflation-verbraucherpreise-richtig-lesen': 'inflation', 'us-arbeitsmarktbericht-payrolls-erklaert': 'wallstreet',
@@ -54,9 +84,9 @@ const bySlugSoft = {
 };
 // Pools nach Kategorie, Instrument und Ratgeber-Thema
 const pools = {
-  category: { marktberichte: ['boerse', 'bulle', 'boerse2', 'skyline', 'boerse3'], unternehmen: ['industrie', 'airbus', 'vw', 'skyline'], wirtschaft: ['inflation', 'industrie', 'china', 'airbus'], zentralbanken: ['ezb', 'bundesbank', 'fed', 'banknoten'], rohstoffe: ['gold', 'oel', 'gas', 'kupfer', 'raffinerie', 'silber'], krypto: ['bitcoin', 'ethereum', 'mining'], analystenstimmen: ['kurstafel', 'wallstreet', 'boerse2'], 'analysen-indizes': ['boerse2', 'kurstafel', 'boerse3', 'wallstreet'], 'analysen-rohstoffe-devisen': ['gold', 'raffinerie', 'banknoten', 'mining', 'silber'], 'analysen-etf': ['boerse', 'sparen'], 'analysen-hebelprodukte': ['boerse3', 'kurstafel'] },
-  instrument: { gold: 'gold', silber: 'silber', platin: 'gold', kupfer: 'kupfer', brent: 'oel', wti: 'raffinerie', erdgas: 'gas', bitcoin: 'bitcoin', ethereum: 'ethereum', solana: 'mining', 'eur-usd': 'banknoten', 'bund-10j': 'bundesbank', 'bund-2j': 'bundesbank', 'us-treasury-10j': 'fed', 'sp-500': 'wallstreet', 'nasdaq-100': 'nvidia', 'dow-jones': 'wallstreet', dax: 'boerse2', mdax: 'boerse3', 'euro-stoxx-50': 'ezb' },
-  topic: { einsteiger: ['sparen', 'banknoten', 'skyline', 'bulle'], 'etf-sparplan': ['boerse', 'kurstafel', 'boerse3', 'sparen'], aktien: ['bulle', 'boerse2', 'wallstreet', 'boerse'], dividenden: ['banknoten', 'sparen', 'boerse2'], 'zinsen-anleihen': ['bundesbank', 'ezb', 'fed'], 'gold-rohstoffe': ['gold', 'silber', 'kupfer', 'oel'], krypto: ['bitcoin', 'ethereum', 'mining'], steuern: ['banknoten', 'sparen'], psychologie: ['bulle', 'skyline', 'jobs'], chartanalyse: ['kurstafel', 'boerse2', 'boerse3'] },
+  category: { marktberichte: ['boerse', 'bulle', 'boerse2', 'skyline', 'boerse3', 'skyline2', 'skyline3', 'nyse', 'london', 'bankgebaeude'], unternehmen: ['industrie', 'airbus', 'vw', 'skyline', 'flugzeug', 'hafen', 'gueterzug', 'chip', 'baustelle', 'bankgebaeude'], wirtschaft: ['inflation', 'industrie', 'china', 'airbus', 'bundestag', 'finanzministerium', 'einkaufswagen', 'hafen', 'gueterzug', 'weizen', 'baustelle', 'tankstelle'], zentralbanken: ['ezb', 'bundesbank', 'fed', 'banknoten', 'fed2', 'bundestag', 'finanzministerium', 'geldautomat'], rohstoffe: ['gold', 'oel', 'gas', 'kupfer', 'raffinerie', 'silber', 'pumpjack', 'oelplattform', 'gasflamme', 'windrad', 'solar', 'kohle', 'atomkraft', 'goldmuenzen', 'silbermuenzen', 'weizen', 'schiff'], krypto: ['bitcoin', 'ethereum', 'mining', 'blockchain', 'chip'], analystenstimmen: ['kurstafel', 'wallstreet', 'boerse2', 'nyse', 'london', 'skyline2'], 'analysen-indizes': ['boerse2', 'kurstafel', 'boerse3', 'wallstreet', 'nyse', 'skyline2', 'london'], 'analysen-rohstoffe-devisen': ['gold', 'raffinerie', 'banknoten', 'mining', 'silber', 'pumpjack', 'goldmuenzen', 'geldautomat'], 'analysen-etf': ['boerse', 'sparen'], 'analysen-hebelprodukte': ['boerse3', 'kurstafel'] },
+  instrument: { gold: 'gold', silber: 'silber', platin: 'goldmuenzen', kupfer: 'kupfer', brent: 'oel', wti: 'pumpjack', erdgas: 'gas', uran: 'atomkraft', 'eur-gbp': 'london', solana: 'blockchain', bitcoin: 'bitcoin', ethereum: 'ethereum', solana: 'mining', 'eur-usd': 'banknoten', 'bund-10j': 'bundesbank', 'bund-2j': 'bundesbank', 'us-treasury-10j': 'fed', 'sp-500': 'wallstreet', 'nasdaq-100': 'nvidia', 'dow-jones': 'wallstreet', dax: 'boerse2', mdax: 'boerse3', 'euro-stoxx-50': 'ezb' },
+  topic: { einsteiger: ['sparen', 'banknoten', 'skyline', 'bulle', 'geldautomat', 'einkaufswagen'], 'etf-sparplan': ['boerse', 'kurstafel', 'boerse3', 'sparen', 'skyline2', 'london'], aktien: ['bulle', 'boerse2', 'wallstreet', 'boerse', 'nyse', 'bankgebaeude'], dividenden: ['banknoten', 'sparen', 'boerse2', 'goldmuenzen'], 'zinsen-anleihen': ['bundesbank', 'ezb', 'fed', 'fed2', 'finanzministerium'], 'gold-rohstoffe': ['gold', 'silber', 'kupfer', 'oel', 'goldmuenzen', 'silbermuenzen', 'pumpjack'], krypto: ['bitcoin', 'ethereum', 'mining', 'blockchain'], steuern: ['banknoten', 'sparen', 'finanzministerium', 'bundestag'], psychologie: ['bulle', 'skyline', 'jobs', 'skyline2', 'schiff'], chartanalyse: ['kurstafel', 'boerse2', 'boerse3', 'nyse'] },
   guide: { einsteiger: ['sparen', 'bulle'], broker: ['wallstreet', 'kurstafel'], 'etf-sparplan': ['boerse', 'sparen'], chartanalyse: ['kurstafel', 'boerse2'], strategien: ['bulle', 'skyline'], kennzahlen: ['boerse2', 'boerse3'], boersenlexikon: ['boerse', 'skyline'], anleihen: ['bundesbank', 'ezb'], rohstoffe: ['gold', 'oel'], krypto: ['bitcoin', 'mining'] },
   any: Object.keys(photos),
 };
@@ -65,25 +95,35 @@ const used = new Map();
 const take = (key) => { used.set(key, (used.get(key) || 0) + 1); return photos[key]; };
 const leastUsed = (keys) => keys.slice().sort((a, b) => (used.get(a) || 0) - (used.get(b) || 0))[0];
 // Wunschmotiv nur, solange es noch nicht (oder seltener als der Pool) genutzt wurde – sonst das seltenste aus dem Pool
-const fresh = (key, pool) => { const u = used.get(key) || 0; if (!pool || u === 0) return key; const alt = leastUsed(pool); return (used.get(alt) || 0) < u ? alt : key; };
+// Seltenstes Motiv aus dem Pool; ist der Pool ausgeschöpft, ein noch ungenutztes Motiv aus dem Gesamtbestand
+const fromPool = (pool) => { const k = leastUsed(pool); if ((used.get(k) || 0) === 0) return k; const g = leastUsed(pools.any); return (used.get(g) || 0) < (used.get(k) || 0) ? g : k; };
+const fresh = (key, pool) => { const u = used.get(key) || 0; if (u === 0) return key; const alt = fromPool(pool || pools.any); return (used.get(alt) || 0) < u ? alt : key; };
 const has = (f) => fs.existsSync(path.join(__dirname, '..', 'public', 'img', 'topics', f + '.jpg'));
 
 function pick(item) {
   const { kind, slug = '', category, instruments = [], topic, index = 0 } = item;
-  if (bySlug[slug]) return take(bySlug[slug]);
+  if (bySlug[slug]) return take(fresh(bySlug[slug], pools.category[category] || pools.topic[topic] || pools.any));
   if (bySlugSoft[slug]) return take(fresh(bySlugSoft[slug], pools.category[category] || pools.any));
   if (kind === 'article') {
-    if (slug.startsWith('boerse-frankfurt-')) return take(leastUsed(pools.category.marktberichte));
+    if (slug.startsWith('boerse-frankfurt-')) return take(fromPool(pools.category.marktberichte));
     const mChart = slug.match(/^(.+)-chartanalyse-\d{4}/); if (mChart && pools.instrument[mChart[1]]) return take(fresh(pools.instrument[mChart[1]], pools.category[category]));
     const mPrice = slug.match(/^(.+)-(preis|kurs)-\d{4}/); if (mPrice && pools.instrument[mPrice[1]]) return take(fresh(pools.instrument[mPrice[1]], pools.category[category]));
     for (const s of instruments) if (pools.instrument[s] && (used.get(pools.instrument[s]) || 0) === 0) return take(pools.instrument[s]);
-    if (pools.category[category]) return take(leastUsed(pools.category[category]));
+    if (pools.category[category]) return take(fromPool(pools.category[category]));
   }
-  if (kind === 'post' && pools.topic[topic]) return take(leastUsed(pools.topic[topic]));
-  if (kind === 'guide') { for (const [k, pool] of Object.entries(pools.guide)) if (slug.includes(k)) return take(leastUsed(pool)); }
-  return take(leastUsed(pools.any));
+  if (kind === 'post' && pools.topic[topic]) return take(fromPool(pools.topic[topic]));
+  if (kind === 'guide') { for (const [k, pool] of Object.entries(pools.guide)) if (slug.includes(k)) return take(fromPool(pool)); }
+  return take(fromPool(pools.any));
 }
 const credit = (p) => p ? `${p.title} – ${p.artist}, Wikimedia Commons, ${p.license}` : '';
 const all = () => Object.values(photos).filter(p => has(p.key));
 
-module.exports = { photos, pick, credit, all };
+// Ersatzmotiv für eine Seite, auf der das zugewiesene Foto schon vorkommt: passender Pool, sonst Gesamtbestand; bevorzugt global selten genutzt
+function alternative(item, excludeFiles) {
+  const pool = (item.categoryObj && pools.category[item.category]) || (item.topicObj && pools.topic[item.topic]) || [];
+  const cands = [...pool, ...pools.any].filter((k, i, arr) => arr.indexOf(k) === i && !excludeFiles.has(photos[k].file));
+  if (!cands.length) return null;
+  const k = cands.slice().sort((a, b) => (used.get(a) || 0) - (used.get(b) || 0))[0];
+  return take(k);
+}
+module.exports = { photos, pick, credit, all, alternative };
