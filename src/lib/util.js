@@ -66,6 +66,17 @@ function addDays(d, n) { const x = new Date(toDate(d)); x.setDate(x.getDate() + 
 function startOfWeek(d) { const x = new Date(toDate(d)); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day); x.setHours(0, 0, 0, 0); return x; }
 
 // Relativ zum Build-Datum: "heute", "gestern", sonst dd.mm.
+// Relative Zeitangabe für Meldungen: „gerade eben“, „vor 5 Minuten“, „vor 2 Stunden“, „gestern“, „vor 3 Tagen“, sonst Datum
+function relTime(d, now) {
+  d = toDate(d); now = toDate(now);
+  const sec = Math.round((now - d) / 1000);
+  if (sec < 60) return 'gerade eben';
+  const min = Math.round(sec / 60);
+  if (min < 60) return min === 1 ? 'vor 1 Minute' : `vor ${min} Minuten`;
+  const h = Math.round(min / 60);
+  if (h < 24 && d.getDate() === now.getDate()) return h === 1 ? 'vor 1 Stunde' : `vor ${h} Stunden`;
+  return relDate(d, now);
+}
 function relDate(d, now) {
   d = toDate(d); now = toDate(now);
   const a = new Date(d); a.setHours(0, 0, 0, 0);
@@ -117,6 +128,6 @@ module.exports = {
   esc, attr, raw, html, render, Raw,
   num, pct, eur, bigEur, nf, nf0,
   MONTHS, MONTHS_SHORT, DAYS, DAYS_SHORT, pad,
-  isoDate, dateShort, dateDM, dateLong, dateFull, dateWeekday, time, addDays, startOfWeek, relDate,
+  isoDate, dateShort, dateDM, dateLong, dateFull, dateWeekday, time, addDays, startOfWeek, relDate, relTime,
   slugify, readTime, wkn,
 };

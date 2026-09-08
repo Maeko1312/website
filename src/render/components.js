@@ -4,7 +4,7 @@ const charts = require('./charts');
 
 module.exports = function (ctx) {
   const { config, util, instruments, snapshot, history, now } = ctx;
-  const { html, raw, esc, num, pct, bigEur, dateShort, dateWeekday, relDate, time, isoDate } = util;
+  const { html, raw, esc, num, pct, bigEur, dateShort, dateWeekday, relDate, relTime, time, isoDate } = util;
   const q = (slug) => snapshot.quotes[slug] || null;
   const dir = (v) => v > 0 ? 'up' : v < 0 ? 'down' : 'flat';
   const c = {};
@@ -94,7 +94,7 @@ module.exports = function (ctx) {
   const instOf = (a) => a.instruments && a.instruments.length ? instruments.bySlug[a.instruments[0]] : null;
   c.storyTop = (a, { showDate = true } = {}) => {
     const isPost = !!a.topicObj; const cat = isPost ? null : catOf(a); const inst = isPost ? null : instOf(a); const qq = inst ? q(inst.slug) : null;
-    return html`<div class="story-top">${a.featured ? html`<span class="badge is-accent">Top</span>` : ''}${showDate ? html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>${qq ? c.delta(qq.changePct) : ''}` : isPost ? html`<span class="tag"><a href="${c.topicUrl(a.topicObj)}">${a.topicObj.name}</a></span>` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
+    return html`<div class="story-top">${a.featured ? html`<span class="badge is-accent">Top</span>` : ''}${showDate ? html`<time datetime="${a.date.toISOString()}" data-rel>${relTime(a.date, now)}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>` : isPost ? html`<span class="tag"><a href="${c.topicUrl(a.topicObj)}">${a.topicObj.name}</a></span>` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
   };
   // Aufmacher (Startseite): großes Bild mit Textüberlagerung
   // Vorschaubilder: echte Fotos (src/public/img/stock, deterministisch je Beitrag); eigenes Bild (image-Feld) hat Vorrang; Chart-Grafik nur als Rückfall
@@ -222,7 +222,7 @@ module.exports = function (ctx) {
   // Ressort-Spalte (Startseite): Banner mit Ressortname, ein Aufmacher mit Foto, darunter Schlagzeilen in Zeilen
   c.ressortColumn = (cat, items) => {
     const [lead, ...rows] = items; const inst = instOf(lead);
-    const when = (a) => html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>`;
+    const when = (a) => html`<time datetime="${a.date.toISOString()}" data-rel>${relTime(a.date, now)}</time>`;
     return html`<div class="ressort">
       <h3 class="ressort-head" id="h-r-${cat.slug}"><a href="${c.catUrl(cat)}">${cat.name}<span class="chev" aria-hidden="true">›</span></a></h3>
       <article class="ressort-lead ${lead.featured ? 'is-promoted' : ''}"><a class="card-link" href="${c.articleUrl(lead)}" aria-label="${lead.title}"></a>${c.thumb(lead.slug, { label: inst ? inst.short || inst.name : cat.name, image: lead.image })}<div class="ressort-lead-body"><div class="story-top">${lead.featured ? html`<span class="badge is-accent">Top</span>` : ''}${when(lead)}</div><h4 class="story-title">${lead.title}</h4><p class="story-excerpt">${lead.deck}</p></div></article>

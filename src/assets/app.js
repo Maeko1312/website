@@ -814,6 +814,22 @@
     });
   }
 
+  /* ---------- Relative Zeitangaben („vor 5 Minuten“) beim Laden auffrischen (statische Seite) ---------- */
+  function relTimes() {
+    var els = $$('time[data-rel]'); if (!els.length) return;
+    function label(d, now) {
+      var sec = Math.round((now - d) / 1000); if (sec < 60) return 'gerade eben';
+      var min = Math.round(sec / 60); if (min < 60) return min === 1 ? 'vor 1 Minute' : 'vor ' + min + ' Minuten';
+      var h = Math.round(min / 60); if (h < 24 && d.getDate() === now.getDate()) return h === 1 ? 'vor 1 Stunde' : 'vor ' + h + ' Stunden';
+      var a = new Date(d); a.setHours(0, 0, 0, 0); var b = new Date(now); b.setHours(0, 0, 0, 0);
+      var diff = Math.round((b - a) / 86400000);
+      if (diff === 0) return 'heute'; if (diff === 1) return 'gestern'; if (diff > 1 && diff < 7) return 'vor ' + diff + ' Tagen';
+      return null;
+    }
+    var now = new Date();
+    els.forEach(function (el) { var d = new Date(el.getAttribute('datetime')); if (isNaN(d)) return; var t = label(d, now); if (t && el.textContent !== t) el.textContent = t; });
+  }
+
   /* ---------- Kopieren-Knöpfe (ISIN, WKN, Kürzel) ---------- */
   function copyButtons() {
     $$('[data-copy]').forEach(function (btn) {
@@ -868,6 +884,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); swiper(); copyButtons(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); swiper(); copyButtons(); relTimes(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
   });
 })();
