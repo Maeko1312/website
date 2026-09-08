@@ -1812,3 +1812,9 @@ body.is-fokus .nl-bar { display: none; }
 .fokus-risk-list li { padding: 0 0 0 40px; background: transparent; border: 0; }
 .fokus-risk-list li::before { content: counter(risk, lower-alpha) "."; position: absolute; left: 0; top: 0; width: auto; height: auto; display: block; background: transparent; border-radius: 0; color: var(--ink); font-family: var(--font-body); font-weight: 700; font-size: 16px; line-height: 24px; }
 @media (max-width: 560px) { .fokus-risk-list li { padding: 0 0 0 34px; } .fokus-risk-list li::before { left: 0; top: 0; } }
+
+/* Im Fokus: Abbildungen im Text immer als Cover-Bild, nie verzerrt */
+.fokus-figure { margin: 24px 0 28px; }
+.fokus-figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-2); }
+.fokus-hero img { height: auto; object-fit: cover; }
+.fokus-prose img:not(.fokus-portrait img) { max-width: 100%; height: auto; }
