@@ -18,7 +18,7 @@ module.exports = function (ctx) {
         <div class="stack">
           ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.heroStory(first)}
           <section>${c.sectionTitle(section === 'analysen' ? 'Alle Analysen' : 'Weitere Meldungen', { tag: 'h2' })}${c.storyList(section === 'analysen' ? arts : others, { thumb: true, excerpt: true })}</section>` : html`<div class="empty">In diesem Ressort gibt es noch keine Beiträge.</div>`}
-          ${cat && arts.length < 8 ? (() => { const pool = content.articles.filter(x => !arts.includes(x)).slice(0, Math.max(4, 10 - arts.length)); return pool.length ? html`<section>${c.sectionTitle(section === 'analysen' ? 'Weitere aktuelle Analysen' : 'Aktuelle Meldungen aus allen Ressorts', { tag: 'h2', href: section === 'analysen' ? '/analysen' : '/nachrichten', more: 'Alle' })}${c.storyList(pool, { thumb: true, excerpt: true })}</section>` : ''; })() : ''}
+          ${cat && arts.length < 8 ? (() => { const pool = content.articles.filter(x => !arts.includes(x)).slice(0, Math.max(4, 10 - arts.length)); return pool.length ? html`<section>${c.sectionTitle(section === 'analysen' ? 'Weitere aktuelle Analysen' : 'Aktuelle Meldungen aus allen Ressorts', { tag: 'h2', href: section === 'analysen' ? '/nachrichten' : '/nachrichten', more: 'Alle' })}${c.storyList(pool, { thumb: true, excerpt: true })}</section>` : ''; })() : ''}
           ${cat ? html`<p class="small muted">Ressort „${cat.name}“: ${arts.length} ${arts.length === 1 ? 'Beitrag' : 'Beiträge'}. Neue Meldungen erscheinen oben; der <a href="/feed.xml">RSS-Feed</a> liefert alle Ressorts.</p>` : ''}
         </div>
         <aside>
@@ -46,7 +46,7 @@ module.exports = function (ctx) {
     const insts = (a.instruments || []).map(s => instruments.bySlug[s]).filter(Boolean);
     const main = insts[0];
     const related = content.articles.filter(x => x !== a && (x.category === a.category || (main && x.instruments && x.instruments.includes(main.slug)))).slice(0, 5);
-    const listUrl = cat.kind === 'analysis' ? '/analysen' : '/nachrichten';
+    const listUrl = cat.kind === 'analysis' ? '/nachrichten' : '/nachrichten';
     const body = html`<div class="container page">
       ${c.breadcrumb([[cat.kind === 'analysis' ? 'Analysen' : 'Nachrichten', listUrl], [cat.name, c.catUrl(cat)], [a.title, c.articleUrl(a)]])}
       <div class="layout">

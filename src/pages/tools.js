@@ -6,25 +6,20 @@ module.exports = function (ctx) {
   const add = (path, title, description, body, noindex) => { content.searchablePages.push({ title, path, kicker: 'Werkzeuge', description }); pages.push({ path, html: layout.page({ title, description, path, body, section: 'werkzeuge', noindex }) }); };
   const tools = content.tools;
 
-  // Hub
+  // Hub: alle Rechner untereinander auf einer Seite (Sprungliste oben, Erklärung je Rechner einklappbar)
   {
-    const body = html`<div class="container page">
+    const body = html`<div class="container page calc-hub">
       ${c.breadcrumb([['Werkzeuge', '/werkzeuge']])}
-      ${c.pageHead({ kicker: 'Werkzeuge', title: 'Rechner & Werkzeuge', lead: 'Sieben Rechner für die wichtigsten Anlegerfragen – Zinseszins, Sparplan, Rendite, Dividende, Währung, Positionsgröße, Inflation. Alle Berechnungen laufen in Ihrem Browser, es werden keine Daten übertragen.' })}
-      <div class="tool-grid">${tools.map(t => html`<a class="tool-card" href="/werkzeuge/${t.slug}"><span class="icon">${raw(t.icon)}</span><h3>${t.title}</h3><p>${t.short}</p></a>`)}<a class="tool-card" href="/merkliste"><span class="icon">${raw(layout.icons.star)}</span><h3>Merkliste</h3><p>Ihre beobachteten Aktien, Indizes und Rohstoffe auf einer Seite – gespeichert nur in Ihrem Browser.</p></a></div>
-      <section style="margin-top:32px">${c.sectionTitle('Direkt rechnen')}${c.calcTabs(tools, { id: 'tools-hub' })}</section>
-      <div class="grid-2" style="margin-top:32px"><section class="card">${c.sectionTitle('Passende Ratgeber')}<ul class="side-list">${content.guides.slice(0, 5).map(g => html`<li><a href="/wissen/${g.slug}"><span class="kicker">${g.kicker}</span><span>${g.title}</span></a></li>`)}</ul></section><section class="card">${c.sectionTitle('Hinweis')}<p class="small">Die Rechner arbeiten mit vereinfachten Annahmen (konstante Rendite, monatliche Verzinsung, keine Steuern, sofern nicht angegeben). Sie ersetzen keine Finanz- oder Steuerberatung. Zahlen mit Komma oder Punkt als Dezimaltrennzeichen werden akzeptiert.</p></section></div>
+      ${c.pageHead({ kicker: 'Werkzeuge', title: 'Rechner', lead: 'Sieben Rechner für die wichtigsten Anlegerfragen – Zinseszins, Sparplan, Rendite, Dividende, Währung, Positionsgröße, Inflation. Alle Berechnungen laufen in Ihrem Browser, es werden keine Daten übertragen.' })}
+      <nav class="chips calc-jump" aria-label="Rechner auswählen">${tools.map(t => html`<a class="chip" href="#${t.slug}">${t.title}</a>`)}<a class="chip" href="/merkliste">Merkliste</a></nav>
+      ${tools.map(t => html`<section class="calc-section" id="${t.slug}" aria-labelledby="h-${t.slug}">
+        <div class="section-title"><h2 id="h-${t.slug}">${t.title}</h2></div>
+        <p class="calc-lead">${t.lead}</p>
+        ${c.calcForm(t, { id: 'hub-' + t.slug, framed: true })}
+        <details class="calc-more"><summary>Erklärung und Formel</summary><div class="prose">${raw(c.wrapTables(t.text))}</div></details>
+      </section>`)}
     </div>`;
-    add('/werkzeuge', 'Rechner & Werkzeuge', 'Zinseszins-, Sparplan-, Rendite-, Dividenden-, Währungs-, Positionsgrößen- und Inflationsrechner.', body);
-  }
-  for (const t of tools) {
-    const body = html`<div class="container page">
-      ${c.breadcrumb([['Werkzeuge', '/werkzeuge'], [t.title, `/werkzeuge/${t.slug}`]])}
-      ${c.pageHead({ kicker: 'Rechner', title: t.title, lead: t.lead })}
-      ${c.calcForm(t, { id: 'page' })}
-      <div class="layout no-sticky" style="margin-top:28px"><div class="prose card">${raw(c.wrapTables(t.text))}</div><aside>${c.sideCard('Weitere Rechner', html`<ul class="side-links">${tools.filter(x => x !== t).map(x => html`<li><a href="/werkzeuge/${x.slug}">${raw(x.icon)}${x.title}</a></li>`)}</ul>`)}${c.newsletterBox({ compact: true })}</aside></div>
-    </div>`;
-    add(`/werkzeuge/${t.slug}`, t.title, t.lead, body);
+    add('/werkzeuge', 'Rechner & Werkzeuge', 'Zinseszins-, Sparplan-, Rendite-, Dividenden-, Währungs-, Positionsgrößen- und Inflationsrechner auf einer Seite.', body);
   }
 
   // Merkliste

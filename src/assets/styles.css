@@ -1818,3 +1818,15 @@ body.is-fokus .nl-bar { display: none; }
 .fokus-figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-2); }
 .fokus-hero img { height: auto; object-fit: cover; }
 .fokus-prose img:not(.fokus-portrait img) { max-width: 100%; height: auto; }
+
+/* Rechner-Seite: alle Rechner untereinander */
+.calc-jump { margin: 0 0 28px; }
+.calc-section { margin: 0 0 40px; padding-top: 8px; scroll-margin-top: 96px; }
+.calc-section .section-title { margin-bottom: 6px; }
+.calc-section .calc-lead { font-size: 15.5px; line-height: 23px; color: var(--body); max-width: 78ch; margin: 0 0 14px; }
+.calc-more { margin-top: 12px; border: 1px solid var(--line); background: var(--surface); }
+.calc-more summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: 15px; color: var(--ink); list-style: none; display: flex; justify-content: space-between; }
+.calc-more summary::-webkit-details-marker { display: none; }
+.calc-more summary::after { content: "+"; color: var(--muted); font-size: 20px; line-height: 1; }
+.calc-more[open] summary::after { content: "–"; }
+.calc-more .prose { padding: 0 16px 16px; font-size: 15px; line-height: 24px; }

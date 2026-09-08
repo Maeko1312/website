@@ -164,10 +164,10 @@ module.exports = function (ctx) {
   // „Termine der Woche“: die nächsten Termine mit Relevanz ≥ 2
   c.eventsCard = (n = 5) => {
     const ev = ctx.content.upcomingEvents(n); if (!ev.length) return '';
-    return html`<section class="card snap-card" aria-labelledby="h-events">${c.sectionTitle('Termine der Woche', { href: '/termine/wirtschaftskalender', more: 'Kalender', id: 'h-events' })}<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${util.dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul></section>`;
+    return html`<section class="card snap-card" aria-labelledby="h-events">${c.sectionTitle('Termine der Woche', {})}<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${util.dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul></section>`;
   };
   // „Werkzeuge“: Rechner-Links als Karte (Platz des Fokus-Blocks, wenn kein Unternehmen hervorgehoben ist)
-  c.toolsCard = () => html`<section class="card snap-card tools-card" aria-labelledby="h-tools">${c.sectionTitle('Werkzeuge', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-tools' })}<ul class="tools-list">${ctx.content.tools.slice(0, 6).map(t => html`<li><a href="/werkzeuge/${t.slug}"><span class="tools-icon">${raw(t.icon || '')}</span><span><strong>${t.title}</strong><small>${t.short}</small></span></a></li>`)}</ul></section>`;
+  c.toolsCard = () => html`<section class="card snap-card tools-card" aria-labelledby="h-tools">${c.sectionTitle('Werkzeuge', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-tools' })}<ul class="tools-list">${ctx.content.tools.slice(0, 6).map(t => html`<li><a href="/werkzeuge#${t.slug}"><span class="tools-icon">${raw(t.icon || '')}</span><span><strong>${t.title}</strong><small>${t.short}</small></span></a></li>`)}</ul></section>`;
   // Kompakte Fokus-Karte (Spalte in der Schnellübersicht)
   c.focusCard = () => {
     const inst = instruments.all.find(i => i.featured); if (!inst) return '';
@@ -208,7 +208,7 @@ module.exports = function (ctx) {
     const fx = q('eur-usd'), bund = q('bund-10j');
     if (fx && fx.price != null) bullets.push({ text: `Euro/Dollar bei ${num(fx.price, 4)} (${sg(fx.changePct)})${bund && bund.price != null ? `, zehnjährige Bundrendite ${num(bund.price, 2)} %` : ''}.`, url: '/devisen' });
     const ev = ctx.content.upcomingEvents(1)[0];
-    if (ev) { const d = new Date(ev.date + 'T00:00:00'); bullets.push({ text: `Als Nächstes: ${ev.title}, ${util.dateWeekday(d)} um ${ev.time} Uhr (${ev.countryName}).`, url: '/termine/wirtschaftskalender' }); }
+    if (ev) { const d = new Date(ev.date + 'T00:00:00'); bullets.push({ text: `Als Nächstes: ${ev.title}, ${util.dateWeekday(d)} um ${ev.time} Uhr (${ev.countryName}).`, url: '/nachrichten/wirtschaft' }); }
     if (bullets.length < 3) return '';
     const nums = ['dax', 'mdax', 'euro-stoxx-50', 'sp-500', 'eur-usd', 'gold', 'brent', 'bitcoin'].map(s => instruments.bySlug[s]).filter(Boolean).map(i => ({ i, x: q(i.slug) || {} })).filter(o => o.x.price != null);
     return html`<section class="day-brief" aria-labelledby="h-brief">
@@ -278,7 +278,7 @@ module.exports = function (ctx) {
       if (!wide(a) && fls.length && !wide(fls[0])) { const b = fls.shift(); rows.push(html`<div class="calc-pair">${field(a)}${field(b)}</div>${hints([a, b])}`); }
       else rows.push(html`${field(a)}${hints([a])}`);
     }
-    const head = intro ? html`<div class="calc-intro"><p class="calc-lead">${t.lead} <a href="/werkzeuge/${t.slug}">Erklärung und Formel ›</a></p></div>` : '';
+    const head = intro ? html`<div class="calc-intro"><p class="calc-lead">${t.lead} <a href="/werkzeuge#${t.slug}">Erklärung und Formel ›</a></p></div>` : '';
     const form = html`<form class="calc" data-calc="${t.calc}" novalidate><div class="calc-form">${head}<div class="calc-grid">${rows}</div><p class="calc-live"><span>Das Ergebnis aktualisiert sich beim Tippen.</span><button type="reset" class="link-btn">Zurücksetzen</button></p></div><div class="calc-out" data-calc-out aria-live="polite"></div></form>`;
     return framed ? html`<div class="calc-shell"><div class="calc-panel">${form}</div></div>` : form;
   };
@@ -303,9 +303,9 @@ module.exports = function (ctx) {
   c.sideIndices = () => c.sideCard('Indizes', c.miniQuotes(['dax', 'mdax', 'sdax', 'tecdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'nikkei-225'].map(s => instruments.bySlug[s])), { href: '/indizes', more: 'Alle Indizes' });
   c.sideAnalysis = (n = 5) => c.sideCard('Neueste Analysen', c.analysisList(ctx.content.articles.filter(a => a.kind === 'analysis').slice(0, n)), { href: '/nachrichten/analysen', more: 'Alle Analysen' });
   c.sideLatest = (n = 6, exclude) => c.sideCard('Aktuelle Nachrichten', c.storyList(ctx.content.articles.filter(a => a.kind === 'news' && a.slug !== exclude).slice(0, n), { variant: 'is-compact' }), { href: '/nachrichten', more: 'Alle Nachrichten' });
-  c.sideUpcoming = (n = 5) => { const ev = ctx.content.upcomingEvents(n); return c.sideCard('Nächste Termine', html`<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>`, { href: '/termine/wirtschaftskalender', more: 'Kalender' }); };
+  c.sideUpcoming = (n = 5) => { const ev = ctx.content.upcomingEvents(n); return c.sideCard('Nächste Termine', html`<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>`, {}); };
   c.sideRecent = () => html`<section class="card" data-recent hidden>${c.sectionTitle('Zuletzt gelesen')}<ul class="side-list" data-recent-list></ul><p class="small muted" style="margin-top:8px">Wird nur lokal in Ihrem Browser gespeichert.</p></section>`;
-  c.sideTools = () => c.sideCard('Rechner & Werkzeuge', html`<ul class="side-links">${[['Zinseszinsrechner', '/werkzeuge/zinseszinsrechner'], ['Sparplanrechner', '/werkzeuge/sparplanrechner'], ['Renditerechner', '/werkzeuge/renditerechner'], ['Dividendenrechner', '/werkzeuge/dividendenrechner'], ['Währungsrechner', '/werkzeuge/waehrungsrechner'], ['Merkliste', '/merkliste']].map(([l, h]) => html`<li><a href="${h}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>${l}</a></li>`)}</ul>`, { href: '/werkzeuge', more: 'Alle' });
+  c.sideTools = () => c.sideCard('Rechner & Werkzeuge', html`<ul class="side-links">${[['Zinseszinsrechner', '/werkzeuge#zinseszinsrechner'], ['Sparplanrechner', '/werkzeuge#sparplanrechner'], ['Renditerechner', '/werkzeuge#renditerechner'], ['Dividendenrechner', '/werkzeuge#dividendenrechner'], ['Währungsrechner', '/werkzeuge#waehrungsrechner'], ['Merkliste', '/merkliste']].map(([l, h]) => html`<li><a href="${h}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>${l}</a></li>`)}</ul>`, { href: '/werkzeuge', more: 'Alle' });
   c.sideKnowledge = () => c.sideCard('Börsenwissen', html`<ul class="side-list">${ctx.content.guides.slice(0, 5).map(g => html`<li><a href="/wissen/${g.slug}"><span class="kicker">${g.kicker}</span><span>${g.title}</span></a></li>`)}</ul>`, { href: '/wissen', more: 'Übersicht' });
   // Lesetipps: je Thema der neueste Beitrag, als nummerierte Zeilen (zweite Blog-Darstellung auf der Startseite)
   c.postTips = (posts, n = 6) => {
@@ -415,13 +415,13 @@ module.exports = function (ctx) {
     // Such-Aliasse: englische und umgangssprachliche Begriffe, die direkt zu einer Seite führen (Marko liest die Seite oft übersetzt)
     const aliases = {
       '/werkzeuge': 'tools, tool, calculator, calculators, rechner, kalkulator, werkzeug, werkzeuge',
-      '/werkzeuge/zinseszinsrechner': 'compound interest, zinseszins, zinsrechner, interest calculator',
-      '/werkzeuge/sparplanrechner': 'savings plan, sparplan, sparrate, sparplan rechner',
-      '/werkzeuge/renditerechner': 'return calculator, rendite, yield, performance, cagr',
-      '/werkzeuge/dividendenrechner': 'dividend calculator, dividende, ausschüttung, passives einkommen',
-      '/werkzeuge/waehrungsrechner': 'currency converter, currency, umrechner, währung, wechselkurs, euro dollar, fx converter',
-      '/werkzeuge/positionsgroessenrechner': 'position size, positionsgröße, risiko, stop loss',
-      '/werkzeuge/inflationsrechner': 'inflation calculator, inflation, kaufkraft, purchasing power',
+      '/werkzeuge#zinseszinsrechner': 'compound interest, zinseszins, zinsrechner, interest calculator',
+      '/werkzeuge#sparplanrechner': 'savings plan, sparplan, sparrate, sparplan rechner',
+      '/werkzeuge#renditerechner': 'return calculator, rendite, yield, performance, cagr',
+      '/werkzeuge#dividendenrechner': 'dividend calculator, dividende, ausschüttung, passives einkommen',
+      '/werkzeuge#waehrungsrechner': 'currency converter, currency, umrechner, währung, wechselkurs, euro dollar, fx converter',
+      '/werkzeuge#positionsgroessenrechner': 'position size, positionsgröße, risiko, stop loss',
+      '/werkzeuge#inflationsrechner': 'inflation calculator, inflation, kaufkraft, purchasing power',
       '/nachrichten/ratgeber': 'ratgeber, blog, beiträge, tipps, einsteiger, anleitung',
       '/newsletter': 'newsletter, abo, abonnieren, subscribe, e-mail, email, briefing',
       '/wissen': 'knowledge, wissen, lernen, learn, guides, ratgeber, education, börsenwissen',

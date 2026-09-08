@@ -68,22 +68,7 @@ const nav = [
     ],
   },
   {
-    label: 'Werkzeuge', href: '/werkzeuge', key: 'werkzeuge', cols: 2,
-    groups: [
-      { title: 'Rechner', links: [
-        ['Alle Rechner', '/werkzeuge'],
-        ['Zinseszinsrechner', '/werkzeuge/zinseszinsrechner'],
-        ['Sparplanrechner', '/werkzeuge/sparplanrechner'],
-        ['Renditerechner', '/werkzeuge/renditerechner'],
-      ] },
-      { title: 'Weitere', links: [
-        ['Dividendenrechner', '/werkzeuge/dividendenrechner'],
-        ['Währungsrechner', '/werkzeuge/waehrungsrechner'],
-        ['Positionsgrößenrechner', '/werkzeuge/positionsgroessenrechner'],
-        ['Inflationsrechner', '/werkzeuge/inflationsrechner'],
-        ['Merkliste', '/merkliste'],
-      ] },
-    ],
+    label: 'Werkzeuge', href: '/werkzeuge', key: 'werkzeuge',
   },
 ];
 
