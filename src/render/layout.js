@@ -43,7 +43,7 @@ module.exports = function (ctx) {
       <div class="strip-scroll">${stripSlugs.map(s => {
         const inst = instruments.bySlug[s], qq = q(s); if (!inst || !qq) return '';
         const d = dir(qq.changePct);
-        const w = inst.wkn || util.wkn(qq.isin || inst.isin); return html`<a class="strip-item ${inst.featured ? 'is-featured' : ''}" href="${inst.url || '/kurs/' + inst.slug}"${inst.featured ? raw(' title="Im Fokus (Anzeige)"') : ''}><span class="strip-name notranslate" translate="no">${inst.short || inst.name}${inst.featured ? html`<span class="strip-flag">Fokus</span>` : ''}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
+        const w = inst.wkn || util.wkn(qq.isin || inst.isin); return html`<a class="strip-item ${inst.featured ? 'is-featured' : ''}" href="${inst.url || '/kurs/' + inst.slug}"${inst.featured ? raw(' title="Im Fokus (Anzeige)"') : ''}><span class="strip-name notranslate" translate="no">${inst.short || inst.name}${inst.featured ? html`<span class="strip-flag">Anzeige</span>` : ''}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
       })}</div>
       <div class="strip-meta"><a href="/methodik" title="Kursdaten: Herkunft und Verzögerung">${asOfLabel} · Xetra 15 Min. verzögert</a></div>
     </div></div>`;
@@ -133,7 +133,7 @@ module.exports = function (ctx) {
         <button class="burger" type="button" data-nav-toggle aria-expanded="false" aria-controls="nav-panel">${raw(icons.burger)}<span class="burger-label">Menü</span></button>
         <a class="brand notranslate" translate="no" href="/" aria-label="${config.brand} – Startseite">Börsen<em>blick</em></a>
         ${searchForm('is-head')}
-        <div class="head-actions"><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a>${langMenu()}</div>
+        <div class="head-actions"><a class="icon-btn" href="/merkliste" title="Merkliste" aria-label="Merkliste">${raw(icons.star)}<span class="count" data-watch-count hidden>0</span></a></div>
       </div>
       ${mainNav(current)}
       ${marketStrip()}
@@ -156,7 +156,7 @@ module.exports = function (ctx) {
       <button class="close" type="button" data-nl-modal-close aria-label="Schließen">×</button>
       <span class="kicker">Bevor Sie gehen</span>
       <h2 id="nl-modal-title">Die Börse in zwei Minuten – jeden Morgen um 7:30 Uhr</h2>
-      <p>Was über Nacht passiert ist, drei Termine des Tages und die eine Meldung, die zählt. Kostenlos, werbefrei, jederzeit abbestellbar.</p>
+      <p>Was über Nacht passiert ist, drei Termine des Tages und die eine Meldung, die zählt. Kostenlos, jederzeit abbestellbar, Sponsoren klar gekennzeichnet.</p>
       <form class="newsletter" data-newsletter ${formAttrs()} novalidate>
         <label class="visually-hidden" for="nl-modal-email">E-Mail-Adresse</label>
         <div class="control"><input id="nl-modal-email" type="email" name="${config.newsletterEmailField}" placeholder="ihre@e-mail.de" required autocomplete="email"></div>
@@ -196,7 +196,7 @@ module.exports = function (ctx) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="content-language" content="de">
-<script>(function(h){if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(!("IntersectionObserver" in window))return;h.className+=" reveal-on";setTimeout(function(){if(!window.BB_MOTION)h.className=h.className.replace(" reveal-on","")},2500)})(document.documentElement)</script>
+
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}">

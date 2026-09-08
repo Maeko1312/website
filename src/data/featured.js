@@ -7,6 +7,8 @@
 
 const salescloser = {
   slug: 'salescloser-technologies', active: true,
+  category: 'unternehmen', start: '2026-08-30', end: '2026-12-31', // Laufzeit: nach `end` keine Platzierung mehr, der Beitrag bleibt mit Kennzeichnung erreichbar
+  placements: ['home', 'strip', 'ressort', 'related'],
   company: 'SalesCloser Technologies Ltd.', short: 'SalesCloser', sector: 'Technologie', country: 'Kanada',
   sponsor: 'SalesCloser Technologies Ltd.',
   publisher: { name: 'Senergy Communications Capital Inc.', law: 'ein Unternehmen nach dem Recht der Provinz British Columbia, Kanada', address: '1122 Mainland Street, Vancouver, BC, Kanada' },
@@ -215,4 +217,7 @@ const salescloser = {
 };
 
 const campaigns = [salescloser];
-module.exports = { campaigns, active: campaigns.filter(c => c.active), bySlug: Object.fromEntries(campaigns.map(c => [c.slug, c])) };
+const now = new Date();
+const live = (c) => c.active && (!c.start || new Date(c.start + 'T00:00:00') <= now) && (!c.end || now <= new Date(c.end + 'T23:59:59'));
+const has = (c, p) => !c.placements || c.placements.includes(p);
+module.exports = { campaigns, active: campaigns.filter(live), placed: (p) => campaigns.filter(c => live(c) && has(c, p)), bySlug: Object.fromEntries(campaigns.map(c => [c.slug, c])) };

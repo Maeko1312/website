@@ -6,7 +6,9 @@ module.exports = function (ctx) {
   const cats = content.categories;
   const newsSubnav = [['Alle', '/nachrichten'], ...cats.news.map(k => [k.name, `/nachrichten/${k.slug}`]), ['Ratgeber', '/nachrichten/ratgeber']];
 
+  const campaignFor = (catSlug, placement) => content.featured.placed(placement).find(f => f.category === catSlug) || null;
   function listPage({ path, title, lead, kicker, arts, subnav, section, crumbs, cat }) {
+    const band = cat ? campaignFor(cat.slug, 'ressort') : null;
     // Keine doppelten Motive auf einer Listenseite: Doppelgänger erhalten ein hier noch ungenutztes Foto
     { const seenImg = new Set(); for (const it of arts) { if (!it.image) continue; if (seenImg.has(it.image)) { const alt = content.photos.alternative(it, seenImg); if (alt) { it.image = alt.file; it.imageAlt = alt.alt; it.imageCredit = content.photos.credit(alt); } } seenImg.add(it.image); } }
     const [first, ...others] = arts;
@@ -16,7 +18,7 @@ module.exports = function (ctx) {
       ${c.subnav(subnav, path)}
       <div class="layout">
         <div class="stack">
-          ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.heroStory(first)}
+          ${arts.length ? html`${section === 'analysen' ? html`<div class="card">${c.analysisList(arts.slice(0, 6))}</div>` : c.heroStory(first)}${c.sponsoredBand(band)}
           <section>${c.sectionTitle(section === 'analysen' ? 'Alle Analysen' : 'Weitere Meldungen', { tag: 'h2' })}${c.storyList(section === 'analysen' ? arts : others, { thumb: true, excerpt: true })}</section>` : html`<div class="empty">In diesem Ressort gibt es noch keine Beiträge.</div>`}
           ${cat && arts.length < 8 ? (() => { const pool = content.articles.filter(x => !arts.includes(x)).slice(0, Math.max(4, 10 - arts.length)); return pool.length ? html`<section>${c.sectionTitle(section === 'analysen' ? 'Weitere aktuelle Analysen' : 'Aktuelle Meldungen aus allen Ressorts', { tag: 'h2', href: section === 'analysen' ? '/nachrichten' : '/nachrichten', more: 'Alle' })}${c.storyList(pool, { thumb: true, excerpt: true })}</section>` : ''; })() : ''}
           ${cat ? html`<p class="small muted">Ressort „${cat.name}“: ${arts.length} ${arts.length === 1 ? 'Beitrag' : 'Beiträge'}. Neue Meldungen erscheinen oben; der <a href="/feed.xml">RSS-Feed</a> liefert alle Ressorts.</p>` : ''}
@@ -47,6 +49,7 @@ module.exports = function (ctx) {
     const main = insts[0];
     const matches = content.articles.filter(x => x !== a && (x.category === a.category || (main && x.instruments && x.instruments.includes(main.slug))));
     const related = [...matches, ...content.articles.filter(x => x !== a && !matches.includes(x))].slice(0, 8);
+    const relCamp = campaignFor(a.category, 'related'); if (relCamp) related.splice(Math.min(2, related.length), 0, c.campaignItem(relCamp)); // gekennzeichnete Kampagnenkarte im passenden Ressort
     const listUrl = cat.kind === 'analysis' ? '/nachrichten' : '/nachrichten';
     const srcCount = ((a.body.match(/<ul class="sources">[\s\S]*?<\/ul>/) || [''])[0].match(/<li>/g) || []).length;
     const hasHist = !!(main && ctx.hist(main.slug) && ctx.hist(main.slug).points.length > 1);
@@ -54,7 +57,7 @@ module.exports = function (ctx) {
       ${c.breadcrumb([['Nachrichten', '/nachrichten'], [cat.name, c.catUrl(cat)], [a.title, c.articleUrl(a)]])}
       <article class="reader-article" data-article="${a.title}" data-article-cat="${cat.name}">
         <header class="reader-head">
-          <p class="reader-kicker"><a href="${c.catUrl(cat)}">${cat.name}</a>${a.kind === 'analysis' && a.direction ? html` · <span class="${a.direction === 'up' ? 'up' : 'down'}">${a.direction === 'up' ? 'Bullisch' : 'Bärisch'}</span>` : ''}${a.featured ? html` <span class="badge is-accent">Im Fokus</span>` : ''}${a.sponsored ? html` <span class="badge">Anzeige</span>` : ''}</p>
+          <p class="reader-kicker"><a href="${c.catUrl(cat)}">${cat.name}</a>${a.kind === 'analysis' && a.direction ? html` · <span class="${a.direction === 'up' ? 'up' : 'down'}">${a.direction === 'up' ? 'Bullisch' : 'Bärisch'}</span>` : ''}${a.featured ? html` <span class="badge is-accent">Im Fokus</span>` : ''}${a.sponsored ? html` <span class="badge">Anzeige</span>` : ''}${a.generated ? html` <span class="reader-auto">automatisch aus Kursdaten erstellt</span>` : ''}</p>
           <h1>${a.title}</h1>
           <p class="reader-deck">${a.deck}</p>
           <p class="reader-meta"><time datetime="${a.date.toISOString()}" translate="no">${dateLong(a.date)}, ${time(a.date)} Uhr</time><span>Lesezeit ${a.readTime} Min.</span>${srcCount ? html`<span><a href="#quellen">${srcCount} Quellen</a></span>` : ''}</p>

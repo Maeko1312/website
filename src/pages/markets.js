@@ -104,7 +104,7 @@ module.exports = function (ctx) {
         <section class="card">${c.sectionTitle('Steuern und Handel in Deutschland')}<ul style="padding-left:1.2em;display:grid;gap:6px"><li>Gewinne aus Kryptowährungen sind nach <strong>einem Jahr Haltedauer steuerfrei</strong>; innerhalb eines Jahres gilt eine Freigrenze von 1.000 € pro Jahr. Details: <a href="/wissen/steuern">Steuern auf Kapitalerträge</a>.</li><li>Krypto-Börsen mit deutscher BaFin-Lizenz oder EU-Zulassung nach MiCA unterliegen der Aufsicht; Einlagen sind jedoch nicht durch die Einlagensicherung geschützt.</li><li>Alternativ gibt es börsengehandelte Krypto-ETNs, die sich wie ein Wertpapier ins Depot legen lassen.</li></ul></section>
         <section>${c.sectionTitle('Nachrichten Krypto', { href: '/nachrichten/krypto', more: 'Alle' })}${c.storyList(c.byCategory('krypto', 5), { thumb: true, excerpt: true })}</section>
       </div><aside>${c.sideCard('Risikohinweis', html`<p class="small">Kryptowährungen schwanken extrem: Tagesbewegungen von 5 bis 10 % und Rückgänge von über 70 % vom Hoch sind in der Vergangenheit mehrfach vorgekommen. Investieren Sie nur Beträge, deren Totalverlust Sie tragen können.</p>`)}${c.sideAnalysis(5)}${c.newsletterBox({ compact: true })}</aside></div></div>`;
-    add('/krypto', 'Kryptowährungen', 'Bitcoin, Ethereum und Solana: Kurse in US-Dollar und Euro, Performance, Steuern und Nachrichten.', body);
+    add('/krypto', 'Krypto-Kurse: Bitcoin, Ethereum, Solana', 'Bitcoin, Ethereum und Solana: Kurse in US-Dollar und Euro, Performance, Steuern und Nachrichten.', body);
   }
 
   // ---------- Anleihen & Zinsen ----------

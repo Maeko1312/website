@@ -2,10 +2,16 @@
 module.exports = function (ctx) {
   const { c, layout, util, content, config } = ctx;
   const { html } = util;
-  const news = content.articles.filter(a => a.kind === 'news');
+  // Nur der neueste automatische Tagesbericht auf der Startseite – keine Reihe fast gleicher DAX-Schlagzeilen
+  const allNews = content.articles.filter(a => a.kind === 'news');
+  const latestReport = allNews.find(a => a.generated && a.slug.startsWith('boerse-frankfurt-'));
+  const news = allNews.filter(a => !(a.generated && a.slug.startsWith('boerse-frankfurt-')) || a === latestReport);
   // Aufmacher: hervorgehobener Blogbeitrag > hervorgehobene Nachricht > neueste Meldung
-  const campaign = content.featured.active[0] || null; // aktive Kampagne (Im Fokus) ist der Aufmacher
-  const lead = campaign ? c.campaignItem(campaign) : (content.blog.posts.find(p => p.featured) || news.find(a => a.featured) || news[0]);
+  // Aufmacher = aktive Kampagne (gekennzeichnet als Anzeige, Vorgabe des Betreibers), sonst die hervorgehobene bzw. neueste eigene Meldung
+  const campaign = content.featured.placed('home')[0] || null;
+  const lead = campaign ? c.campaignItem(campaign) : (news.find(a => a.featured && !a.generated) || content.blog.posts.find(p => p.featured) || news.find(a => !a.generated) || news[0]);
+  const briefPoints = news.filter(a => !a.generated && a !== lead && a.summary && a.summary.length).slice(0, 5);
+  const briefEvents = content.upcomingEvents(3);
   const rest = news.filter(a => a !== lead);
   const todayCards = rest.slice(0, 4);
   const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)]; // hervorgehobene zuerst
@@ -39,6 +45,7 @@ module.exports = function (ctx) {
   </div>
 
 
+  ${c.todayBrief(briefPoints, briefEvents)}
   ${ressortCols.length ? html`<section class="news-section ressorts" aria-labelledby="h-ressorts">
     ${c.sectionTitle('Nachrichten nach Ressort', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-ressorts' })}
     <div class="ressort-grid" style="--n:${ressortCols.length}">${ressortCols.map(r => c.ressortColumn(r.cat, r.items))}</div>
@@ -46,15 +53,14 @@ module.exports = function (ctx) {
 </div>
 
 <div class="container" style="padding-bottom:40px">
-  ${c.quizBox({ wide: true })}
-
   <section class="news-section" aria-labelledby="h-more">
     ${c.sectionTitle('Mehr Nachrichten', { href: '/nachrichten', more: 'Alle Nachrichten', id: 'h-more' })}
     <div class="news-layout">
       <div class="news-rows">${moreNews.map(a => c.newsRow(a))}</div>
-      <aside class="news-aside">${c.newsletterBox({ compact: true })}${c.pollBox()}${c.sideAnalysis(6)}</aside>
+      <aside class="news-aside">${c.pollBox()}${c.sideAnalysis(6)}</aside>
     </div>
   </section>
+  ${c.quizBox({ wide: true })}
   <section aria-labelledby="h-calc" style="margin-bottom:32px">
     ${c.sectionTitle('Rechner', { href: '/werkzeuge', more: 'Alle Werkzeuge', id: 'h-calc' })}
     ${c.calcTabs(content.tools, { id: 'home' })}

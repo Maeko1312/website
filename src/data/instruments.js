@@ -69,7 +69,7 @@ const bonds = [
 
 const all = [...indices, ...commodities, ...fx, ...crypto, ...bonds];
 // Gesponserte Unternehmen (aktive Kampagnen aus featured.js): eigene Kursdaten und Fokus-Eintrag in der Kursleiste, aber nicht Teil von `all`
-const sponsors = require('./featured').active.filter(f => f.instrument).map(f => ({ ...f.instrument, featured: true, url: '/fokus/' + f.slug }));
+const sponsors = require('./featured').placed('strip').filter(f => f.instrument).map(f => ({ ...f.instrument, featured: true, url: '/fokus/' + f.slug }));
 const bySlug = Object.fromEntries([...all, ...sponsors].map(i => [i.slug, i]));
 // CMS-Flag: hervorgehobene Unternehmen (Marktleiste vorn, Fokus-Kennzeichnung). Leer lassen, wenn nichts hervorgehoben werden soll.
 const FEATURED = [];

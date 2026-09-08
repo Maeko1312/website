@@ -22,7 +22,7 @@ module.exports = function (ctx) {
           <details><summary>Muss ich Kursgewinne in der Steuererklärung angeben?</summary><p>Bei deutschen Banken nicht – sie führen die Abgeltungsteuer automatisch ab. Ausnahmen: ausländische Depots, Kryptowährungen und wenn Sie Verluste zwischen verschiedenen Banken verrechnen wollen. Details im Ratgeber <a href="/wissen/steuern">Steuern</a>.</p></details>
           <details><summary>Warum stehen bei Xetra-Kursen „15 Minuten verzögert“?</summary><p>Echtzeitkurse der Deutschen Börse sind lizenzpflichtig. Kostenlose Portale zeigen deshalb Kurse mit 15 Minuten Verzögerung; Ihr Broker liefert Echtzeitkurse für die Orderaufgabe. Mehr unter <a href="/methodik">Methodik & Datenquellen</a>.</p></details>
         </section>
-      </div><aside>${c.sideTools()}${c.sideCard('Redaktion', html`<p class="small">Die Ratgeber schreibt ${content.authors.bySlug['sara-yilmaz'].name}, die Chartanalyse-Grundlagen ${content.authors.bySlug['jonas-weber'].name}. Wer wir sind: <a href="/redaktion">Redaktion</a>, nach welchen Regeln wir arbeiten: <a href="/redaktionelle-leitlinien">Leitlinien</a>.</p>`)}${c.newsletterBox({ compact: true })}</aside></div></div>`;
+      </div><aside>${c.sideTools()}${c.sideCard('Redaktion', html`<p class="small">Die Ratgeber erscheinen unter der <a href="/redaktion">Börsenblick-Redaktion</a> und werden aus öffentlichen Quellen zusammengestellt. Stand: September 2026, Rechtsstand Deutschland. Keine Anlage- oder Steuerberatung.</p>`)}${c.newsletterBox({ compact: true })}</aside></div></div>`;
     add('/wissen', 'Börsenwissen', 'Ratgeber für Einsteiger und Fortgeschrittene, Börsenlexikon und Rechner – Börse verständlich erklärt.', body);
   }
 
@@ -40,7 +40,7 @@ module.exports = function (ctx) {
           <footer class="article-foot">
             ${c.newsletterBox({ dark: true })}
             <div class="card"><h3 style="margin-bottom:10px">Weiterlesen</h3><ul class="side-list">${others.map(o => html`<li><a href="/wissen/${o.slug}"><span class="kicker">${o.kicker}</span><span>${o.title}</span></a></li>`)}</ul></div>
-            ${c.disclaimer()}
+            <p class="small muted">Stand: September 2026 · Rechtsstand: Deutschland · keine Anlage- oder Steuerberatung.</p>${c.disclaimer()}
           </footer>
         </article>
         <aside class="no-sticky">

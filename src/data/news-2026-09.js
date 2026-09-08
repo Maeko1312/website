@@ -109,7 +109,7 @@ module.exports = [
     sources: [['biallo.de: Bundesanleihe – Rendite auf 15-Jahres-Hoch', 'https://www.biallo.de/geldanlage/news/bundesanleihe-15-jahreshoch/'], ['LBBW: EZB-Zinsentscheid – Prognosen und Termine 2026', 'https://www.lbbw.de/artikel/maerkte-verstehen/ezb-zinsentscheid-leitzins-prognosen_ait4bfmrfe_d.html'], ['Statistisches Bundesamt: Inflationsrate im August 2026 voraussichtlich +2,9 %', 'https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/08/PD26_311_611.html']],
   },
   {
-    slug: 'ezb-vor-zweiter-zinserhoehung-einlagensatz-2-50-prozent',
+    slug: 'ezb-vor-zweiter-zinserhoehung-einlagensatz-2-50-prozent', featured: true, // Aufmacher der Woche: Zinsentscheid am Donnerstag
     category: 'zentralbanken', date: '2026-09-08T07:30:00', instruments: ['bund-10j', 'eur-usd', 'euro-stoxx-50'],
     title: 'EZB vor zweiter Zinserhöhung: Einlagensatz dürfte am Donnerstag auf 2,50 Prozent steigen',
     deck: 'Der EZB-Rat tagt am 9. und 10. September in Berlin. Volkswirte erwarten mehrheitlich einen Schritt um 25 Basispunkte – getrieben von einer Inflation von 3,3 Prozent im Euroraum und teurer Energie. Die Entscheidung kommt um 14:15 Uhr, die Pressekonferenz um 14:45 Uhr.',

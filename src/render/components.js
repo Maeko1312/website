@@ -18,7 +18,7 @@ module.exports = function (ctx) {
   c.catUrl = (cat) => cat.kind === 'analysis' ? `/analysen/${cat.slug.replace(/^analysen-/, '')}` : `/nachrichten/${cat.slug}`;
   c.fmtPrice = ctx.fmtPrice;
   c.unit = (inst) => inst.type === 'index' ? 'Pkt.' : inst.type === 'bond' ? '%' : inst.type === 'fx' ? inst.unit : inst.type === 'stock' ? (inst.currency && inst.currency !== 'EUR' ? inst.currency : '€') : inst.unit;
-  c.asOf = ctx.layout ? ctx.layout.asOfLabel : '';
+  c.asOf = 'Stand der Kursangaben: ' + util.dateLong(new Date(config.quotesAsOf)); // Layout ist beim Aufbau der Komponenten noch nicht da
 
   /* ---------- Bild-Platzhalter: deterministische Grafik pro Beitrag ---------- */
   function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -39,7 +39,7 @@ module.exports = function (ctx) {
   c.subnav = (items, current) => html`<ul class="subnav">${items.map(([l, h]) => html`<li><a href="${h}"${h === current ? raw(' class="is-current" aria-current="page"') : ''}>${l}</a></li>`)}</ul>`;
   c.note = (text, kind = '') => html`<div class="note ${kind}">${text}</div>`;
   c.placeholder = () => raw('<span class="badge is-placeholder" title="Redaktioneller Beispielinhalt – wird durch echte Meldungen ersetzt">Beispielinhalt</span>');
-  c.disclaimer = () => raw('<p class="disclaimer">Dieser Beitrag dient ausschließlich der Information und stellt keine Anlageberatung und keine Empfehlung zum Kauf oder Verkauf von Wertpapieren dar. Kursangaben ' + esc(c.asOf) + '. Frühere Wertentwicklungen sind kein verlässlicher Indikator für künftige Ergebnisse.</p>');
+  c.disclaimer = () => raw('<p class="disclaimer">Dieser Beitrag dient ausschließlich der Information und stellt keine Anlageberatung und keine Empfehlung zum Kauf oder Verkauf von Wertpapieren dar. Kursangaben: ' + esc(util.dateLong(new Date(config.quotesAsOf))) + '. Frühere Wertentwicklungen sind kein verlässlicher Indikator für künftige Ergebnisse.</p>');
   // Tabellen in Fließtext scrollbar machen (mobil)
   c.wrapTables = (h) => String(h).replace(/<table(\s[^>]*)?>/g, (m) => `<div class="table-wrap">${m}`).replace(/<\/table>/g, '</table></div>');
   c.summaryBox = (items) => items && items.length ? html`<aside class="summary"><span class="kicker">Das Wichtigste in Kürze</span><ul>${items.map(t => html`<li>${t}</li>`)}</ul></aside>` : '';
@@ -108,7 +108,11 @@ module.exports = function (ctx) {
     return html`<span class="thumb is-photo ${cls}"><img src="${src}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}"${eager ? raw(' fetchpriority="high"') : ''} decoding="async" width="1200" height="750"></span>`;
   };
   // Aktive Kampagne als Aufmacher-Objekt (gleiche Felder wie ein Beitrag)
-  c.campaignItem = (f) => ({ title: f.title, deck: f.lead, image: f.image, imageAlt: f.imageAlt, featured: true, sponsored: true, url: '/fokus/' + f.slug, kicker: f.sector, slug: 'fokus-' + f.slug, date: new Date(f.updated + 'T08:00:00'), isCampaign: true });
+  c.campaignItem = (f) => ({ title: f.title, deck: f.lead, image: f.image, imageAlt: f.imageAlt, featured: true, sponsored: true, sponsor: f.sponsor, url: '/fokus/' + f.slug, kicker: f.sector, slug: 'fokus-' + f.slug, date: new Date(f.updated + 'T08:00:00'), isCampaign: true });
+  // Startseite: „Heute in fünf Punkten“ aus den neuesten redaktionellen Meldungen (erster Satz der Zusammenfassung) + nächste Termine
+  c.todayBrief = (points, events) => points.length ? html`<section class="brief" aria-labelledby="h-brief"><div class="brief-main"><div class="section-title"><h2 id="h-brief">Heute in fünf Punkten</h2><span class="stand" translate="no">${dateWeekday(now)}</span></div><ol class="brief-list">${points.map(a => html`<li><a href="${c.articleUrl(a)}">${a.summary[0]}</a><span class="brief-src">${a.categoryObj.name}</span></li>`)}</ol></div>${events && events.length ? html`<div class="brief-side"><h3 class="kicker">Wichtige Termine</h3><ul class="brief-events">${events.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><span class="brief-date" translate="no"><b>${d.getDate()}.${d.getMonth() + 1}.</b><small>${e.time} Uhr</small></span><span class="brief-ev">${e.title}<small>${e.countryName}</small></span></li>`; })}</ul></div>` : ''}</section>` : '',
+  // Gekennzeichnetes Sponsor-Band (Startseite, Ressortseite)
+  c.sponsoredBand = (f) => f ? html`<section class="sponsored-band" aria-label="Anzeige: ${f.company}"><a class="sponsored-band-media" href="/fokus/${f.slug}" aria-hidden="true" tabindex="-1"><img src="${f.image}" alt="" loading="lazy" width="1200" height="675"></a><div class="sponsored-band-body"><p class="sponsored-label"><span class="badge">Anzeige</span> Verbreitet im Auftrag von ${f.sponsor}</p><h2><a href="/fokus/${f.slug}">${f.title}</a></h2><p>${f.lead}</p><a class="btn btn-ghost btn-sm" href="/fokus/${f.slug}">Zum gesponserten Beitrag<span aria-hidden="true"> ›</span></a></div></section>` : '';
   c.heroStory = (a) => {
     // Aufmacher: aktive Kampagne (Im Fokus), hervorgehobener Beitrag oder die neueste Meldung
     const isPost = !!a.topicObj, isCampaign = !!a.isCampaign;
@@ -232,8 +236,8 @@ module.exports = function (ctx) {
   // Swiper „Mehr verwandte Nachrichten“ (Leseseite): Karten mit Foto, Ressort, Zeit, Titel, Teaser
   c.relatedSwiper = (items, { title = 'Mehr verwandte Nachrichten', id = 'h-related' } = {}) => {
     if (!items || !items.length) return '';
-    const card = (a) => { const isPost = !!a.topicObj; const url = isPost ? c.blogUrl(a) : c.articleUrl(a); const label = isPost ? a.topicObj.name : a.categoryObj.name;
-      return html`<article class="swipe-card"><a class="card-link" href="${url}" aria-label="${a.title}"></a>${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image })}<div class="swipe-body"><span class="kicker">${label} · <time datetime="${a.date.toISOString()}" data-rel>${relTime(a.date, now)}</time></span><h3>${a.title}</h3><p>${isPost ? a.lead : a.deck}</p><span class="read-more">Weiterlesen<span aria-hidden="true"> ›</span></span></div></article>`; };
+    const card = (a) => { const isPost = !!a.topicObj, isCamp = !!a.isCampaign; const url = a.url || (isPost ? c.blogUrl(a) : c.articleUrl(a)); const label = isCamp ? 'Anzeige' : isPost ? a.topicObj.name : a.categoryObj.name;
+      return html`<article class="swipe-card ${isCamp ? 'is-sponsored' : ''}"><a class="card-link" href="${url}" aria-label="${a.title}"></a>${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image })}<div class="swipe-body"><span class="kicker">${isCamp ? html`<span class="badge">Anzeige</span> ${a.sponsor}` : html`${label} · <time datetime="${a.date.toISOString()}" data-rel>${relTime(a.date, now)}</time>`}</span><h3>${a.title}</h3><p>${isPost ? a.lead : a.deck}</p><span class="read-more">Weiterlesen<span aria-hidden="true"> ›</span></span></div></article>`; };
     return html`<section class="focus-swiper related-swiper" aria-labelledby="${id}" data-swiper><div class="section-title"><h2 id="${id}">${title}</h2><div class="swiper-nav"><button type="button" class="swiper-btn" data-swiper-prev aria-label="Zurück">‹</button><button type="button" class="swiper-btn" data-swiper-next aria-label="Weiter">›</button></div></div><div class="swiper-track" data-swiper-track tabindex="0" aria-label="Verwandte Beiträge, horizontal scrollbar">${items.map(card)}</div></section>`;
   };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
@@ -253,7 +257,7 @@ module.exports = function (ctx) {
     ${compactRow ? html`<div class="row"><label class="visually-hidden" for="${id}">E-Mail-Adresse</label><div class="control"><input id="${id}" type="email" name="${config.newsletterEmailField}" placeholder="ihre@e-mail.de" required autocomplete="email"></div><button class="btn ${cls}" type="submit">${button}</button></div>` : html`<label class="visually-hidden" for="${id}">E-Mail-Adresse</label><div class="control"><input id="${id}" type="email" name="${config.newsletterEmailField}" placeholder="ihre@e-mail.de" required autocomplete="email"></div>`}
     <label class="check"><input type="checkbox" name="consent" required><span>Ich möchte den Newsletter erhalten und akzeptiere die <a href="/datenschutz">Datenschutzhinweise</a>. Abmeldung jederzeit mit einem Klick.</span></label>
     ${compactRow ? '' : html`<button class="btn ${cls} btn-lg" type="submit">${button}</button>`}
-    ${fine ? html`<div class="nl-proof"><span>Werktäglich 7:30 Uhr</span><span>2 Minuten Lesezeit</span><span>Kostenlos, werbefrei</span></div>` : ''}
+    ${fine ? html`<div class="nl-proof"><span>Werktäglich 7:30 Uhr</span><span>2 Minuten Lesezeit</span><span>Kostenlos, ohne Tracking</span></div>` : ''}
     <div class="newsletter-note" data-newsletter-note hidden tabindex="-1">Der Versanddienst wird gerade angebunden – die Anmeldung ist in Kürze möglich. Bis dahin: <a href="/feed.xml">RSS-Feed abonnieren</a> oder die <a href="/nachrichten">Nachrichten</a> als Lesezeichen speichern.</div>
   </form>`;
   // Abschluss-Sektion (dunkles Band, ganze Breite) – letzter Block der Startseite
@@ -335,7 +339,7 @@ module.exports = function (ctx) {
       ...ctx.content.blog.posts.map(p => ({ title: p.title, url: c.blogUrl(p), date: p.date, cat: 'Ratgeber · ' + p.topicObj.name, desc: p.lead })),
     ].sort((a, b) => b.date - a.date).slice(0, 40)
       .map(i => `  <item>\n    <title>${esc(i.title)}</title>\n    <link>${config.domain}${i.url}</link>\n    <guid>${config.domain}${i.url}</guid>\n    <pubDate>${i.date.toUTCString()}</pubDate>\n    <category>${esc(i.cat)}</category>\n    <description>${esc(i.desc)}</description>\n  </item>`).join('\n');
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n  <title>${esc(config.brand)} – Nachrichten & Blog</title>\n  <link>${config.domain}</link>\n  <description>${esc(config.description)}</description>\n  <language>de-de</language>\n  <lastBuildDate>${now.toUTCString()}</lastBuildDate>\n  <atom:link href="${config.domain}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n</channel>\n</rss>\n`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n  <title>${esc(config.brand)} – Nachrichten</title>\n  <link>${config.domain}</link>\n  <description>${esc(config.description)}</description>\n  <language>de-de</language>\n  <lastBuildDate>${now.toUTCString()}</lastBuildDate>\n  <atom:link href="${config.domain}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n</channel>\n</rss>\n`;
   };
   // ---------- Kursdaten-Metadaten (Quelle, Verzögerung) ----------
   c.sourceLabel = () => ctx.config.dataSource || null;

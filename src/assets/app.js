@@ -471,7 +471,7 @@
           var paid2 = monthly * yrs3 * 12;
           html = row('Depotwert nach ' + yrs3 + ' Jahren', eur(val), true) + bar([['Eingezahlt', paid2], ['Wertzuwachs', val - paid2]]) + row('Eingezahlt', eur(paid2)) + row('Wertzuwachs', eur(val - paid2)) + row('Angenommene Rendite nach Kosten', fmt.num((ret - cost) * 100, 2) + ' % p. a.');
         }
-        out.innerHTML = html;
+        out.innerHTML = /NaN|Infinity|∞/.test(html) ? '<p class="calc-hint">Bitte alle Felder mit Zahlen ausfüllen (Dezimaltrennzeichen: Komma).</p>' : html;
       }
       form.addEventListener('input', run);
       form.addEventListener('submit', function (e) { e.preventDefault(); run(); });

@@ -96,7 +96,7 @@ module.exports = function (ctx) {
   </div>
 </div>`;
 
-    content.searchablePages.push({ title: `${f.company} – Im Fokus`, path: url, kicker: 'Im Fokus', description: f.lead.slice(0, 160) });
+    content.searchablePages.push({ title: `${f.company} – Anzeige`, path: url, kicker: 'Anzeige', description: f.lead.slice(0, 160) });
     const jsonLd = { '@context': 'https://schema.org', '@type': 'Article', headline: f.title, description: f.lead, datePublished: f.firstPublished, dateModified: f.updated, isAccessibleForFree: true, sponsor: { '@type': 'Organization', name: f.sponsor }, publisher: { '@type': 'Organization', name: config.brand }, about: { '@type': 'Corporation', name: f.company, tickerSymbol: inst.short, url: f.website } };
     pages.push({ path: url, html: layout.page({ title: `${f.company}: ${f.title}`, description: f.lead, path: url, body, section: null, ogType: 'article', jsonLd, reading: true, bodyClass: 'is-fokus' }) });
   }

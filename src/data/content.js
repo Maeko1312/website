@@ -24,6 +24,10 @@ module.exports = function (ctx) {
       return calendar.events.filter(e => e.date > today || (e.date === today && (parseInt(e.time, 10) * 60 + parseInt(e.time.slice(3), 10)) >= nowMin)).filter(e => e.impact >= 2).slice(0, n);
     },
   };
+  // Attribution: alle Beiträge erscheinen unter der Redaktion (keine fiktiven Personen)
+  for (const a of articles) a.author = 'redaktion';
+  for (const p of blog.posts) p.author = 'redaktion';
+  for (const g of guides) if (g.author) g.author = 'redaktion';
   articles.forEach(a => { a.categoryObj = categories.bySlug[a.category]; if (!a.categoryObj) throw new Error(`Unbekannte Kategorie ${a.category} in ${a.slug}`); if (!authors.bySlug[a.author]) throw new Error(`Unbekannter Autor ${a.author}`); });
   // Themenfotos zuordnen (echte Fotos, freie Lizenzen; Bildnachweise unter /bildnachweise) – eigenes image-Feld hat Vorrang
   const photos = require('./photos');

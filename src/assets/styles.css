@@ -1890,3 +1890,42 @@ body.is-fokus .nl-bar { display: none; }
 .related-swiper .swiper-track { grid-auto-columns: calc((100% - 40px) / 3); }
 @media (max-width: 900px) { .related-swiper .swiper-track { grid-auto-columns: calc((100% - 20px) / 2); } }
 @media (max-width: 600px) { .related-swiper .swiper-track { grid-auto-columns: 86%; } }
+
+/* Kennzeichnung automatisch erstellter Beiträge */
+.reader-auto { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted); font-size: 12.5px; }
+
+/* ---------- Startseite: Briefing und Sponsor-Band ---------- */
+.brief { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 24px 40px; margin: 8px 0 32px; padding: 22px 26px 24px; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--ink); }
+.brief .section-title { margin-bottom: 10px; }
+.brief-list { list-style: none; margin: 0; padding: 0; counter-reset: bp; display: grid; gap: 10px; }
+.brief-list li { counter-increment: bp; position: relative; padding-left: 34px; font-size: 16px; line-height: 24px; }
+.brief-list li::before { content: counter(bp); position: absolute; left: 0; top: 1px; width: 22px; height: 22px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+.brief-list a { color: var(--ink); font-weight: 500; }
+.brief-list a:hover { color: var(--link); text-decoration: none; }
+.brief-src { display: block; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.brief-side .kicker { display: block; margin-bottom: 8px; }
+.brief-events { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.brief-events li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.brief-date { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; background: var(--surface-2); font-family: var(--font-mono); line-height: 1.1; }
+.brief-date b { font-size: 15px; }
+.brief-date small { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+.brief-ev { font-size: 14.5px; line-height: 20px; font-weight: 600; color: var(--ink); }
+.brief-ev small { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.sponsored-band { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 0; margin: 0 0 32px; background: #f4f2fa; border: 1px solid #cdc6ea; }
+.sponsored-band-media { display: block; min-height: 100%; }
+.sponsored-band-media img { display: block; width: 100%; height: 100%; min-height: 220px; object-fit: cover; aspect-ratio: 16 / 9; }
+.sponsored-band-body { padding: 22px 26px 24px; display: flex; flex-direction: column; gap: 10px; }
+.sponsored-label { margin: 0; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.sponsored-band h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 26px; line-height: 1.1; margin: 0; }
+.sponsored-band h2 a { color: var(--ink); }
+.sponsored-band h2 a:hover { color: var(--link); text-decoration: none; }
+.sponsored-band p { margin: 0; font-size: 15px; line-height: 22px; color: var(--body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.sponsored-band .btn { align-self: flex-start; margin-top: auto; }
+.swipe-card.is-sponsored { background: #f4f2fa; border-color: #cdc6ea; }
+.calc-hint { padding: 12px 14px; background: var(--surface-2); border-left: 3px solid var(--accent); font-size: 14px; line-height: 20px; color: var(--body); }
+/* Mobile: Menü verdeckt nichts, Kursleiste weg solange das Menü offen ist */
+html.nav-open .market-strip { display: none; }
+.nav-panel { z-index: 99; }
+/* Merkliste auf schmalen Bildschirmen: nur Name, Kurs, Veränderung, Entfernen */
+@media (max-width: 640px) { [data-watchlist-table] th:nth-child(n+4):not(:last-child), [data-watchlist-table] td:nth-child(n+4):not(:last-child) { display: none; } }
+@media (max-width: 900px) { .brief { grid-template-columns: minmax(0, 1fr); } .sponsored-band { grid-template-columns: minmax(0, 1fr); } .sponsored-band-media img { min-height: 0; } }
