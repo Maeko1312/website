@@ -835,7 +835,7 @@
     $$('[data-copy]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var v = btn.getAttribute('data-copy');
-        var done = function () { btn.classList.add('is-done'); btn.textContent = '\u2713'; toast('Kopiert: ' + v); setTimeout(function () { btn.classList.remove('is-done'); btn.textContent = '\u29c9'; }, 1500); };
+        var done = function () { btn.classList.add('is-done'); btn.setAttribute('title', 'Kopiert'); toast('Kopiert: ' + v); setTimeout(function () { btn.classList.remove('is-done'); btn.setAttribute('title', 'Kopieren'); }, 1500); };
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(done, done); else done();
       });
     });

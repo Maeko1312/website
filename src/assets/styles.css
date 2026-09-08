@@ -1788,3 +1788,15 @@ body.is-fokus .nl-bar { display: none; }
 .fokus-kv .is-wide dd { display: block; padding-right: 0; font-weight: 400; }
 .fokus-listings { display: none; }
 .fokus-actions { margin: 0; }
+
+/* Kopieren-Knöpfe: dezentes Icon, Hover in Akzentfarbe, Häkchen nach dem Kopieren */
+.copy-btn { border: 0; background: transparent; color: var(--muted); width: 28px; height: 28px; border-radius: 4px; display: inline-grid; place-items: center; cursor: pointer; padding: 0; transition: background-color .15s, color .15s; }
+.copy-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.copy-btn:hover { background: var(--accent-soft); color: var(--accent); }
+.copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.copy-btn .ic-check { display: none; }
+.copy-btn.is-done { color: var(--up); background: transparent; border-color: transparent; }
+.copy-btn.is-done .ic-copy { display: none; }
+.copy-btn.is-done .ic-check { display: block; }
+.fokus-kv .copy-wrap { grid-template-columns: auto 28px; gap: 6px; }
+.fokus-kv dd:not(:has(.copy-btn)) { padding-right: 34px; }

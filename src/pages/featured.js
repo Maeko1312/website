@@ -31,7 +31,7 @@ module.exports = function (ctx) {
     const cashPerShare = f.shareInfo && inst.sharesOutstanding ? 3780000 / inst.sharesOutstanding : null;
     const rt = readTime(f.sections.map(s => s.html || '').join(''));
     const tocItems = f.sections.filter(s => s.id && s.h2).map(s => [s.id, s.h2]).concat([['kurs', 'Kursentwicklung'], ['faq', 'Häufige Fragen'], ['risiken', 'Risikofaktoren'], ['haftungsausschluss', 'Haftungsausschluss']]);
-    const copy = (v) => html`<span class="copy-wrap"><code translate="no">${v}</code><button type="button" class="copy-btn" data-copy="${v}" aria-label="${v} kopieren" title="Kopieren">⧉</button></span>`;
+    const copy = (v) => html`<span class="copy-wrap"><code translate="no">${v}</code><button type="button" class="copy-btn" data-copy="${v}" aria-label="${v} kopieren" title="Kopieren"><svg class="ic-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="ic-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></button></span>`;
 
     // ---------- Module ----------
     const modules = {
