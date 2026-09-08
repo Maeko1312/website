@@ -126,7 +126,7 @@
     for (var j = 0; j < index.length; j++) { if (norm(index[j].t) === nq) return index[j]; }
     return null;
   }
-  var typeLabel = { article: 'Nachricht', blog: 'Blog', stock: 'Aktie', index: 'Index', commodity: 'Rohstoff', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihe', term: 'Lexikon', page: 'Seite', guide: 'Wissen' };
+  var typeLabel = { article: 'Nachricht', blog: 'Ratgeber', stock: 'Aktie', index: 'Index', commodity: 'Rohstoff', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihe', term: 'Lexikon', page: 'Seite', guide: 'Wissen' };
   function closeSearch() { $$('[data-search-results]').forEach(function (r) { r.hidden = true; r.innerHTML = ''; }); }
   function headerSearch() {
     $$('[data-search]').forEach(function (form) {
@@ -174,7 +174,7 @@
         var groups = {};
         hits.forEach(function (h) { (groups[h.y] = groups[h.y] || []).push(h); });
         var order = ['stock', 'index', 'commodity', 'fx', 'crypto', 'bond', 'article', 'blog', 'guide', 'term', 'page'];
-        var plural = { stock: 'Aktien', index: 'Indizes', commodity: 'Rohstoffe', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihen', article: 'Nachrichten', blog: 'Blog', guide: 'Wissen', term: 'Lexikon', page: 'Seiten' };
+        var plural = { stock: 'Aktien', index: 'Indizes', commodity: 'Rohstoffe', fx: 'Devisen', crypto: 'Krypto', bond: 'Anleihen', article: 'Nachrichten', blog: 'Ratgeber', guide: 'Wissen', term: 'Lexikon', page: 'Seiten' };
         var dh = directHit(query);
         out.innerHTML = (dh ? '<p class="search-direct">Direkt zur Seite: <a href="' + dh.u + '">' + escapeHtml(dh.t) + '</a></p>' : '') + order.filter(function (k) { return groups[k]; }).map(function (k) {
           return '<section class="search-group"><h2 class="section-title"><span>' + (groups[k].length > 1 ? plural[k] : typeLabel[k]) + '</span></h2><ul class="result-list">' +

@@ -13,8 +13,8 @@ module.exports = function (ctx) {
   c.typeLabel = (inst) => typeLabel[inst.type] || '';
   c.url = (inst) => `/kurs/${inst.slug}`;
   c.articleUrl = (a) => `/artikel/${a.slug}`;
-  c.blogUrl = (p) => `/blog/${p.slug}`;
-  c.topicUrl = (t) => `/blog/thema/${t.slug}`;
+  c.blogUrl = (p) => `/artikel/${p.slug}`; // Ratgeber-Beiträge sind Nachrichten: gleiche URL-Struktur
+  c.topicUrl = () => '/nachrichten/ratgeber'; // Themen sind nur noch Etiketten, die Ratgeber-Seite sammelt alle
   c.catUrl = (cat) => cat.kind === 'analysis' ? `/analysen/${cat.slug.replace(/^analysen-/, '')}` : `/nachrichten/${cat.slug}`;
   c.fmtPrice = ctx.fmtPrice;
   c.unit = (inst) => inst.type === 'index' ? 'Pkt.' : inst.type === 'bond' ? '%' : inst.type === 'fx' ? inst.unit : inst.type === 'stock' ? '€' : inst.unit;
@@ -93,8 +93,8 @@ module.exports = function (ctx) {
   const catOf = (a) => ctx.content.categories.bySlug[a.category];
   const instOf = (a) => a.instruments && a.instruments.length ? instruments.bySlug[a.instruments[0]] : null;
   c.storyTop = (a, { showDate = true } = {}) => {
-    const cat = catOf(a); const inst = instOf(a); const qq = inst ? q(inst.slug) : null;
-    return html`<div class="story-top">${a.featured ? html`<span class="badge is-accent">Top</span>` : ''}${showDate ? html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>${qq ? c.delta(qq.changePct) : ''}` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
+    const isPost = !!a.topicObj; const cat = isPost ? null : catOf(a); const inst = isPost ? null : instOf(a); const qq = inst ? q(inst.slug) : null;
+    return html`<div class="story-top">${a.featured ? html`<span class="badge is-accent">Top</span>` : ''}${showDate ? html`<time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now)}${relDate(a.date, now) === 'heute' ? ', ' + time(a.date) + ' Uhr' : ''}</time>` : ''}${inst ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>${qq ? c.delta(qq.changePct) : ''}` : isPost ? html`<span class="tag"><a href="${c.topicUrl(a.topicObj)}">${a.topicObj.name}</a></span>` : html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>`}${a.kind === 'analysis' && a.direction ? html`<span class="dir ${a.direction}">${a.direction === 'up' ? 'bullish' : 'bearish'}</span>` : ''}</div>`;
   };
   // Aufmacher (Startseite): großes Bild mit Textüberlagerung
   // Vorschaubilder: echte Fotos (src/public/img/stock, deterministisch je Beitrag); eigenes Bild (image-Feld) hat Vorrang; Chart-Grafik nur als Rückfall
@@ -117,8 +117,8 @@ module.exports = function (ctx) {
     return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image, eager: true })}<a class="hero-link" href="${url}" aria-label="${a.title}"></a><div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
   };
   c.storyItem = (a, { thumb = false, excerpt = false } = {}) => {
-    const inst = instOf(a); const cat = catOf(a);
-    return html`<li><article class="story ${thumb ? 'has-thumb' : ''}">${thumb ? html`<a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>` : ''}<div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3>${excerpt ? html`<p class="story-excerpt">${a.deck}</p>` : ''}</div></article></li>`;
+    const isPost = !!a.topicObj; const inst = isPost ? null : instOf(a); const cat = isPost ? null : catOf(a); const url = isPost ? c.blogUrl(a) : c.articleUrl(a);
+    return html`<li><article class="story ${thumb ? 'has-thumb' : ''}">${thumb ? html`<a href="${url}" aria-hidden="true" tabindex="-1">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label: inst ? inst.short || inst.name : isPost ? a.topicObj.name : cat.name, image: a.image })}</a>` : ''}<div>${c.storyTop(a)}<h3 class="story-title"><a href="${url}">${a.title}</a></h3>${excerpt ? html`<p class="story-excerpt">${isPost ? a.lead : a.deck}</p>` : ''}</div></article></li>`;
   };
   c.storyList = (arts, { variant = '', thumb = false, excerpt = false } = {}) => html`<ul class="story-list ${variant}">${arts.map(a => c.storyItem(a, { thumb, excerpt }))}</ul>`;
   c.denseList = (arts) => html`<ul class="story-list is-dense">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); const dup = inst && [inst.short, inst.name].filter(Boolean).some(n => a.title.toLowerCase().startsWith(n.toLowerCase())); return html`<li><time datetime="${a.date.toISOString()}" translate="no">${relDate(a.date, now) === 'heute' ? time(a.date) : util.dateDM(a.date)}</time><span class="story-title">${inst && !dup ? html`<span class="tag"><a href="${c.url(inst)}">${inst.short || inst.name}</a></span>` : !inst ? html`<span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>` : ''} <a href="${c.articleUrl(a)}">${a.title}</a></span></li>`; })}</ul>`;
@@ -234,7 +234,7 @@ module.exports = function (ctx) {
   /* ---------- Blog ---------- */
   c.postCard = (p, { featured = false } = {}) => html`<article class="post-card ${featured ? 'is-featured' : ''} ${p.featured ? 'is-promoted' : ''}" data-topic="${p.topic}">${p.featured ? html`<span class="card-flag"><span class="badge is-accent">Im Fokus</span>${p.sponsored ? html`<span class="badge">Anzeige</span>` : ''}</span>` : ''}<a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name, image: p.image })}</a><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a></span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p><a class="read-more" href="${c.blogUrl(p)}">Weiterlesen<span aria-hidden="true"> ›</span></a></div></article>`;
   c.postList = (posts) => html`<ul class="post-list">${posts.map(p => html`<li><a href="${c.blogUrl(p)}" aria-hidden="true" tabindex="-1">${c.thumb('blog-' + p.slug, { label: p.topicObj.name })}</a><div><span class="kicker">${p.topicObj.name} · ${p.minutes} Min.</span><h3 class="story-title"><a href="${c.blogUrl(p)}">${p.title}</a></h3></div></li>`)}</ul>`;
-  c.sideBlog = (n = 5, exclude) => c.sideCard('Aus dem Blog', html`<ul class="side-list">${ctx.content.blog.posts.filter(p => p.slug !== exclude).slice(0, n).map(p => html`<li><a href="${c.blogUrl(p)}"><span class="kicker">${p.topicObj.name}</span><span>${p.title}</span></a></li>`)}</ul>`, { href: '/blog', more: 'Alle Beiträge' });
+  c.sideBlog = (n = 5, exclude) => c.sideCard('Ratgeber', html`<ul class="side-list">${ctx.content.blog.posts.filter(p => p.slug !== exclude).slice(0, n).map(p => html`<li><a href="${c.blogUrl(p)}"><span class="kicker">${p.topicObj.name}</span><span>${p.title}</span></a></li>`)}</ul>`, { href: '/nachrichten/ratgeber', more: 'Alle Beiträge' });
 
   /* ---------- Newsletter ---------- */
   let nlCounter = 0;
@@ -308,7 +308,7 @@ module.exports = function (ctx) {
     const seen = new Set(); const picks = [];
     for (const p of posts) { if (seen.has(p.topic)) continue; seen.add(p.topic); picks.push(p); if (picks.length >= n) break; }
     if (picks.length < 2) return '';
-    return html`<section aria-labelledby="h-tipps" style="margin-bottom:32px">${c.sectionTitle('Lesetipps der Redaktion', { href: '/blog', more: 'Alle Beiträge', id: 'h-tipps' })}<ol class="tips-list">${picks.map((p, i) => html`<li><span class="tips-num" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a> · ${p.minutes} Min. Lesezeit</span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p></div></li>`)}</ol></section>`;
+    return html`<section aria-labelledby="h-tipps" style="margin-bottom:32px">${c.sectionTitle('Lesetipps der Redaktion', { href: '/nachrichten/ratgeber', more: 'Alle Beiträge', id: 'h-tipps' })}<ol class="tips-list">${picks.map((p, i) => html`<li><span class="tips-num" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><div><span class="kicker"><a href="${c.topicUrl(p.topicObj)}">${p.topicObj.name}</a> · ${p.minutes} Min. Lesezeit</span><h3><a href="${c.blogUrl(p)}">${p.title}</a></h3><p>${p.lead}</p></div></li>`)}</ol></section>`;
   };
   c.pollBox = ({ wide = false, half = false } = {}) => {
     const p = ctx.content.poll;
@@ -321,7 +321,7 @@ module.exports = function (ctx) {
   c.rssFeed = () => {
     const items = [
       ...ctx.content.articles.map(a => ({ title: a.title, url: c.articleUrl(a), date: a.date, cat: catOf(a).name, desc: a.deck })),
-      ...ctx.content.blog.posts.map(p => ({ title: p.title, url: c.blogUrl(p), date: p.date, cat: 'Blog · ' + p.topicObj.name, desc: p.lead })),
+      ...ctx.content.blog.posts.map(p => ({ title: p.title, url: c.blogUrl(p), date: p.date, cat: 'Ratgeber · ' + p.topicObj.name, desc: p.lead })),
     ].sort((a, b) => b.date - a.date).slice(0, 40)
       .map(i => `  <item>\n    <title>${esc(i.title)}</title>\n    <link>${config.domain}${i.url}</link>\n    <guid>${config.domain}${i.url}</guid>\n    <pubDate>${i.date.toUTCString()}</pubDate>\n    <category>${esc(i.cat)}</category>\n    <description>${esc(i.desc)}</description>\n  </item>`).join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n  <title>${esc(config.brand)} – Nachrichten & Blog</title>\n  <link>${config.domain}</link>\n  <description>${esc(config.description)}</description>\n  <language>de-de</language>\n  <lastBuildDate>${now.toUTCString()}</lastBuildDate>\n  <atom:link href="${config.domain}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n</channel>\n</rss>\n`;
@@ -405,7 +405,7 @@ module.exports = function (ctx) {
     const out = [];
     for (const i of instruments.all) out.push({ t: i.name, k: [i.short, i.isin, i.index, i.sector].filter(Boolean).join(' · '), u: c.url(i), y: i.type, w: i.type === 'stock' || i.type === 'index' ? 3 : 2, d: i.blurb });
     for (const a of ctx.content.articles) out.push({ t: a.title, k: catOf(a).name + ' · ' + dateShort(a.date), u: c.articleUrl(a), y: 'article', w: 1, d: a.deck });
-    for (const p of ctx.content.blog.posts) out.push({ t: p.title, k: 'Blog · ' + p.topicObj.name, u: c.blogUrl(p), y: 'blog', w: 2, d: p.lead });
+    for (const p of ctx.content.blog.posts) out.push({ t: p.title, k: 'Ratgeber · ' + p.topicObj.name, u: c.blogUrl(p), y: 'blog', w: 2, d: p.lead });
     for (const g of ctx.content.guides) out.push({ t: g.title, k: g.kicker, u: `/wissen/${g.slug}`, y: 'guide', w: 2, d: g.lead });
     for (const t of ctx.content.glossary) out.push({ t: t.term, k: t.short || '', u: `/wissen/boersenlexikon#${t.slug}`, y: 'term', w: 1, d: t.def.slice(0, 140) });
     // Such-Aliasse: englische und umgangssprachliche Begriffe, die direkt zu einer Seite führen (Marko liest die Seite oft übersetzt)
@@ -418,7 +418,7 @@ module.exports = function (ctx) {
       '/werkzeuge/waehrungsrechner': 'currency converter, currency, umrechner, währung, wechselkurs, euro dollar, fx converter',
       '/werkzeuge/positionsgroessenrechner': 'position size, positionsgröße, risiko, stop loss',
       '/werkzeuge/inflationsrechner': 'inflation calculator, inflation, kaufkraft, purchasing power',
-      '/blog': 'blog, beiträge, posts, artikel, ratgeber',
+      '/nachrichten/ratgeber': 'ratgeber, blog, beiträge, tipps, einsteiger, anleitung',
       '/newsletter': 'newsletter, abo, abonnieren, subscribe, e-mail, email, briefing',
       '/wissen': 'knowledge, wissen, lernen, learn, guides, ratgeber, education, börsenwissen',
       '/wissen/boersenlexikon': 'glossary, glossar, lexikon, begriffe, definitions, dictionary',

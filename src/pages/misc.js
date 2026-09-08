@@ -47,7 +47,7 @@ module.exports = function (ctx) {
     const body = html`<div class="container page"><div class="layout"><div>
       ${c.pageHead({ kicker: 'Newsletter', title: 'Fast geschafft – bitte bestätigen Sie Ihre Anmeldung', lead: 'Wir haben Ihnen eine E-Mail geschickt. Klicken Sie auf den Bestätigungslink, dann kommt die erste Ausgabe von „Börsenblick am Morgen“ am nächsten Handelstag um 7:30 Uhr.' })}
       <section class="card"><h2 style="font-size:18px;margin-bottom:10px">Keine E-Mail erhalten?</h2><ul style="padding-left:1.2em;display:grid;gap:6px"><li>Prüfen Sie den Spam- oder Werbeordner und markieren Sie die Nachricht als „kein Spam“.</li><li>Fügen Sie unsere Absenderadresse zu Ihren Kontakten hinzu, damit künftige Ausgaben im Posteingang landen.</li><li>Nach fünf Minuten immer noch nichts? Melden Sie sich einfach <a href="/newsletter">erneut an</a>.</li></ul></section>
-      <section class="card" style="margin-top:20px">${c.sectionTitle('Bis dahin: die meistgelesenen Beiträge', { href: '/blog', more: 'Zum Blog' })}${c.postList(content.blog.posts.slice(0, 4))}</section>
+      <section class="card" style="margin-top:20px">${c.sectionTitle('Bis dahin: die meistgelesenen Beiträge', { href: '/nachrichten/ratgeber', more: 'Alle Ratgeber' })}${c.postList(content.blog.posts.slice(0, 4))}</section>
     </div><aside class="no-sticky">${c.sideIndices()}${c.sideUpcoming(4)}</aside></div></div>`;
     pages.push({ path: '/newsletter/danke', html: layout.page({ title: 'Anmeldung bestätigen', description: 'Bitte bestätigen Sie Ihre Newsletter-Anmeldung.', path: '/newsletter/danke', body, section: 'nachrichten', noindex: true }) });
   }
