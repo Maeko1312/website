@@ -1800,3 +1800,9 @@ body.is-fokus .nl-bar { display: none; }
 .copy-btn.is-done .ic-check { display: block; }
 .fokus-kv .copy-wrap { grid-template-columns: auto 28px; gap: 6px; }
 .fokus-kv dd:not(:has(.copy-btn)) { padding-right: 34px; }
+
+/* Im Fokus: Risikofaktoren als Zeilen mit fetten Buchstaben */
+.fokus-risk-list { list-style: none; counter-reset: risk; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+.fokus-risk-list li { counter-increment: risk; position: relative; padding: 14px 18px 14px 56px; background: var(--surface); border: 1px solid var(--line); font-size: 15.5px; line-height: 24px; color: var(--body); }
+.fokus-risk-list li::before { content: counter(risk, lower-alpha); position: absolute; left: 16px; top: 13px; width: 26px; height: 26px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-weight: 700; font-size: 14px; border-radius: 4px; }
+@media (max-width: 560px) { .fokus-risk-list li { padding: 12px 14px 12px 48px; font-size: 15px; line-height: 23px; } .fokus-risk-list li::before { left: 12px; top: 11px; } }
