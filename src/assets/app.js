@@ -437,6 +437,9 @@
       var bar = function (parts) { var sum = parts.reduce(function (a, p) { return a + Math.max(0, p[1]); }, 0); if (!sum) return ''; return '<div class="calc-bar" aria-hidden="true">' + parts.map(function (p, i) { return '<span class="calc-bar-seg is-' + (i + 1) + '" style="width:' + (Math.max(0, p[1]) / sum * 100).toFixed(1) + '%"></span>'; }).join('') + '</div><div class="calc-legend">' + parts.map(function (p, i) { return '<span><i class="is-' + (i + 1) + '"></i>' + p[0] + ' <b>' + fmt.num(Math.max(0, p[1]) / sum * 100, 0) + ' %</b></span>'; }).join('') + '</div>'; };
       function run() {
         var html = '';
+        // Keine plausibel wirkenden Ergebnisse aus leeren Feldern: erst rechnen, wenn alle Zahlenfelder gefüllt sind
+        var empty = Array.prototype.filter.call(form.querySelectorAll('input[type=text], input[type=number]'), function (el) { return !el.disabled && el.offsetParent !== null && String(el.value).trim() === ''; });
+        if (empty.length) { out.innerHTML = '<p class="calc-hint">Bitte alle Felder mit Zahlen ausfüllen (Dezimaltrennzeichen: Komma).</p>'; return; }
         if (type === 'zinseszins') {
           var start = read('start') || 0, rate = read('rate') || 0, yrs = read('years') || 0, r = (read('interest') || 0) / 100;
           var total = start * Math.pow(1 + r, yrs), paid = start;

@@ -1929,3 +1929,11 @@ html.nav-open .market-strip { display: none; }
 /* Merkliste auf schmalen Bildschirmen: nur Name, Kurs, Veränderung, Entfernen */
 @media (max-width: 640px) { [data-watchlist-table] th:nth-child(n+4):not(:last-child), [data-watchlist-table] td:nth-child(n+4):not(:last-child) { display: none; } }
 @media (max-width: 900px) { .brief { grid-template-columns: minmax(0, 1fr); } .sponsored-band { grid-template-columns: minmax(0, 1fr); } .sponsored-band-media img { min-height: 0; } }
+/* Schmale Bildschirme: keine horizontalen Überläufe */
+.reader-foot > * { min-width: 0; }
+.related-swiper .swiper-track { min-width: 0; }
+.calc-more .prose { overflow-wrap: anywhere; }
+.calc-more .prose p { overflow-x: auto; }
+.brand { min-height: 40px; }
+@media (max-width: 480px) { .hero-main .hero-body h2, .hero-main .hero-body h3 { font-size: 26px; line-height: 1.15; } .hero-main .hero-body p { font-size: 16px; line-height: 24px; } }
+@media (max-width: 860px) { .nl-closing-inner { grid-template-columns: minmax(0, 1fr); } } /* späte Zweispalten-Regel überschreibt sonst die Mobilregel */
