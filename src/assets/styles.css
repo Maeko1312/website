@@ -1956,3 +1956,4 @@ html.nav-open .market-strip { display: none; }
 .ressort-lead.is-promoted { background: transparent; box-shadow: none; padding: 0 0 12px; margin-left: 0; }
 .ressort-list li.is-promoted { background: transparent; box-shadow: none; padding-left: 0; margin-left: 0; }
 .news-row.is-promoted { box-shadow: none; padding-left: 0; margin-left: 0; background: transparent; }
+.brief-src { grid-column: 2; margin-top: 0; }
