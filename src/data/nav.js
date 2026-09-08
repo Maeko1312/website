@@ -27,6 +27,7 @@ const nav = [
   },
   {
     label: 'Nachrichten', href: '/nachrichten', key: 'nachrichten', cols: 2,
+    // Ressorts aus categories.js (alle Nachrichten-Kategorien + Ratgeber), nichts anderes
     groups: [
       { title: 'Ressorts', links: [
         ['Alle Nachrichten', '/nachrichten'],
@@ -35,13 +36,11 @@ const nav = [
         ['Wirtschaft & Konjunktur', '/nachrichten/wirtschaft'],
         ['Zentralbanken & Zinsen', '/nachrichten/zentralbanken'],
       ] },
-      { title: 'Weitere Themen', links: [
+      { title: 'Weitere Ressorts', links: [
         ['Rohstoffe & Energie', '/nachrichten/rohstoffe'],
         ['Kryptowährungen', '/nachrichten/krypto'],
         ['Analystenstimmen', '/nachrichten/analystenstimmen'],
         ['Ratgeber', '/nachrichten/ratgeber'],
-        ['Newsletter', '/newsletter'],
-        ['RSS-Feed', '/feed.xml'],
       ] },
     ],
     feature: 'latest',
