@@ -33,7 +33,7 @@ const day = (t) => iso(t).slice(0, 10);
 (async () => {
   const out = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
   let ok = 0, fail = 0;
-  for (const inst of instruments.all) {
+  for (const inst of [...instruments.all, ...(instruments.sponsors || [])]) {
     if (!inst.yahoo) continue;
     const entry = { currency: null, i1d: null, w5y: null, mMax: null };
     try {

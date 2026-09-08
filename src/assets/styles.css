@@ -1542,3 +1542,97 @@ html.reveal-on :where(.card, .post-card, .story-card, .guide-card, .tool-card, .
 .ressort-lead.is-promoted { background: #f4f2fa; box-shadow: inset 3px 0 0 var(--accent); padding: 12px 0 12px 12px; margin-left: -12px; }
 @media (max-width: 1200px) { .ressort-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; } }
 @media (max-width: 640px) { .ressort-grid { grid-template-columns: minmax(0, 1fr); } .ressort-lead .thumb { aspect-ratio: 16 / 9; } }
+
+/* ---------- Im Fokus: gesponserte Unternehmensporträts (/fokus/…) ---------- */
+.fokus-bar { background: var(--accent-soft); border-bottom: 1px solid #cdc6ea; font-size: 13px; line-height: 18px; }
+.fokus-bar .container { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding-top: 9px; padding-bottom: 9px; }
+.fokus-bar-text { color: var(--ink); }
+.fokus-bar-meta { color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+.fokus-bar a { margin-left: auto; color: var(--link); font-weight: 600; }
+.fokus-head { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 420px); gap: 28px 40px; align-items: start; margin: 8px 0 24px; }
+.fokus-flags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.fokus-head h1 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.06; letter-spacing: 0; margin: 0 0 14px; text-wrap: balance; }
+.fokus-head .deck { font-size: 18px; line-height: 28px; color: var(--body); max-width: 68ch; }
+.fokus-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 16px 0 18px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em; color: var(--muted); }
+.fokus-cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.fokus-ticker { position: relative; padding: 18px 20px 20px; border-top: 4px solid var(--accent); }
+.fokus-ticker h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 24px; line-height: 1.1; margin: 4px 0 10px; }
+.fokus-price { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.fokus-price strong { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.fokus-price strong small { font-size: 15px; font-weight: 600; color: var(--muted); font-stretch: 100%; font-family: var(--font-body); }
+.fokus-kv { margin: 12px 0 16px; }
+.fokus-kv > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.fokus-kv dt { color: var(--muted); }
+.fokus-kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.fokus-kv .is-wide { display: block; }
+.fokus-kv .is-wide dd { text-align: left; margin-top: 4px; }
+.range-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.copy-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.copy-wrap code { font-family: var(--font-mono); font-size: 13px; letter-spacing: .02em; }
+.copy-btn { border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted); border-radius: var(--radius-sm); width: 24px; height: 24px; font-size: 13px; line-height: 1; cursor: pointer; transition: color .15s, border-color .15s; }
+.copy-btn:hover { color: var(--ink); border-color: var(--ink); }
+.copy-btn.is-done { color: var(--up); border-color: var(--up); }
+.fokus-ticker-cta { display: block; text-align: center; }
+.fokus-hero { margin: 0 0 28px; }
+.fokus-hero img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--navy-2); }
+.fokus-hero figcaption, .fokus-figure figcaption { margin-top: 6px; font-size: 12.5px; line-height: 18px; color: var(--muted); }
+.fokus-kpis { margin: 0 0 28px; }
+.fokus-kpis .number-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fokus-kpis .number-tile strong.up { color: var(--up); }
+.fokus-prose h2 { scroll-margin-top: 96px; }
+.fokus-highlights { margin: 32px 0; padding: 22px 24px 8px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); }
+.fokus-highlights h2 { margin: 0 0 14px; font-size: 24px; }
+.fokus-highlights ol { list-style: none; margin: 0; padding: 0; counter-reset: hl; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+.fokus-highlights li { counter-increment: hl; position: relative; padding: 0 0 16px 40px; }
+.fokus-highlights li::before { content: counter(hl, decimal-leading-zero); position: absolute; left: 0; top: 2px; font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); }
+.fokus-highlights strong { display: block; font-size: 16px; line-height: 22px; color: var(--ink); margin-bottom: 4px; }
+.fokus-highlights p { margin: 0; font-size: 14.5px; line-height: 21px; color: var(--body); }
+.fokus-steps { counter-reset: st; list-style: none; padding: 0; margin: 12px 0 18px; display: grid; gap: 8px; }
+.fokus-steps li { counter-increment: st; position: relative; padding: 10px 14px 10px 46px; background: var(--surface-2); }
+.fokus-steps li::before { content: counter(st); position: absolute; left: 12px; top: 8px; width: 24px; height: 24px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+.fokus-grid-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 20px; padding-left: 1.2em; }
+.fokus-chart { margin: 24px 0 28px; padding: 16px 18px 12px; background: var(--surface); border: 1px solid var(--line); }
+.fokus-chart figcaption { font-size: 14px; margin-bottom: 8px; }
+.fokus-chart svg { display: block; width: 100%; height: auto; }
+.fokus-bars .bar.is-accent { fill: var(--accent); }
+.fokus-bars .bar-value { font-family: var(--font-mono); font-size: 13px; font-weight: 600; fill: var(--ink); }
+.fokus-bars .bar-label { font-size: 12px; fill: var(--muted); }
+.fokus-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 20px 0 24px; }
+.fokus-card { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--accent); display: flex; flex-direction: column; gap: 6px; }
+.fokus-card h3 { font-family: var(--font-body); font-weight: 600; font-size: 16px; line-height: 22px; margin: 0; }
+.fokus-card p { margin: 0; font-size: 14px; line-height: 20px; color: var(--body); }
+.fokus-card .kicker { color: var(--accent); }
+.fokus-patent-no { margin-top: auto; padding-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.fokus-team { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 20px 0 24px; }
+.fokus-person { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: start; padding: 16px; background: var(--surface); border: 1px solid var(--line); }
+.fokus-person img { width: 96px; height: 96px; object-fit: cover; object-position: 60% 20%; background: var(--surface-2); }
+.fokus-person .avatar.is-lg { width: 96px; height: 96px; font-size: 26px; }
+.fokus-person h3 { font-family: var(--font-body); font-weight: 600; font-size: 16px; line-height: 22px; margin: 0 0 2px; }
+.fokus-person .kicker { display: block; margin-bottom: 6px; }
+.fokus-person p { margin: 0; font-size: 14px; line-height: 20px; color: var(--body); }
+.fokus-kurs { margin: 28px 0; scroll-margin-top: 96px; }
+.fokus-quote-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 14px; margin: 0 0 12px; }
+.fokus-quote-price { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 30px; line-height: 1; letter-spacing: 0; }
+.fokus-quote-price small { font-size: 14px; font-family: var(--font-body); font-stretch: 100%; font-weight: 600; color: var(--muted); }
+.fokus-valuation { margin: 24px 0 28px; }
+.fokus-valuation .number-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.fokus-timeline-wrap { margin: 28px 0; }
+.fokus-timeline { list-style: none; margin: 12px 0 0; padding: 0 0 0 18px; border-left: 2px solid var(--line-strong); display: grid; gap: 14px; }
+.fokus-timeline li { position: relative; display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; font-size: 14.5px; line-height: 21px; }
+.fokus-timeline li::before { content: ""; position: absolute; left: -24px; top: 6px; width: 10px; height: 10px; background: var(--accent); }
+.fokus-timeline-date { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); padding-top: 2px; }
+.fokus-faq { margin: 28px 0; scroll-margin-top: 96px; }
+.fokus-risks { margin: 28px 0; scroll-margin-top: 96px; }
+.fokus-risk-list { padding-left: 1.4em; display: grid; gap: 8px; font-size: 14.5px; line-height: 21px; color: var(--body); list-style: lower-latin; }
+.fokus-sources ol.sources { padding-left: 1.4em; font-size: 13.5px; line-height: 19px; display: grid; gap: 4px; }
+.fokus-legal { margin: 28px 0 0; padding: 22px 24px; background: var(--surface-2); border: 1px solid var(--line); scroll-margin-top: 96px; }
+.fokus-legal h2 { margin-top: 0; }
+.fokus-legal p { font-size: 13.5px; line-height: 20px; color: var(--body); }
+.fokus-legal-flag { margin-bottom: 10px; }
+.fokus-legal .kv { margin-top: 8px; font-size: 13.5px; }
+.fokus-toc ol { margin: 8px 0 0; padding-left: 1.4em; display: grid; gap: 6px; font-size: 14px; line-height: 20px; }
+.fokus-toc a { color: var(--ink); }
+.fokus-toc a:hover { color: var(--link); }
+@media (max-width: 1024px) { .fokus-head { grid-template-columns: minmax(0, 1fr); } .fokus-valuation .number-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fokus-cards { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .fokus-kpis .number-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fokus-highlights ol, .fokus-grid-list, .fokus-team { grid-template-columns: minmax(0, 1fr); } .fokus-timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } .fokus-bar a { margin-left: 0; } .fokus-head h1 { font-size: 28px; } }
+@media (max-width: 560px) { .fokus-kpis .number-tiles, .fokus-valuation .number-tiles { grid-template-columns: minmax(0, 1fr); } .fokus-person { grid-template-columns: 72px minmax(0, 1fr); } .fokus-person img, .fokus-person .avatar.is-lg { width: 72px; height: 72px; } }

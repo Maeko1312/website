@@ -10,11 +10,12 @@ module.exports = function (ctx) {
   const blog = require('./blog')(ctx);
   const tools = require('./tools')(ctx);
   const quiz = require('./quiz')(ctx);
+  const featured = require('./featured'); // gesponserte Unternehmensporträts (Im Fokus)
 
   const content = {
     categories, authors, glossary: glossary.list, glossaryBySlug: glossary.bySlug, blog, tools, quiz,
     holidays: calendar.holidays, events: calendar.events, countries: calendar.countries, calendarRange: calendar.range,
-    guides, articles,
+    guides, articles, featured,
     searchablePages: [],
     poll: { id: 'p1', question: 'Wo steht der DAX am Jahresende?', options: ['Über 28.000 Punkten', 'Zwischen 25.000 und 28.000', 'Unter 25.000 Punkten'], counts: [412, 688, 297] },
     upcomingEvents(n) {

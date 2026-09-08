@@ -23,7 +23,7 @@ const components = require('./src/render/components.js')(ctx);
 ctx.layout = layout; ctx.c = components;
 
 // Seitenmodule
-const pageModules = ['home', 'news', 'blog', 'markets', 'quote', 'calendar', 'knowledge', 'tools', 'misc'];
+const pageModules = ['home', 'news', 'blog', 'markets', 'quote', 'calendar', 'knowledge', 'tools', 'featured', 'misc'];
 const pages = [];
 for (const m of pageModules) {
   const mod = require(`./src/pages/${m}.js`);
@@ -78,7 +78,7 @@ fs.writeFileSync(path.join(DIST, 'instruments.json'), JSON.stringify(components.
   const histLong = fs.existsSync(longPath) ? JSON.parse(fs.readFileSync(longPath, 'utf8')) : {};
   fs.mkdirSync(path.join(DIST, 'data', 'history'), { recursive: true });
   let n = 0;
-  for (const inst of instruments.all) {
+  for (const inst of [...instruments.all, ...(instruments.sponsors || [])]) {
     const h = history[inst.slug], l = histLong[inst.slug] || {};
     if (!h && !l.w5y) continue;
     const qq = snapshot.quotes[inst.slug] || {};

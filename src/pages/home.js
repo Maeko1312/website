@@ -4,7 +4,8 @@ module.exports = function (ctx) {
   const { html } = util;
   const news = content.articles.filter(a => a.kind === 'news');
   // Aufmacher: hervorgehobener Blogbeitrag > hervorgehobene Nachricht > neueste Meldung
-  const lead = content.blog.posts.find(p => p.featured) || news.find(a => a.featured) || news[0];
+  const campaign = content.featured.active[0] || null; // aktive Kampagne (Im Fokus) ist der Aufmacher
+  const lead = campaign ? c.campaignItem(campaign) : (content.blog.posts.find(p => p.featured) || news.find(a => a.featured) || news[0]);
   const rest = news.filter(a => a !== lead);
   const todayCards = rest.slice(0, 4);
   const posts = [...content.blog.posts.filter(p => p.featured), ...content.blog.posts.filter(p => !p.featured)]; // hervorgehobene zuerst

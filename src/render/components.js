@@ -17,7 +17,7 @@ module.exports = function (ctx) {
   c.topicUrl = () => '/nachrichten/ratgeber'; // Themen sind nur noch Etiketten, die Ratgeber-Seite sammelt alle
   c.catUrl = (cat) => cat.kind === 'analysis' ? `/analysen/${cat.slug.replace(/^analysen-/, '')}` : `/nachrichten/${cat.slug}`;
   c.fmtPrice = ctx.fmtPrice;
-  c.unit = (inst) => inst.type === 'index' ? 'Pkt.' : inst.type === 'bond' ? '%' : inst.type === 'fx' ? inst.unit : inst.type === 'stock' ? '€' : inst.unit;
+  c.unit = (inst) => inst.type === 'index' ? 'Pkt.' : inst.type === 'bond' ? '%' : inst.type === 'fx' ? inst.unit : inst.type === 'stock' ? (inst.currency && inst.currency !== 'EUR' ? inst.currency : '€') : inst.unit;
   c.asOf = ctx.layout ? ctx.layout.asOfLabel : '';
 
   /* ---------- Bild-Platzhalter: deterministische Grafik pro Beitrag ---------- */
@@ -107,12 +107,14 @@ module.exports = function (ctx) {
     const src = image || stockImage(seed);
     return html`<span class="thumb is-photo ${cls}"><img src="${src}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}"${eager ? raw(' fetchpriority="high"') : ''} decoding="async" width="1200" height="750"></span>`;
   };
+  // Aktive Kampagne als Aufmacher-Objekt (gleiche Felder wie ein Beitrag)
+  c.campaignItem = (f) => ({ title: f.title, deck: f.lead, image: f.image, imageAlt: f.imageAlt, featured: true, sponsored: true, url: '/fokus/' + f.slug, kicker: f.sector, slug: 'fokus-' + f.slug, date: new Date(f.updated + 'T08:00:00'), isCampaign: true });
   c.heroStory = (a) => {
-    // Aufmacher: hervorgehobener Beitrag (Blog oder Nachricht) oder die neueste Meldung
-    const isPost = !!a.topicObj;
-    const inst = isPost ? null : instOf(a); const cat = isPost ? null : catOf(a);
-    const url = isPost ? c.blogUrl(a) : c.articleUrl(a);
-    const kicker = isPost ? a.topicObj.name : cat.name;
+    // Aufmacher: aktive Kampagne (Im Fokus), hervorgehobener Beitrag oder die neueste Meldung
+    const isPost = !!a.topicObj, isCampaign = !!a.isCampaign;
+    const inst = isPost || isCampaign ? null : instOf(a); const cat = isPost || isCampaign ? null : catOf(a);
+    const url = a.url || (isPost ? c.blogUrl(a) : c.articleUrl(a));
+    const kicker = isCampaign ? a.kicker : isPost ? a.topicObj.name : cat.name;
     const label = inst ? inst.short || inst.name : kicker;
     return html`<article class="hero-main ${a.featured ? 'is-promoted' : ''}">${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image, eager: true })}<a class="hero-link" href="${url}" aria-label="${a.title}"></a><div class="hero-body"><span class="kicker">${a.featured ? html`<span class="badge is-accent hero-flag">Im Fokus</span>${a.sponsored ? html`<span class="badge hero-flag">Anzeige</span>` : ''}` : ''}${kicker}</span><h2><a href="${url}">${a.title}</a></h2><p>${isPost ? a.lead : a.deck}</p></div></article>`;
   };
@@ -127,6 +129,8 @@ module.exports = function (ctx) {
   c.todayItem = (a) => { const inst = instOf(a); const cat = catOf(a); return html`<li><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a><div>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></div></li>`; };
   // Promo-Karte für Seitenleisten: der hervorgehobene Beitrag (Blog bevorzugt, sonst Nachricht); ohne Flag nichts
   c.featuredPromo = () => {
+    const camp = ctx.content.featured && ctx.content.featured.active[0];
+    if (camp) return html`<section class="card promo-card" aria-labelledby="promo-title"><div class="card-flag"><span class="badge is-accent">Im Fokus</span><span class="badge">Anzeige</span></div><a href="/fokus/${camp.slug}" aria-hidden="true" tabindex="-1">${c.thumb('fokus-' + camp.slug, { label: camp.short, image: camp.image })}</a><span class="kicker">${camp.sector}</span><h2 id="promo-title" class="promo-title"><a href="/fokus/${camp.slug}">${camp.title}</a></h2><p>${camp.lead}</p><a class="read-more" href="/fokus/${camp.slug}">Zum Unternehmensporträt<span aria-hidden="true"> ›</span></a></section>`;
     const post = ctx.content.blog.posts.find(p => p.featured);
     const art = post ? null : ctx.content.articles.find(a => a.featured);
     if (!post && !art) return '';

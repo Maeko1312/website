@@ -36,14 +36,14 @@ module.exports = function (ctx) {
   // Marktleiste (10 Werte)
   // Marktleiste: die meistbeachteten Märkte (Index, Gold, Euro/Dollar, Silber, Öl, Bitcoin …); hervorgehobene Instrumente (featured) stehen davor.
   const stripBase = ['dax', 'gold', 'eur-usd', 'silber', 'brent', 'bitcoin', 'sp-500', 'nasdaq-100', 'mdax', 'euro-stoxx-50', 'bund-10j', 'platin'];
-  const featuredSlugs = instruments.all.filter(i => i.featured).map(i => i.slug);
+  const featuredSlugs = (instruments.sponsors || []).map(i => i.slug); // Fokus-Unternehmen (Anzeige) zuerst
   const stripSlugs = [...featuredSlugs, ...stripBase.filter(s => !featuredSlugs.includes(s))];
   function marketStrip() {
     return html`<div class="market-strip" aria-label="Marktüberblick"><div class="container">
       <div class="strip-scroll">${stripSlugs.map(s => {
         const inst = instruments.bySlug[s], qq = q(s); if (!inst || !qq) return '';
         const d = dir(qq.changePct);
-        const w = util.wkn(qq.isin || inst.isin); return html`<a class="strip-item ${inst.featured ? 'is-featured' : ''}" href="/kurs/${inst.slug}"${inst.featured ? raw(' title="Im Fokus der Redaktion"') : ''}><span class="strip-name notranslate" translate="no">${inst.short || inst.name}${inst.featured ? html`<span class="strip-flag">Fokus</span>` : ''}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
+        const w = inst.wkn || util.wkn(qq.isin || inst.isin); return html`<a class="strip-item ${inst.featured ? 'is-featured' : ''}" href="${inst.url || '/kurs/' + inst.slug}"${inst.featured ? raw(' title="Im Fokus (Anzeige)"') : ''}><span class="strip-name notranslate" translate="no">${inst.short || inst.name}${inst.featured ? html`<span class="strip-flag">Fokus</span>` : ''}</span>${w ? html`<span class="wkn">${w}</span>` : ''}<span class="strip-row"><strong>${fmtPrice(inst, qq)}${inst.type === 'bond' ? ' %' : ''}</strong><span class="${d}">${pct(qq.changePct)}</span></span></a>`;
       })}</div>
       <div class="strip-meta"><a href="/methodik" title="Kursdaten: Herkunft und Verzögerung">${asOfLabel} · Xetra 15 Min. verzögert</a></div>
     </div></div>`;

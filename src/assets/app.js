@@ -814,6 +814,17 @@
     });
   }
 
+  /* ---------- Kopieren-Knöpfe (ISIN, WKN, Kürzel) ---------- */
+  function copyButtons() {
+    $$('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var v = btn.getAttribute('data-copy');
+        var done = function () { btn.classList.add('is-done'); btn.textContent = '\u2713'; toast('Kopiert: ' + v); setTimeout(function () { btn.classList.remove('is-done'); btn.textContent = '\u29c9'; }, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(done, done); else done();
+      });
+    });
+  }
+
   /* ---------- FAQ: weich auf- und zuklappen ---------- */
   function faq() {
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -857,6 +868,6 @@
   }
 
   d.addEventListener('DOMContentLoaded', function () {
-    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); swiper(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
+    clock(); nav(); headerSearch(); searchPage(); tabs(); sortable(); filters(); watchlist(); recent(); newsletter(); nlBar(); nlModal(); calculators(); weeks(); poll(); quiz(); cookieNote(); share(); faq(); ichart(); pagedGrid(); lang(); swiper(); copyButtons(); try { motion(); } catch (e) { d.documentElement.classList.remove('reveal-on'); } stickyAside(); headerShadow(); progress();
   });
 })();

@@ -52,7 +52,7 @@ async function fetchYahoo(symbol) {
 }
 
 (async () => {
-  const tickers = instruments.all.map(i => i.tv).filter(Boolean);
+  const tickers = [...instruments.all, ...(instruments.sponsors || [])].map(i => i.tv).filter(Boolean);
   console.log(`TradingView: ${tickers.length} Symbole …`);
   const tv = await fetchTV(tickers);
   const missing = tickers.filter(t => !tv[t]);
@@ -60,7 +60,7 @@ async function fetchYahoo(symbol) {
 
   const history = {};
   const snapshot = { asOf: new Date().toISOString(), quotes: {} };
-  for (const inst of instruments.all) {
+  for (const inst of [...instruments.all, ...(instruments.sponsors || [])]) {
     const q = inst.tv ? tv[inst.tv] : null;
     let h = null;
     if (inst.yahoo) {
