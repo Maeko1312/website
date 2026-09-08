@@ -28,7 +28,7 @@ module.exports = {
     register: '[Registergericht, Registernummer]',
   },
   // Snapshot-Zeitpunkt der statischen Kurse (wird im UI als "Stand" angezeigt)
-  quotesAsOf: '2026-09-04T17:35:00+02:00',
+  quotesAsOf: require('./data/market-snapshot.json').asOf, // Zeitpunkt des letzten Datenabrufs (scripts/fetch-market-data.js)
   // Anzeige unter Charts und in den Instrument-Details
   dataSource: 'TradingView / Yahoo Finance',
 };
