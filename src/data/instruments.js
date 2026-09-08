@@ -1,10 +1,8 @@
 'use strict';
-// Instrumente-Universum. Kurse/Historie kommen aus market-snapshot.json + history.json
+// Instrumente-Universum: bewusst klein (Indizes, Rohstoffe, Devisen, Krypto, Anleihen) – keine Einzelaktien,
+// damit die Seite ohne teuren Datenfeed und ohne tägliche Pflege auskommt. Kurse/Historie kommen aus market-snapshot.json + history.json
 // (einmalig per scripts/fetch-market-data.js erzeugt, statisch eingebettet).
 // tv = TradingView-Symbol (Snapshot), yahoo = Yahoo-Symbol (Historie).
-
-const stock = (slug, name, tv, yahoo, isin, sector, index, blurb) =>
-  ({ slug, name, type: 'stock', tv, yahoo, isin, sector, index, exchange: 'Xetra', currency: 'EUR', unit: '€', blurb });
 
 const indices = [
   { slug: 'dax', name: 'DAX', type: 'index', tv: 'XETR:DAX', yahoo: '^GDAXI', isin: 'DE0008469008', exchange: 'Xetra', currency: 'EUR', unit: 'Punkte', region: 'Deutschland',
@@ -29,72 +27,6 @@ const indices = [
     blurb: 'Der VIX misst die erwartete Schwankungsbreite des S&P 500 für die nächsten 30 Tage – das „Angstbarometer“ der Wall Street.' },
 ];
 
-const dax = [
-  stock('adidas', 'adidas', 'XETR:ADS', 'ADS.DE', 'DE000A1EWWW0', 'Konsumgüter', 'DAX', 'Zweitgrößter Sportartikelhersteller der Welt mit Sitz in Herzogenaurach.'),
-  stock('airbus', 'Airbus', 'XETR:AIR', 'AIR.DE', 'NL0000235190', 'Luft- und Raumfahrt', 'DAX', 'Europäischer Flugzeugbauer und größter ziviler Flugzeughersteller der Welt.'),
-  stock('allianz', 'Allianz', 'XETR:ALV', 'ALV.DE', 'DE0008404005', 'Versicherungen', 'DAX', 'Einer der größten Versicherer und Vermögensverwalter weltweit, Sitz in München.'),
-  stock('basf', 'BASF', 'XETR:BAS', 'BAS.DE', 'DE000BASF111', 'Chemie', 'DAX', 'Weltgrößter Chemiekonzern mit Stammsitz in Ludwigshafen.'),
-  stock('bayer', 'Bayer', 'XETR:BAYN', 'BAYN.DE', 'DE000BAY0017', 'Pharma & Agrar', 'DAX', 'Life-Science-Konzern mit den Sparten Pharma, Consumer Health und Crop Science.'),
-  stock('beiersdorf', 'Beiersdorf', 'XETR:BEI', 'BEI.DE', 'DE0005200000', 'Konsumgüter', 'DAX', 'Hamburger Konsumgüterkonzern, bekannt für Marken wie Nivea, Eucerin und Tesa.'),
-  stock('bmw', 'BMW', 'XETR:BMW', 'BMW.DE', 'DE0005190003', 'Automobile', 'DAX', 'Münchner Premium-Automobilhersteller mit den Marken BMW, Mini und Rolls-Royce.'),
-  stock('brenntag', 'Brenntag', 'XETR:BNR', 'BNR.DE', 'DE000A1DAHH0', 'Chemiedistribution', 'DAX', 'Weltmarktführer im Handel mit Chemikalien und Inhaltsstoffen, Sitz in Essen.'),
-  stock('commerzbank', 'Commerzbank', 'XETR:CBK', 'CBK.DE', 'DE000CBK1001', 'Banken', 'DAX', 'Zweitgrößte deutsche Privatbank mit Schwerpunkt Mittelstand und Privatkunden.'),
-  stock('continental', 'Continental', 'XETR:CON', 'CON.DE', 'DE0005439004', 'Automobilzulieferer', 'DAX', 'Reifen- und Automobilzulieferer aus Hannover.'),
-  stock('daimler-truck', 'Daimler Truck', 'XETR:DTG', 'DTG.DE', 'DE000DTR0CK8', 'Nutzfahrzeuge', 'DAX', 'Einer der größten Nutzfahrzeughersteller der Welt, 2021 von Daimler abgespalten.'),
-  stock('deutsche-bank', 'Deutsche Bank', 'XETR:DBK', 'DBK.DE', 'DE0005140008', 'Banken', 'DAX', 'Größte deutsche Bank mit globalem Investmentbanking und Privatkundengeschäft.'),
-  stock('deutsche-boerse', 'Deutsche Börse', 'XETR:DB1', 'DB1.DE', 'DE0005810055', 'Finanzdienstleistungen', 'DAX', 'Betreiberin der Frankfurter Wertpapierbörse, von Xetra, Eurex und Clearstream.'),
-  stock('dhl-group', 'DHL Group', 'XETR:DHL', 'DHL.DE', 'DE0005552004', 'Logistik', 'DAX', 'Weltgrößter Logistikkonzern, ehemals Deutsche Post, Sitz in Bonn.'),
-  stock('deutsche-telekom', 'Deutsche Telekom', 'XETR:DTE', 'DTE.DE', 'DE0005557508', 'Telekommunikation', 'DAX', 'Europas größter Telekommunikationskonzern mit der US-Tochter T-Mobile US.'),
-  stock('eon', 'E.ON', 'XETR:EOAN', 'EOAN.DE', 'DE000ENAG999', 'Versorger', 'DAX', 'Energiekonzern mit Fokus auf Stromnetze und Kundenlösungen, Sitz in Essen.'),
-  stock('fresenius', 'Fresenius', 'XETR:FRE', 'FRE.DE', 'DE000FRE5EN2', 'Gesundheit', 'DAX', 'Gesundheitskonzern mit der Klinikkette Helios und dem Arzneimittelgeschäft Kabi.'),
-  stock('fresenius-medical-care', 'Fresenius Medical Care', 'XETR:FME', 'FME.DE', 'DE0005785802', 'Gesundheit', 'DAX', 'Weltgrößter Anbieter von Dialyseprodukten und -dienstleistungen.'),
-  stock('gea-group', 'GEA Group', 'XETR:G1A', 'G1A.DE', 'DE0006602006', 'Maschinenbau', 'DAX', 'Spezialist für Prozesstechnik in der Lebensmittel- und Getränkeindustrie, Sitz in Düsseldorf.'),
-  stock('hannover-rueck', 'Hannover Rück', 'XETR:HNR1', 'HNR1.DE', 'DE0008402215', 'Versicherungen', 'DAX', 'Drittgrößter Rückversicherer der Welt.'),
-  stock('heidelberg-materials', 'Heidelberg Materials', 'XETR:HEI', 'HEI.DE', 'DE0006047004', 'Baustoffe', 'DAX', 'Einer der größten Baustoffhersteller weltweit, ehemals HeidelbergCement.'),
-  stock('henkel', 'Henkel', 'XETR:HEN3', 'HEN3.DE', 'DE0006048432', 'Konsumgüter', 'DAX', 'Düsseldorfer Konzern für Klebstoffe, Wasch- und Reinigungsmittel sowie Kosmetik (Vorzugsaktie).'),
-  stock('infineon', 'Infineon', 'XETR:IFX', 'IFX.DE', 'DE0006231004', 'Halbleiter', 'DAX', 'Größter deutscher Halbleiterhersteller, stark in Automobil- und Leistungselektronik.'),
-  stock('mercedes-benz', 'Mercedes-Benz Group', 'XETR:MBG', 'MBG.DE', 'DE0007100000', 'Automobile', 'DAX', 'Stuttgarter Hersteller von Premium- und Luxusfahrzeugen.'),
-  stock('merck', 'Merck', 'XETR:MRK', 'MRK.DE', 'DE0006599905', 'Pharma & Chemie', 'DAX', 'Darmstädter Wissenschafts- und Technologiekonzern mit Pharma, Life Science und Elektronik.'),
-  stock('mtu-aero-engines', 'MTU Aero Engines', 'XETR:MTX', 'MTX.DE', 'DE000A0D9PT0', 'Luft- und Raumfahrt', 'DAX', 'Deutschlands führender Triebwerkshersteller mit Sitz in München.'),
-  stock('muenchener-rueck', 'Münchener Rück', 'XETR:MUV2', 'MUV2.DE', 'DE0008430026', 'Versicherungen', 'DAX', 'Weltgrößter Rückversicherer, Erstversicherung über die Tochter ERGO.'),
-  stock('porsche-se', 'Porsche SE', 'XETR:PAH3', 'PAH3.DE', 'DE000PAH0038', 'Beteiligungen', 'DAX', 'Holding der Familien Porsche und Piëch, Großaktionärin von Volkswagen (Vorzugsaktie).'),
-  stock('qiagen', 'Qiagen', 'XETR:QIA', 'QIA.DE', 'NL0015002SN0', 'Biotechnologie', 'DAX', 'Anbieter von Probenvorbereitungs- und Testtechnologien für Molekulardiagnostik.'),
-  stock('rheinmetall', 'Rheinmetall', 'XETR:RHM', 'RHM.DE', 'DE0007030009', 'Rüstung', 'DAX', 'Düsseldorfer Rüstungs- und Technologiekonzern, größter deutscher Wehrtechnikhersteller.'),
-  stock('rwe', 'RWE', 'XETR:RWE', 'RWE.DE', 'DE0007037129', 'Versorger', 'DAX', 'Einer der größten Erzeuger erneuerbarer Energien in Europa, Sitz in Essen.'),
-  stock('sap', 'SAP', 'XETR:SAP', 'SAP.DE', 'DE0007164600', 'Software', 'DAX', 'Europas größter Softwarekonzern und wertvollstes deutsches Unternehmen, Sitz in Walldorf.'),
-  stock('scout24', 'Scout24', 'XETR:G24', 'G24.DE', 'DE000A12DM80', 'Internet', 'DAX', 'Betreiberin des Immobilienportals ImmoScout24.'),
-  stock('siemens', 'Siemens', 'XETR:SIE', 'SIE.DE', 'DE0007236101', 'Industrie', 'DAX', 'Technologiekonzern mit Schwerpunkt Automatisierung, Infrastruktur und Mobilität.'),
-  stock('siemens-energy', 'Siemens Energy', 'XETR:ENR', 'ENR.DE', 'DE000ENER6Y0', 'Energietechnik', 'DAX', 'Energietechnikkonzern mit Gasturbinen, Netztechnik und der Windtochter Siemens Gamesa.'),
-  stock('siemens-healthineers', 'Siemens Healthineers', 'XETR:SHL', 'SHL.DE', 'DE000SHL1006', 'Medizintechnik', 'DAX', 'Medizintechniksparte von Siemens: Bildgebung, Diagnostik und Krebstherapie.'),
-  stock('symrise', 'Symrise', 'XETR:SY1', 'SY1.DE', 'DE000SYM9999', 'Spezialchemie', 'DAX', 'Hersteller von Duft- und Geschmacksstoffen aus Holzminden.'),
-  stock('vonovia', 'Vonovia', 'XETR:VNA', 'VNA.DE', 'DE000A1ML7J1', 'Immobilien', 'DAX', 'Größtes deutsches Wohnungsunternehmen mit rund 540.000 Wohnungen.'),
-  stock('volkswagen', 'Volkswagen', 'XETR:VOW3', 'VOW3.DE', 'DE0007664039', 'Automobile', 'DAX', 'Europas größter Autohersteller mit den Marken VW, Audi, Porsche, Skoda und Seat (Vorzugsaktie).'),
-  stock('zalando', 'Zalando', 'XETR:ZAL', 'ZAL.DE', 'DE000ZAL1111', 'Onlinehandel', 'DAX', 'Europas größte Online-Plattform für Mode und Lifestyle, Sitz in Berlin.'),
-];
-
-const mdax = [
-  stock('porsche-ag', 'Porsche AG', 'XETR:P911', 'P911.DE', 'DE000PAG9113', 'Automobile', 'MDAX', 'Sportwagenhersteller aus Stuttgart-Zuffenhausen (Vorzugsaktie).'),
-  stock('sartorius', 'Sartorius', 'XETR:SRT3', 'SRT3.DE', 'DE0007165631', 'Labortechnik', 'MDAX', 'Göttinger Pharma- und Laborzulieferer (Vorzugsaktie).'),
-  stock('lufthansa', 'Lufthansa', 'XETR:LHA', 'LHA.DE', 'DE0008232125', 'Luftfahrt', 'MDAX', 'Größte deutsche Fluggesellschaft mit Marken wie Swiss, Austrian und Eurowings.'),
-  stock('puma', 'Puma', 'XETR:PUM', 'PUM.DE', 'DE0006969603', 'Konsumgüter', 'MDAX', 'Sportartikelhersteller aus Herzogenaurach.'),
-  stock('thyssenkrupp', 'thyssenkrupp', 'XETR:TKA', 'TKA.DE', 'DE0007500001', 'Industrie', 'MDAX', 'Essener Industriekonzern mit Stahl, Werkstoffhandel und Marinesystemen.'),
-  stock('evonik', 'Evonik', 'XETR:EVK', 'EVK.DE', 'DE000EVNK013', 'Spezialchemie', 'MDAX', 'Einer der weltweit führenden Spezialchemiekonzerne, Sitz in Essen.'),
-  stock('aurubis', 'Aurubis', 'XETR:NDA', 'NDA.DE', 'DE0006766504', 'Metalle', 'MDAX', 'Größter Kupferproduzent Europas mit Sitz in Hamburg.'),
-  stock('leg-immobilien', 'LEG Immobilien', 'XETR:LEG', 'LEG.DE', 'DE000LEG1110', 'Immobilien', 'MDAX', 'Wohnungsunternehmen mit Schwerpunkt Nordrhein-Westfalen.'),
-  stock('aixtron', 'Aixtron', 'XETR:AIXA', 'AIXA.DE', 'DE000A0WMPJ6', 'Halbleiterausrüstung', 'MDAX', 'Hersteller von Anlagen zur Beschichtung von Halbleitern, Sitz in Herzogenrath.'),
-  stock('nemetschek', 'Nemetschek', 'XETR:NEM', 'NEM.DE', 'DE0006452907', 'Software', 'MDAX', 'Münchner Softwareanbieter für Architektur, Bau und Gebäudemanagement.'),
-  stock('bechtle', 'Bechtle', 'XETR:BC8', 'BC8.DE', 'DE0005158703', 'IT-Dienstleistungen', 'MDAX', 'Größtes deutsches IT-Systemhaus mit Sitz in Neckarsulm.'),
-  stock('carl-zeiss-meditec', 'Carl Zeiss Meditec', 'XETR:AFX', 'AFX.DE', 'DE0005313704', 'Medizintechnik', 'MDAX', 'Medizintechnikunternehmen für Augenheilkunde und Mikrochirurgie aus Jena.'),
-  stock('kion-group', 'Kion Group', 'XETR:KGX', 'KGX.DE', 'DE000KGX8881', 'Maschinenbau', 'MDAX', 'Hersteller von Gabelstaplern und Lagertechnik, Sitz in Frankfurt.'),
-  stock('hochtief', 'Hochtief', 'XETR:HOT', 'HOT.DE', 'DE0006070006', 'Bau', 'MDAX', 'Essener Baukonzern mit starkem Geschäft in Nordamerika und Australien.'),
-  stock('knorr-bremse', 'Knorr-Bremse', 'XETR:KBX', 'KBX.DE', 'DE000KBX1006', 'Industrie', 'MDAX', 'Weltmarktführer für Bremssysteme in Schienen- und Nutzfahrzeugen, Sitz in München.'),
-  stock('hensoldt', 'Hensoldt', 'XETR:HAG', 'HAG.DE', 'DE000HAG0005', 'Rüstung', 'MDAX', 'Sensor- und Radarspezialist für Verteidigung und Sicherheit aus Taufkirchen.'),
-  stock('hugo-boss', 'Hugo Boss', 'XETR:BOSS', 'BOSS.DE', 'DE000A1PHFF7', 'Bekleidung', 'MDAX', 'Modekonzern aus Metzingen.'),
-  stock('wacker-chemie', 'Wacker Chemie', 'XETR:WCH', 'WCH.DE', 'DE000WCH8881', 'Chemie', 'MDAX', 'Münchner Chemiekonzern, u. a. Polysilizium für Solar- und Halbleiterindustrie.'),
-  stock('teamviewer', 'TeamViewer', 'XETR:TMV', 'TMV.DE', 'DE000A2YN900', 'Software', 'MDAX', 'Göppinger Anbieter von Fernwartungs- und Kollaborationssoftware.'),
-  stock('hellofresh', 'HelloFresh', 'XETR:HFG', 'HFG.DE', 'DE000A161408', 'Onlinehandel', 'MDAX', 'Berliner Kochboxen-Versender.'),
-];
-
 const commodities = [
   { slug: 'gold', name: 'Gold', type: 'commodity', tv: 'TVC:GOLD', yahoo: 'GC=F', exchange: 'Spot', currency: 'USD', unit: 'US-$/Feinunze', unitMetric: '1 Feinunze = 31,1035 g',
     blurb: 'Gold gilt als Krisenwährung und Inflationsschutz. Der Preis wird in US-Dollar je Feinunze notiert.' },
@@ -110,6 +42,8 @@ const commodities = [
     blurb: 'West Texas Intermediate ist die US-Referenzsorte für leichtes, schwefelarmes Rohöl.' },
   { slug: 'erdgas', name: 'Erdgas (Henry Hub)', type: 'commodity', tv: 'NYMEX:NG1!', yahoo: 'NG=F', exchange: 'NYMEX', currency: 'USD', unit: 'US-$/MMBtu', unitMetric: '1 MMBtu ≈ 293 kWh', contract: 'Front-Month-Future (NYMEX)', rollRule: 'nymex-ng', priceKind: 'Terminkontrakt (Future) – kein Spotpreis', kwhPerUnit: 293.071, benchmarkNote: 'US-Referenzpreis; für Europa ist der TTF (Niederlande) maßgeblich',
     blurb: 'Henry Hub ist der US-Referenzpreis für Erdgas. Für Europa ist zusätzlich der niederländische TTF-Preis maßgeblich.' },
+  { slug: 'uran', name: 'Uran (Sprott-Trust)', type: 'commodity', tv: 'TSX:U.UN', yahoo: 'U-UN.TO', exchange: 'Toronto (TSX)', currency: 'CAD', unit: 'CAD je Anteil', unitMetric: 'Anteil am physisch gelagerten Uran (U3O8)', priceKind: 'Anteilspreis des Trusts', benchmarkNote: 'Für Uran gibt es keinen frei verfügbaren Spotpreis; der Trust hält physisches Uran, sein Anteilspreis folgt dem Uranpreis mit Auf- oder Abschlag.',
+    blurb: 'Uran wird nicht an einer öffentlichen Börse gehandelt. Als Näherung für den Uranpreis dient der Sprott Physical Uranium Trust, der physisches Uranoxid (U3O8) lagert; sein Anteilspreis in kanadischen Dollar folgt dem Spotmarkt.' },
 ];
 
 const fx = [
@@ -133,10 +67,10 @@ const bonds = [
   { slug: 'us-treasury-10j', name: 'US-Staatsanleihe 10 Jahre', short: 'US 10J', type: 'bond', tv: 'TVC:US10Y', yahoo: '^TNX', currency: null, unit: '%', maturity: '10 Jahre', priceKind: 'Rendite bis Fälligkeit', blurb: 'Rendite zehnjähriger US-Staatsanleihen – der wichtigste Zins der Welt.' },
 ];
 
-const all = [...indices, ...dax, ...mdax, ...commodities, ...fx, ...crypto, ...bonds];
+const all = [...indices, ...commodities, ...fx, ...crypto, ...bonds];
 const bySlug = Object.fromEntries(all.map(i => [i.slug, i]));
 // CMS-Flag: hervorgehobene Unternehmen (Marktleiste vorn, Fokus-Kennzeichnung). Leer lassen, wenn nichts hervorgehoben werden soll.
-const FEATURED = ['sap'];
+const FEATURED = [];
 for (const f of FEATURED) if (bySlug[f]) bySlug[f].featured = true;
 
-module.exports = { indices, dax, mdax, stocks: [...dax, ...mdax], commodities, fx, crypto, bonds, all, bySlug };
+module.exports = { indices, commodities, fx, crypto, bonds, all, bySlug };

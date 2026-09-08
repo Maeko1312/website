@@ -23,7 +23,7 @@ const components = require('./src/render/components.js')(ctx);
 ctx.layout = layout; ctx.c = components;
 
 // Seitenmodule
-const pageModules = ['home', 'news', 'blog', 'markets', 'quote', 'calendar', 'rankings', 'knowledge', 'tools', 'misc'];
+const pageModules = ['home', 'news', 'blog', 'markets', 'quote', 'calendar', 'knowledge', 'tools', 'misc'];
 const pages = [];
 for (const m of pageModules) {
   const mod = require(`./src/pages/${m}.js`);

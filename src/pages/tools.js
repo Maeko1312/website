@@ -29,10 +29,10 @@ module.exports = function (ctx) {
 
   // Merkliste
   {
-    const popular = ['dax', 'sap', 'rheinmetall', 'siemens-energy', 'gold', 'bitcoin', 'eur-usd', 'allianz'].map(s => instruments.bySlug[s]);
+    const popular = ['dax', 'gold', 'bitcoin', 'eur-usd', 'brent', 'silber', 'bund-10j', 'uran'].map(s => instruments.bySlug[s]);
     const body = html`<div class="container page" data-watchlist-page>
       ${c.breadcrumb([['Werkzeuge', '/werkzeuge'], ['Merkliste', '/merkliste']])}
-      ${c.pageHead({ kicker: 'Werkzeuge', title: 'Meine Merkliste', lead: 'Aktien, Indizes, Rohstoffe und Währungen, die Sie beobachten möchten – mit dem Stern-Symbol auf jeder Kursseite hinzufügen. Die Liste wird ausschließlich lokal in Ihrem Browser gespeichert.' })}
+      ${c.pageHead({ kicker: 'Werkzeuge', title: 'Meine Merkliste', lead: 'Indizes, Rohstoffe, Währungen, Kryptowährungen und Anleihen, die Sie beobachten möchten – mit dem Stern-Symbol auf jeder Kursseite hinzufügen. Die Liste wird ausschließlich lokal in Ihrem Browser gespeichert.' })}
       <div class="card" data-watchlist-table hidden><div class="section-title"><h2>Beobachtete Werte</h2><button class="btn btn-ghost btn-sm" type="button" data-watchlist-clear>Liste leeren</button></div><div class="table-wrap"><table class="quote-table"><thead><tr><th>Name</th><th class="num">Kurs</th><th class="num">±%</th><th class="num">YTD</th><th></th></tr></thead><tbody data-watchlist-rows></tbody></table></div><p class="small muted" style="margin-top:8px">${layout.asOfLabel}.</p></div>
       <div data-watchlist-empty><div class="empty" style="margin-bottom:24px"><p><strong>Ihre Merkliste ist noch leer.</strong></p><p>Klicken Sie auf einer Kursseite oder in der Tabelle unten auf das Stern-Symbol, um Werte hinzuzufügen.</p></div><section class="card">${c.sectionTitle('Häufig beobachtet')}${c.quoteTable(popular, { cols: ['price', 'change', 'ytd', 'watch'], sortable: false })}</section></div>
       <p class="small muted" style="margin-top:20px">Datenschutz: Die Merkliste liegt im lokalen Speicher Ihres Browsers (localStorage) und wird nicht an uns übertragen. Beim Löschen der Browserdaten geht sie verloren. Details unter <a href="/cookie-einstellungen">Cookie-Einstellungen</a>.</p>

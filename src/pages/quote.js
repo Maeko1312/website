@@ -6,7 +6,7 @@ module.exports = function (ctx) {
   const q = (s) => ctx.quote(s) || {};
   const pages = [];
   const eurusd = q('eur-usd').price || 1;
-  const typeHub = { index: ['Indizes', '/indizes'], stock: ['Aktien A–Z', '/aktien'], commodity: ['Rohstoffe', '/rohstoffe'], fx: ['Devisen', '/devisen'], crypto: ['Kryptowährungen', '/krypto'], bond: ['Anleihen & Zinsen', '/anleihen'] };
+  const typeHub = { index: ['Indizes', '/indizes'], commodity: ['Rohstoffe', '/rohstoffe'], fx: ['Devisen', '/devisen'], crypto: ['Kryptowährungen', '/krypto'], bond: ['Anleihen & Zinsen', '/anleihen'] };
   const digitsFor = (i, v) => i.type === 'fx' ? 4 : i.type === 'bond' ? 3 : v >= 1000 ? 0 : 2;
   const fmtV = (i, v) => v == null ? '–' : num(v, digitsFor(i, v));
   const unitLong = (i) => i.type === 'index' ? 'Punkte' : i.type === 'stock' ? '€' : i.type === 'bond' ? '%' : i.type === 'fx' ? i.currency : i.currency === 'USD' ? 'US-$' : i.currency;
@@ -36,21 +36,13 @@ module.exports = function (ctx) {
 
     // Typ-spezifische Zusatzblöcke
     let extra = '';
-    if (inst.type === 'index' && (inst.slug === 'dax' || inst.slug === 'mdax')) {
-      const members = inst.slug === 'dax' ? instruments.dax : instruments.mdax;
-      extra = html`<section class="card">${c.sectionTitle(inst.slug === 'dax' ? 'Die 40 DAX-Werte' : 'MDAX-Werte (Auswahl)', { href: '/aktien', more: 'Aktien A–Z' })}${c.quoteTable(members, { cols: ['price', 'change', 'ytd', 'mcap', 'spark'] })}</section>`;
-    } else if (inst.type === 'stock') {
-      const peers = instruments.stocks.filter(s => s.sector === inst.sector && s.slug !== inst.slug);
-      const idx = instruments.bySlug[inst.index.toLowerCase()];
-      extra = html`${peers.length ? html`<section class="card">${c.sectionTitle(`Branche ${inst.sector}`)}${c.quoteTable([inst, ...peers], { cols: ['price', 'change', 'ytd', 'mcap', 'pe', 'dy'] })}</section>` : ''}
-        ${idx ? html`<section class="card">${c.sectionTitle(`Vergleich mit dem ${idx.name}`)}<div class="table-wrap"><table class="quote-table is-compact"><thead><tr><th></th><th class="num">1 Woche</th><th class="num">1 Monat</th><th class="num">3 Monate</th><th class="num">YTD</th><th class="num">1 Jahr</th></tr></thead><tbody>${[inst, idx].map(i => { const p = q(i.slug).perf || {}; return html`<tr><td><a href="${c.url(i)}">${i.name}</a></td>${['w', 'm1', 'm3', 'ytd', 'y1'].map(k => html`<td class="num">${c.delta(p[k])}</td>`)}</tr>`; })}<tr><td class="muted">Differenz</td>${['w', 'm1', 'm3', 'ytd', 'y1'].map(k => { const d = ((q(inst.slug).perf || {})[k] || 0) - ((q(idx.slug).perf || {})[k] || 0); return html`<td class="num ${d >= 0 ? 'up' : 'down'}">${(d >= 0 ? '+' : '−') + num(Math.abs(d), 2)} Pp.</td>`; })}</tr></tbody></table></div></section>` : ''}`;
-    } else if (inst.type === 'commodity') {
-      const conv = inst.slug === 'gold' || inst.slug === 'silber' || inst.slug === 'platin'
+    if (inst.type === 'commodity') {
+      const conv = inst.currency !== 'USD' ? null : inst.slug === 'gold' || inst.slug === 'silber' || inst.slug === 'platin'
         ? [['1 Feinunze', `${num(x.price, 2)} US-$`, `${num(x.price / eurusd, 2)} €`], ['1 Gramm', `${num(x.price / 31.1035, 2)} US-$`, `${num(x.price / eurusd / 31.1035, 2)} €`], ['1 Kilogramm', `${num(x.price / 31.1035 * 1000, 0)} US-$`, `${num(x.price / eurusd / 31.1035 * 1000, 0)} €`]]
         : inst.slug === 'brent' || inst.slug === 'wti' ? [['1 Barrel (158,99 l)', `${num(x.price, 2)} US-$`, `${num(x.price / eurusd, 2)} €`], ['1 Liter', `${num(x.price / 158.987, 4)} US-$`, `${num(x.price / eurusd / 158.987, 4)} €`], ['1 Hektoliter', `${num(x.price / 1.58987, 2)} US-$`, `${num(x.price / eurusd / 1.58987, 2)} €`]]
         : inst.slug === 'kupfer' ? [['1 Pfund (453,6 g)', `${num(x.price, 4)} US-$`, `${num(x.price / eurusd, 4)} €`], ['1 Kilogramm', `${num(x.price / 0.45359, 2)} US-$`, `${num(x.price / eurusd / 0.45359, 2)} €`], ['1 Tonne', `${num(x.price / 0.45359 * 1000, 0)} US-$`, `${num(x.price / eurusd / 0.45359 * 1000, 0)} €`]]
         : [['1 MMBtu (≈ 293 kWh)', `${num(x.price, 3)} US-$`, `${num(x.price / eurusd, 3)} €`], ['1 Kilowattstunde', `${num(x.price / 293.071 * 100, 3)} US-ct`, `${num(x.price / eurusd / 293.071 * 100, 3)} ct`], ['1 Megawattstunde', `${num(x.price / 0.293071, 2)} US-$`, `${num(x.price / eurusd / 0.293071, 2)} €`]];
-      extra = html`<section class="card">${c.sectionTitle('Umrechnung')}<p class="section-sub">Wechselkurs EUR/USD ${num(eurusd, 4)}</p><div class="table-wrap"><table class="quote-table is-compact"><thead><tr><th>Menge</th><th class="num">in US-Dollar</th><th class="num">in Euro</th></tr></thead><tbody>${conv.map(r => html`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td></tr>`)}</tbody></table></div></section>
+      extra = html`${conv ? html`<section class="card">${c.sectionTitle('Umrechnung')}<p class="section-sub">Wechselkurs EUR/USD ${num(eurusd, 4)}</p><div class="table-wrap"><table class="quote-table is-compact"><thead><tr><th>Menge</th><th class="num">in US-Dollar</th><th class="num">in Euro</th></tr></thead><tbody>${conv.map(r => html`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td></tr>`)}</tbody></table></div></section>` : ''}
         <section class="card">${c.sectionTitle('Weitere Rohstoffe', { href: '/rohstoffe', more: 'Alle' })}${c.quoteTable(instruments.commodities.filter(i => i.slug !== inst.slug), { cols: ['price', 'change', 'ytd'], compact: true, sortable: false })}</section>`;
     } else if (inst.type === 'fx') {
       const [base, quote] = inst.short.split('/');
@@ -67,7 +59,7 @@ module.exports = function (ctx) {
       ${c.breadcrumb([['Märkte', '/maerkte'], [hubName, hubPath], [inst.name, c.url(inst)]])}
       <div class="quote-hero">
         <div><span class="kicker" style="color:rgba(255,255,255,.7)">${c.typeLabel(inst)}${inst.type === 'stock' ? ` · ${inst.index} · ${inst.sector}` : inst.region ? ` · ${inst.region}` : ''}</span><h1>${inst.name}${inst.featured ? html` <span class="badge is-accent quote-flag">Im Fokus</span>` : ''}</h1><div class="ids" translate="no">${x.isin || inst.isin ? html`<span>${x.isin || inst.isin}</span>` : ''}${util.wkn(x.isin || inst.isin) ? html`<span>WKN ${util.wkn(x.isin || inst.isin)}</span>` : ''}${inst.short && inst.short !== inst.name ? html`<span>${inst.short}</span>` : ''}<span>${inst.exchange || 'Interbanken'}</span><span>${util.time(new Date(config.quotesAsOf))} Uhr</span></div></div>
-        <div class="quote-price"><div class="price">${fmtV(inst, x.price)}<small>${inst.type === 'stock' ? '€' : inst.type === 'index' ? 'Pkt.' : inst.type === 'bond' ? '%' : inst.type === 'fx' ? inst.short.split('/')[1] : 'US-$'}</small></div><div class="change"><span class="${dir}">${x.changeAbs != null ? (x.changeAbs > 0 ? '+' : x.changeAbs < 0 ? '−' : '') + num(Math.abs(x.changeAbs), digitsFor(inst, x.price) === 0 ? 2 : digitsFor(inst, x.price)) : '–'}</span><span class="${dir}">${pct(x.changePct)}</span></div><div class="asof">${layout.asOfLabel} · ${updateLabel}${inst.type === 'crypto' ? ` · ${num(x.price / eurusd, 2)} €` : ''}</div></div>
+        <div class="quote-price"><div class="price">${fmtV(inst, x.price)}<small>${inst.type === 'stock' ? '€' : inst.type === 'index' ? 'Pkt.' : inst.type === 'bond' ? '%' : inst.type === 'fx' ? inst.short.split('/')[1] : inst.currency === 'USD' ? 'US-$' : inst.currency}</small></div><div class="change"><span class="${dir}">${x.changeAbs != null ? (x.changeAbs > 0 ? '+' : x.changeAbs < 0 ? '−' : '') + num(Math.abs(x.changeAbs), digitsFor(inst, x.price) === 0 ? 2 : digitsFor(inst, x.price)) : '–'}</span><span class="${dir}">${pct(x.changePct)}</span></div><div class="asof">${layout.asOfLabel} · ${updateLabel}${inst.type === 'crypto' ? ` · ${num(x.price / eurusd, 2)} €` : ''}</div></div>
         <div class="quote-actions">${c.watchButton(inst.slug)}<button class="btn btn-ghost" type="button" data-share><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Link teilen</button>${inst.type === 'stock' ? html`<a class="btn btn-ghost" href="/termine/unternehmen#${inst.slug}">Termine</a>` : ''}<a class="btn btn-ghost" href="/analysen">Analysen</a><span class="blurb">${inst.blurb}</span></div>
       </div>
       <div class="layout" style="margin-top:24px">
@@ -86,14 +78,14 @@ module.exports = function (ctx) {
           <p class="disclaimer">Kurse und Kennzahlen ${layout.asOfLabel}, ${updateLabel}. Gleitende Durchschnitte einfach (SMA) auf Tagesschlussbasis, RSI über 14 Tage. Keine Gewähr für Richtigkeit und Vollständigkeit; keine Anlageberatung. Quellen und Methodik unter <a href="/methodik">Methodik & Datenquellen</a>.</p>
         </div>
         <aside>
-          ${c.sideCard('Über ' + inst.name, html`<p class="small">${inst.blurb}</p>${inst.type === 'stock' ? html`<p class="small muted" style="margin-top:8px">Weitere ${inst.index}-Werte finden Sie auf der <a href="/kurs/${inst.index.toLowerCase()}">${inst.index}-Seite</a> und unter <a href="/aktien">Aktien A–Z</a>.</p>` : ''}`)}
+          ${c.sideCard('Über ' + inst.name, html`<p class="small">${inst.blurb}</p>`)}
           ${c.sideIndices()}
-          ${inst.type === 'stock' ? c.sideMovers() : c.sideAnalysis(5)}
+          ${c.sideAnalysis(5)}
           ${c.newsletterBox({ compact: true })}
         </aside>
       </div>
     </div>`;
-    const title = inst.type === 'stock' ? `${inst.name} Aktie: Kurs, Chart, Kennzahlen` : inst.type === 'index' ? `${inst.name}: Aktueller Stand, Chart, ${inst.slug === 'dax' || inst.slug === 'mdax' ? 'Mitglieder' : 'Kennzahlen'}` : inst.type === 'bond' ? `${inst.name}: Aktuelle Rendite, Entwicklung, Kennzahlen` : inst.type === 'fx' ? `${inst.short}: Kurs, Chart, Umrechnung` : `${inst.name}: Kurs, Chart, Umrechnung`;
+    const title = inst.type === 'stock' ? `${inst.name} Aktie: Kurs, Chart, Kennzahlen` : inst.type === 'index' ? `${inst.name}: Aktueller Stand, Chart, ${inst.slug === 'dax' || inst.slug === 'mdax' ? 'Mitglieder' : 'Kennzahlen'}` : inst.type === 'bond' ? `${inst.name}: Aktuelle Rendite, Entwicklung, Kennzahlen` : inst.type === 'fx' ? `${inst.short}: Kurs, Chart, ${inst.currency === 'USD' ? 'Umrechnung' : 'Hintergrund'}` : `${inst.name}: Kurs, Chart, ${inst.currency === 'USD' ? 'Umrechnung' : 'Hintergrund'}`;
     const description = `${inst.name} aktuell: ${fmtV(inst, x.price)} ${unitLong(inst)} (${pct(x.changePct)}). Chart über 1 Jahr, 52-Wochen-Spanne, Performance und Kennzahlen. ${inst.blurb}`;
     pages.push({ path: c.url(inst), html: layout.page({ title, description, path: c.url(inst), body, section: 'maerkte' }) });
   }

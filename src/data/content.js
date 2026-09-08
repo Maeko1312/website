@@ -5,7 +5,6 @@ module.exports = function (ctx) {
   const authors = require('./authors');
   const glossary = require('./glossary');
   const calendar = require('./calendar')(ctx);
-  const ipos = require('./ipos')(ctx);
   const guides = require('./guides')(ctx);
   const articles = require('./articles')(ctx);
   const blog = require('./blog')(ctx);
@@ -14,8 +13,8 @@ module.exports = function (ctx) {
 
   const content = {
     categories, authors, glossary: glossary.list, glossaryBySlug: glossary.bySlug, blog, tools, quiz,
-    holidays: calendar.holidays, events: calendar.events, companyEvents: calendar.company, countries: calendar.countries, calendarRange: calendar.range,
-    ipos, guides, articles,
+    holidays: calendar.holidays, events: calendar.events, countries: calendar.countries, calendarRange: calendar.range,
+    guides, articles,
     searchablePages: [],
     poll: { id: 'p1', question: 'Wo steht der DAX am Jahresende?', options: ['Über 28.000 Punkten', 'Zwischen 25.000 und 28.000', 'Unter 25.000 Punkten'], counts: [412, 688, 297] },
     upcomingEvents(n) {

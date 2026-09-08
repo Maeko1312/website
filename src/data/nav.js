@@ -9,8 +9,6 @@ const nav = [
       { title: 'Überblick', links: [
         ['Marktüberblick', '/maerkte'],
         ['Indizes', '/indizes'],
-        ['Aktien A–Z', '/aktien'],
-        ['Rankings', '/rankings'],
       ] },
       { title: 'Deutschland', links: [
         ['DAX', '/kurs/dax'],
@@ -53,7 +51,6 @@ const nav = [
       { title: 'Technische Analyse', links: [
         ['Alle Analysen', '/analysen'],
         ['Indizes', '/analysen/indizes'],
-        ['Aktien', '/analysen/aktien'],
         ['Rohstoffe & Devisen', '/analysen/rohstoffe-devisen'],
       ] },
       { title: 'Produkte & Strategie', links: [
@@ -66,23 +63,14 @@ const nav = [
     feature: 'analysis',
   },
   {
-    label: 'Termine', href: '/termine/wirtschaftskalender', key: 'termine', cols: 2,
+    label: 'Termine', href: '/termine/wirtschaftskalender', key: 'termine', cols: 1,
     groups: [
       { title: 'Kalender', links: [
         ['Wirtschaftskalender', '/termine/wirtschaftskalender'],
-        ['Unternehmenstermine', '/termine/unternehmen'],
-        ['Börsengänge (IPOs)', '/termine/ipos'],
-      ] },
-      { title: 'Für Anleger', links: [
-        ['Dividendenkalender', '/termine/dividenden'],
-        ['Hauptversammlungen', '/termine/hauptversammlungen'],
         ['Börsenfeiertage', '/termine/boersenfeiertage'],
       ] },
     ],
     feature: 'events',
-  },
-  {
-    label: 'Rankings', href: '/rankings', key: 'rankings',
   },
   {
     label: 'Blog', href: '/blog', key: 'blog', cols: 2,
@@ -148,9 +136,9 @@ const nav = [
 ];
 
 const footer = [
-  { title: 'Märkte', links: [['Marktüberblick', '/maerkte'], ['DAX', '/kurs/dax'], ['Indizes', '/indizes'], ['Aktien A–Z', '/aktien'], ['Rohstoffe', '/rohstoffe'], ['Devisen', '/devisen'], ['Krypto', '/krypto'], ['Anleihen & Zinsen', '/anleihen'], ['Rankings', '/rankings']] },
+  { title: 'Märkte', links: [['Marktüberblick', '/maerkte'], ['DAX', '/kurs/dax'], ['Indizes', '/indizes'], ['Rohstoffe', '/rohstoffe'], ['Devisen', '/devisen'], ['Krypto', '/krypto'], ['Anleihen & Zinsen', '/anleihen'], ['Gold', '/kurs/gold']] },
   { title: 'Nachrichten & Blog', links: [['Alle Nachrichten', '/nachrichten'], ['Marktberichte', '/nachrichten/marktberichte'], ['Unternehmen', '/nachrichten/unternehmen'], ['Analysen', '/analysen'], ['Blog', '/blog'], ['Blog: Einsteiger', '/blog/thema/einsteiger'], ['Newsletter', '/newsletter'], ['RSS-Feed', '/feed.xml']] },
-  { title: 'Termine & Wissen', links: [['Wirtschaftskalender', '/termine/wirtschaftskalender'], ['Unternehmenstermine', '/termine/unternehmen'], ['Dividendenkalender', '/termine/dividenden'], ['Börsenfeiertage', '/termine/boersenfeiertage'], ['Börse für Einsteiger', '/wissen/einsteiger'], ['Börsenlexikon', '/wissen/boersenlexikon'], ['Rechner', '/werkzeuge'], ['Merkliste', '/merkliste']] },
+  { title: 'Termine & Wissen', links: [['Wirtschaftskalender', '/termine/wirtschaftskalender'], ['Börsenfeiertage', '/termine/boersenfeiertage'], ['Börse für Einsteiger', '/wissen/einsteiger'], ['Börsenlexikon', '/wissen/boersenlexikon'], ['Rechner', '/werkzeuge'], ['Merkliste', '/merkliste']] },
   { title: 'Über uns', links: [['Über Börsenblick', '/ueber-uns'], ['Redaktion', '/redaktion'], ['Redaktionelle Leitlinien', '/redaktionelle-leitlinien'], ['Methodik & Datenquellen', '/methodik'], ['Kontakt', '/kontakt'], ['Werben', '/werben'], ['Impressum', '/impressum'], ['Datenschutz', '/datenschutz']] },
 ];
 

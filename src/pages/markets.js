@@ -6,39 +6,35 @@ module.exports = function (ctx) {
   const q = (s) => ctx.quote(s) || {};
   const pages = [];
   const crumb = (t, p) => [['Märkte', '/maerkte'], [t, p]];
-  const sub = [['Überblick', '/maerkte'], ['Indizes', '/indizes'], ['Aktien A–Z', '/aktien'], ['Rohstoffe', '/rohstoffe'], ['Devisen', '/devisen'], ['Krypto', '/krypto'], ['Anleihen & Zinsen', '/anleihen'], ['Rankings', '/rankings']];
+  const sub = [['Überblick', '/maerkte'], ['Indizes', '/indizes'], ['Rohstoffe', '/rohstoffe'], ['Devisen', '/devisen'], ['Krypto', '/krypto'], ['Anleihen & Zinsen', '/anleihen']];
   const add = (path, title, description, body, kicker = 'Märkte') => { content.searchablePages.push({ title, path, kicker, description }); pages.push({ path, html: layout.page({ title, description, path, body, section: 'maerkte' }) }); };
   const eurusd = q('eur-usd').price || 1;
 
   // ---------- Marktüberblick ----------
   {
-    const m = c.movers(5);
-    const up = instruments.dax.filter(s => (q(s.slug).changePct || 0) > 0).length, down = instruments.dax.filter(s => (q(s.slug).changePct || 0) < 0).length;
     const latestReport = content.articles.find(a => a.category === 'marktberichte');
     const body = html`<div class="container page">
       ${c.breadcrumb([['Märkte', '/maerkte']])}
-      ${c.pageHead({ kicker: 'Märkte', title: 'Marktüberblick', lead: html`Alle wichtigen Kurse auf einer Seite: deutsche und internationale Indizes, Gewinner und Verlierer, Rohstoffe, Devisen, Krypto und Zinsen. ${layout.asOfLabel}.` })}
+      ${c.pageHead({ kicker: 'Märkte', title: 'Marktüberblick', lead: html`Alle wichtigen Kurse auf einer Seite: deutsche und internationale Indizes, Rohstoffe, Devisen, Krypto und Zinsen. ${layout.asOfLabel}.` })}
       ${c.subnav(sub, '/maerkte')}
       <div class="number-tiles" style="margin-bottom:24px">
         <div class="number-tile"><span>DAX</span><strong class="${q('dax').changePct >= 0 ? 'up' : 'down'}">${num(q('dax').price, 0)}</strong><small>${pct(q('dax').changePct)} · Tagesspanne ${num(q('dax').low, 0)}–${num(q('dax').high, 0)}</small></div>
-        <div class="number-tile"><span>Marktbreite DAX</span><strong>${up} <span class="muted" style="font-size:14px">im Plus</span> · ${down} <span class="muted" style="font-size:14px">im Minus</span></strong><small>${instruments.dax.length - up - down} unverändert</small></div>
+        <div class="number-tile"><span>Gold</span><strong class="${q('gold').changePct >= 0 ? 'up' : 'down'}">${num(q('gold').price, 0)} <span class="muted" style="font-size:14px">US-$</span></strong><small>${pct(q('gold').changePct)} · Brent ${num(q('brent').price, 2)} US-$</small></div>
         <div class="number-tile"><span>Euro / US-Dollar</span><strong>${num(eurusd, 4)}</strong><small>${pct(q('eur-usd').changePct)} · Bund 10J ${num(q('bund-10j').price, 2)} %</small></div>
         <div class="number-tile"><span>Volatilität (VIX)</span><strong>${num(q('vix').price, 2)}</strong><small>${q('vix').price < 15 ? 'ruhiger Markt' : q('vix').price < 25 ? 'erhöhte Nervosität' : 'Stressphase'} · ${pct(q('vix').changePct)}</small></div>
       </div>
       <section style="margin-bottom:28px">${c.sectionTitle('Indizes', { href: '/indizes', more: 'Alle Indizes' })}${c.board(['dax', 'mdax', 'sdax', 'tecdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'dow-jones', 'nikkei-225', 'vix'])}</section>
       <div class="layout no-sticky">
         <div class="stack">
-          <section class="movers"><div class="card">${c.sectionTitle('Tagesgewinner', { href: '/rankings#gewinner', more: 'Ranking' })}${c.quoteTable(m.gainers, { cols: ['price', 'change', 'ytd'], compact: true, sortable: false })}</div><div class="card">${c.sectionTitle('Tagesverlierer', { href: '/rankings#verlierer', more: 'Ranking' })}${c.quoteTable(m.losers, { cols: ['price', 'change', 'ytd'], compact: true, sortable: false })}</div></section>
-          <section class="card">${c.sectionTitle('DAX-Werte', { href: '/aktien', more: 'Alle Aktien' })}${c.quoteTable(instruments.dax, { cols: ['price', 'change', 'ytd', 'mcap', 'spark'] })}</section>
+          <section class="card">${c.sectionTitle('Rohstoffe', { href: '/rohstoffe', more: 'Alle Rohstoffe' })}${c.quoteTable(instruments.commodities, { cols: ['price', 'change', 'ytd', 'spark'] })}</section>
+          <section class="card">${c.sectionTitle('Devisen & Krypto', { href: '/devisen', more: 'Alle Devisen' })}${c.quoteTable([...instruments.fx, ...instruments.crypto], { cols: ['price', 'change', 'ytd', 'spark'] })}</section>
         </div>
         <aside>
           ${latestReport ? c.sideCard('Marktbericht', html`${c.storyList([latestReport], { thumb: true, excerpt: true })}`, { href: '/nachrichten/marktberichte', more: 'Alle Berichte' }) : ''}
-          <section class="card">${c.sectionTitle('Rohstoffe', { href: '/rohstoffe', more: 'Alle' })}${c.miniQuotes(instruments.commodities)}</section>
-          <section class="card">${c.sectionTitle('Devisen', { href: '/devisen', more: 'Alle' })}${c.miniQuotes(instruments.fx)}</section>
           <section class="card">${c.sectionTitle('Krypto & Zinsen', { href: '/anleihen', more: 'Zinsen' })}${c.miniQuotes([...instruments.crypto, ...instruments.bonds])}</section>
         </aside>
       </div></div>`;
-    add('/maerkte', 'Marktüberblick', 'DAX, MDAX, internationale Indizes, Gewinner und Verlierer, Rohstoffe, Devisen, Krypto und Zinsen auf einen Blick.', body);
+    add('/maerkte', 'Marktüberblick', 'DAX, MDAX, internationale Indizes, Rohstoffe, Devisen, Krypto und Zinsen auf einen Blick.', body);
   }
 
   // ---------- Indizes ----------
@@ -53,27 +49,6 @@ module.exports = function (ctx) {
         <section class="grid-2">${instruments.indices.slice(0, 6).map(i => html`<div class="card"><h3 style="margin-bottom:6px"><a href="${c.url(i)}">${i.name}</a></h3><p class="small muted" style="margin-bottom:10px">${i.blurb}</p>${ctx.hist(i.slug) ? charts.sparkline(ctx.hist(i.slug).points, { days: 250, w: 320, h: 48 }) : ''}<p class="small muted" style="margin-top:6px">12 Monate · ${pct(q(i.slug).perf && q(i.slug).perf.y1)}</p></div>`)}</section>
       </div><aside>${c.sideAnalysis(6)}${c.sideCard('Was ist ein Performanceindex?', html`<p class="small">Der DAX ist ein <a href="/wissen/boersenlexikon#performanceindex">Performanceindex</a>: Dividenden werden rechnerisch wieder angelegt. Der EURO STOXX 50 und der S&P 500 sind in der Standardvariante Kursindizes – der Vergleich der reinen Punktestände hinkt also.</p>`)}${c.newsletterBox({ compact: true })}</aside></div></div>`;
     add('/indizes', 'Indizes', 'DAX, MDAX, SDAX, TecDAX, EURO STOXX 50, S&P 500, Nasdaq 100, Dow Jones und Nikkei mit Kursen, Performance und Charts.', body);
-  }
-
-  // ---------- Aktien A–Z ----------
-  {
-    const stocks = instruments.stocks.slice().sort((a, b) => a.name.localeCompare(b.name, 'de'));
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const groups = {};
-    for (const s of stocks) { const L = s.name[0].toUpperCase(); (groups[L] = groups[L] || []).push(s); }
-    const body = html`<div class="container page">
-      ${c.breadcrumb(crumb('Aktien A–Z', '/aktien'))}
-      ${c.pageHead({ kicker: 'Märkte', title: 'Aktien A–Z', lead: html`Alle ${stocks.length} beobachteten Aktien aus DAX und MDAX mit Kurs, Tagesveränderung, Performance seit Jahresbeginn, Marktkapitalisierung, KGV und Dividendenrendite. Spalten sind sortierbar.` })}
-      ${c.subnav(sub, '/aktien')}
-      <div class="filter-bar"><label class="label" for="stock-filter">Suchen</label><div class="control" style="flex:1;max-width:360px"><input id="stock-filter" type="search" placeholder="Name, Branche oder ISIN …" data-filter-input="stock-list" autocomplete="off"></div><span class="small muted"><span data-filter-count="stock-list">${stocks.length}</span> Aktien</span></div>
-      <nav class="az" aria-label="Alphabetische Navigation">${letters.map(L => groups[L] ? html`<a href="#buchstabe-${L}">${L}</a>` : html`<span aria-hidden="true">${L}</span>`)}</nav>
-      <div id="stock-list">
-        ${letters.filter(L => groups[L]).map(L => html`<section data-filter-group><h2 class="letter-head" id="buchstabe-${L}">${L}</h2><div class="table-wrap"><table class="quote-table" data-sortable><thead><tr><th>Name</th><th class="num">Kurs</th><th class="num">±%</th><th class="num hide-m">YTD</th><th class="num hide-m">Marktkap.</th><th class="num hide-m">KGV</th><th class="num hide-m">Div.-Rend.</th><th class="hide-m">Branche</th><th data-nosort></th></tr></thead><tbody>${groups[L].map(s => { const x = q(s.slug); return html`<tr data-filter-item="${s.name} ${s.sector} ${x.isin || s.isin || ''} ${s.index}"><td><a href="${c.url(s)}">${s.name}</a><span class="sub">${s.index} · ${x.isin || s.isin || ''}</span></td><td class="num" data-v="${x.price}">${num(x.price)} €</td><td class="num" data-v="${x.changePct}">${c.delta(x.changePct)}</td><td class="num hide-m" data-v="${x.perf ? x.perf.ytd : ''}">${c.delta(x.perf && x.perf.ytd)}</td><td class="num hide-m" data-v="${x.marketCap || 0}">${bigEur(x.marketCap)}</td><td class="num hide-m" data-v="${x.pe || 0}">${x.pe ? num(x.pe, 1) : '–'}</td><td class="num hide-m" data-v="${x.dividendYield || 0}">${x.dividendYield ? num(x.dividendYield, 2) + ' %' : '–'}</td><td class="hide-m muted">${s.sector}</td><td class="right">${c.watchButton(s.slug, true)}</td></tr>`; })}</tbody></table></div></section>`)}
-        <div class="empty" data-filter-empty="stock-list" hidden>Keine Aktie passt zu Ihrer Eingabe. Über die <a href="/suche">Suche</a> finden Sie auch Indizes, Rohstoffe und Lexikoneinträge.</div>
-      </div>
-      <p class="small muted" style="margin-top:16px">${layout.asOfLabel}. Xetra-Schlusskurse, KGV und Dividendenrendite auf Basis der letzten zwölf Monate. Indexzugehörigkeit zum Stichtag – Änderungen durch die Deutsche Börse werden quartalsweise übernommen.</p>
-    </div>`;
-    add('/aktien', 'Aktien A–Z', 'Alle DAX- und MDAX-Aktien alphabetisch mit Kurs, Veränderung, Marktkapitalisierung, KGV und Dividendenrendite.', body);
   }
 
   // ---------- Rohstoffe ----------

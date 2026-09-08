@@ -83,10 +83,6 @@ module.exports = function (ctx) {
   c.miniQuotes = (insts) => html`<div>${insts.map(i => { const qq = q(i.slug) || {}; const w = util.wkn(qq.isin || i.isin); return html`<div class="mini-quote"><span class="name"><a href="${c.url(i)}">${i.short || i.name}</a>${w ? html`<span class="wkn" translate="no">${w}</span>` : ''}</span><span class="vals"><strong>${c.priceCell(i, qq)}</strong>${c.delta(qq.changePct)}</span></div>`; })}</div>`;
   c.board = (slugs) => html`<div class="board">${slugs.map(s => { const i = instruments.bySlug[s], qq = q(s) || {}, h = history[s]; const w = util.wkn((qq && qq.isin) || i.isin); return html`<a class="board-item" href="${c.url(i)}"><span class="strip-name">${i.short || i.name}</span><span class="wkn" translate="no">${w || ''}</span><span class="price">${c.priceCell(i, qq)}</span>${c.delta(qq.changePct)}${h ? charts.sparkline(h.points, { days: 22, w: 200, h: 30 }) : ''}</a>`; })}</div>`;
   c.watchButton = (slug, small = false) => html`<button type="button" class="btn btn-ghost ${small ? 'btn-sm' : ''} watch" data-watch="${slug}" aria-pressed="false" title="Auf die Merkliste setzen">${raw(ctx.layout.icons.star)}${small ? '' : html`<span class="watch-label">Auf Merkliste</span>`}</button>`;
-  c.movers = (n = 5) => {
-    const stocks = instruments.stocks.filter(s => q(s.slug) && q(s.slug).changePct != null).sort((a, b) => q(b.slug).changePct - q(a.slug).changePct);
-    return { gainers: stocks.slice(0, n), losers: stocks.slice(-n).reverse() };
-  };
   c.perfGrid = (qq) => {
     const p = qq && qq.perf; if (!p) return '';
     const items = [['1 Woche', p.w], ['1 Monat', p.m1], ['3 Monate', p.m3], ['6 Monate', p.m6], ['Seit 1.1.', p.ytd], ['1 Jahr', p.y1]];
@@ -161,12 +157,6 @@ module.exports = function (ctx) {
   // Schmale Newsletter-Leiste (eine Zeile) für die Seitenmitte
   c.nlSlim = () => { const id = `nl-${++nlCounter}`; return html`<section class="nl-slim" aria-labelledby="nl-slim-title"><div class="nl-slim-text"><span class="kicker">Newsletter · kostenlos</span><h3 id="nl-slim-title">Börsenblick am Morgen – die Börse in zwei Minuten</h3><p>Jeden Handelstag um 7:30&nbsp;Uhr: Märkte, drei Termine, eine Meldung. Abmeldung jederzeit.</p></div>${nlForm({ id, cls: 'btn-teal', compactRow: true, fine: false })}</section>`; };
   // „Markt heute“: DAX groß, vier Vergleichswerte, Marktbreite – kompakt
-  c.marketToday = () => {
-    const dax = q('dax') || {}; if (dax.price == null) return '';
-    const up = instruments.dax.filter(s => ((q(s.slug) || {}).changePct || 0) > 0).length, down = instruments.dax.filter(s => ((q(s.slug) || {}).changePct || 0) < 0).length;
-    const h = history['dax'];
-    return html`<section class="card snap-card market-card" aria-labelledby="h-market">${c.sectionTitle('Markt heute', { href: '/maerkte', more: 'Alle Märkte', id: 'h-market' })}<div class="market-lead"><a class="market-name" href="/kurs/dax">DAX</a><div class="market-price"><strong>${c.priceCell(instruments.bySlug.dax, dax)}</strong>${c.delta(dax.changePct, { pill: true })}</div>${h && h.points.length > 2 ? html`<div class="market-spark">${charts.sparkline(h.points, { w: 220, h: 40, days: 22, id: 'ms-dax' })}</div>` : ''}</div>${c.miniQuotes(['mdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'eur-usd'].map(s => instruments.bySlug[s]).filter(Boolean))}<p class="small muted market-breadth"><span class="up">${up}</span> DAX-Werte im Plus, <span class="down">${down}</span> im Minus · ${ctx.layout.asOfLabel}</p></section>`;
-  };
   // „Termine der Woche“: die nächsten Termine mit Relevanz ≥ 2
   c.eventsCard = (n = 5) => {
     const ev = ctx.content.upcomingEvents(n); if (!ev.length) return '';
@@ -307,7 +297,6 @@ module.exports = function (ctx) {
   /* ---------- Sidebar-Bausteine ---------- */
   c.sideCard = (title, body, { href, more } = {}) => html`<section class="card">${c.sectionTitle(title, { href, more, tag: 'h2' })}${body}</section>`;
   c.sideIndices = () => c.sideCard('Indizes', c.miniQuotes(['dax', 'mdax', 'sdax', 'tecdax', 'euro-stoxx-50', 'sp-500', 'nasdaq-100', 'nikkei-225'].map(s => instruments.bySlug[s])), { href: '/indizes', more: 'Alle Indizes' });
-  c.sideMovers = () => { const m = c.movers(5); return c.sideCard('Gewinner & Verlierer', html`<h3 class="kicker movers-kicker is-top">Top DAX/MDAX</h3>${c.miniQuotes(m.gainers)}<h3 class="kicker movers-kicker is-flop">Flop DAX/MDAX</h3>${c.miniQuotes(m.losers)}`, { href: '/rankings', more: 'Rankings' }); };
   c.sideAnalysis = (n = 5) => c.sideCard('Neueste Analysen', c.analysisList(ctx.content.articles.filter(a => a.kind === 'analysis').slice(0, n)), { href: '/analysen', more: 'Alle Analysen' });
   c.sideLatest = (n = 6, exclude) => c.sideCard('Aktuelle Nachrichten', c.storyList(ctx.content.articles.filter(a => a.kind === 'news' && a.slug !== exclude).slice(0, n), { variant: 'is-compact' }), { href: '/nachrichten', more: 'Alle Nachrichten' });
   c.sideUpcoming = (n = 5) => { const ev = ctx.content.upcomingEvents(n); return c.sideCard('Nächste Termine', html`<ul class="upcoming">${ev.map(e => { const d = new Date(e.date + 'T00:00:00'); return html`<li><div class="date"><b>${d.getDate()}</b><span>${util.MONTHS_SHORT[d.getMonth()]}</span></div><div><div class="what">${e.title}</div><div class="who">${dateWeekday(d)} · ${e.time} Uhr · ${e.countryName}</div></div></li>`; })}</ul>`, { href: '/termine/wirtschaftskalender', more: 'Kalender' }); };
@@ -429,7 +418,6 @@ module.exports = function (ctx) {
       '/werkzeuge/waehrungsrechner': 'currency converter, currency, umrechner, währung, wechselkurs, euro dollar, fx converter',
       '/werkzeuge/positionsgroessenrechner': 'position size, positionsgröße, risiko, stop loss',
       '/werkzeuge/inflationsrechner': 'inflation calculator, inflation, kaufkraft, purchasing power',
-      '/rankings': 'ranking, rankings, top, top 20, gewinner, verlierer, winners, losers, best stocks, top-listen',
       '/blog': 'blog, beiträge, posts, artikel, ratgeber',
       '/newsletter': 'newsletter, abo, abonnieren, subscribe, e-mail, email, briefing',
       '/wissen': 'knowledge, wissen, lernen, learn, guides, ratgeber, education, börsenwissen',
@@ -438,17 +426,12 @@ module.exports = function (ctx) {
       '/nachrichten': 'news, nachrichten, meldungen, aktuell',
       '/analysen': 'analysis, analyses, analysen, chartanalyse, technical analysis',
       '/indizes': 'indices, index, indizes',
-      '/aktien': 'stocks, shares, aktien, aktie, a-z',
       '/rohstoffe': 'commodities, rohstoffe, oil, öl',
       '/devisen': 'forex, fx, currencies, devisen, währungen',
       '/krypto': 'crypto, krypto, kryptowährungen',
       '/anleihen': 'bonds, anleihen, zinsen, yields, interest rates',
       '/termine/wirtschaftskalender': 'calendar, kalender, termine, events, economic calendar, wirtschaftskalender, konjunkturdaten',
-      '/termine/unternehmen': 'earnings, quartalszahlen, company events, unternehmenstermine',
-      '/termine/dividenden': 'dividends, dividenden, dividendenkalender, ex-tag',
-      '/termine/hauptversammlungen': 'agm, hauptversammlung, hv, annual meeting',
       '/termine/boersenfeiertage': 'holidays, feiertage, börsenfeiertage, trading holidays',
-      '/termine/ipos': 'ipo, ipos, börsengang, börsengänge, listing, neuemission',
       '/merkliste': 'watchlist, merkliste, favoriten, favorites',
       '/ueber-uns': 'about, über uns, kontakt, contact',
       '/redaktion': 'team, redaktion, editorial, autoren, authors',

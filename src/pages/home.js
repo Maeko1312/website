@@ -22,7 +22,7 @@ module.exports = function (ctx) {
   const inRessorts = new Set(ressortCols.flatMap(r => r.items));
   // „Mehr Nachrichten“: alles Weitere, hervorgehobene zuerst, dann chronologisch (ohne Aufmacher, Tageszeilen und Ressortspalten)
   const restStream = stream.filter(i => !inRessorts.has(i));
-  const moreNews = [...restStream.filter(i => i.featured), ...restStream.filter(i => !i.featured)].slice(0, 12);
+  const moreNews = [...restStream.filter(i => i.featured), ...restStream.filter(i => !i.featured)].slice(0, 24);
   const body = html`<h1 class="visually-hidden">Börsenblick – Börse verstehen. Märkte im Blick.</h1>
 <div class="container page home-top">
   <div class="hero">

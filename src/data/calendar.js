@@ -97,48 +97,10 @@ function economicEvents(from, to) {
   return out;
 }
 
-// --- Unternehmenstermine (Platzhalter; Termine "voraussichtlich") ---
-function companyEvents(ctx, from, to) {
-  const { instruments } = ctx;
-  const out = [];
-  const stocks = instruments.stocks;
-  // Quartalsberichte: Q3 im Fenster 20.10.–13.11., Q4/Geschäftsjahr Ende Feb–März, Q1 Ende April–Mitte Mai, Q2 Ende Juli–Mitte Aug
-  const windows = [[9, 20, 10, 13, 'Quartalszahlen Q3'], [1, 20, 2, 20, 'Geschäftsjahreszahlen'], [3, 25, 4, 15, 'Quartalszahlen Q1'], [6, 24, 7, 14, 'Quartalszahlen Q2']];
-  const y = from.getFullYear();
-  const seeded = (s) => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
-  for (const w of windows) {
-    for (const yy of [y, y + 1]) {
-      const start = new Date(yy, w[0], w[1]), end = new Date(yy, w[2], w[3]);
-      const span = Math.round((end - start) / 86400000);
-      stocks.forEach((s) => {
-        let d = addDays(start, seeded(s.slug + w[4]) % span);
-        while (d.getDay() === 0 || d.getDay() === 6) d = addDays(d, 1);
-        out.push({ date: isoDate(d), type: 'Quartalszahlen', title: w[4], company: s, note: 'voraussichtlich', tentative: true });
-      });
-    }
-  }
-  // Hauptversammlungen: April–Juni, Dividende (Ex-Tag) am Folgetag, Zahlung 3 Geschäftstage später
-  stocks.forEach((s) => {
-    for (const yy of [y, y + 1]) {
-      const start = new Date(yy, 3, 8); let d = addDays(start, seeded(s.slug + 'hv') % 75);
-      while (d.getDay() === 0 || d.getDay() === 6) d = addDays(d, 1);
-      const q = ctx.quote(s.slug);
-      const hasDiv = q && q.dividendYield && q.dividendYield > 0.2;
-      out.push({ date: isoDate(d), type: 'Hauptversammlung', title: 'Ordentliche Hauptversammlung', company: s, note: 'voraussichtlich', tentative: true });
-      if (hasDiv) {
-        const perShare = q.price * q.dividendYield / 100;
-        out.push({ date: isoDate(addDays(d, 1)), type: 'Dividende', title: 'Ex-Dividende', company: s, amount: perShare, yieldPct: q.dividendYield, note: 'Betrag: Vorjahresbasis', tentative: true });
-      }
-    }
-  });
-  return out.filter(e => { const d = new Date(e.date + 'T00:00:00'); return d >= from && d <= to; }).sort((a, b) => a.date.localeCompare(b.date) || a.company.name.localeCompare(b.company.name));
-}
-
 module.exports = function (ctx) {
   const now = ctx.now;
   const from = startOfWeek(addDays(now, -7));
   const to = addDays(startOfWeek(now), 7 * 8 - 1);
   const events = economicEvents(from, to);
-  const company = companyEvents(ctx, addDays(startOfWeek(now), -7), addDays(now, 400));
-  return { holidays, events, company, countries, range: { from, to }, economicRange: (a, b) => economicEvents(a, b) };
+  return { holidays, events, countries, range: { from, to }, economicRange: (a, b) => economicEvents(a, b) };
 };
