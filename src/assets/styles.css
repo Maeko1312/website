@@ -1830,3 +1830,48 @@ body.is-fokus .nl-bar { display: none; }
 .calc-more summary::after { content: "+"; color: var(--muted); font-size: 20px; line-height: 1; }
 .calc-more[open] summary::after { content: "–"; }
 .calc-more .prose { padding: 0 16px 16px; font-size: 15px; line-height: 24px; }
+
+/* ---------- Leseseite (Nachrichten, Analysen, Ratgeber): eine ruhige Spalte, Information vor Dekoration ---------- */
+.reader { max-width: 780px; margin-left: auto; margin-right: auto; }
+.reader-kicker { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.reader-kicker a { color: inherit; }
+.reader-kicker .up { color: var(--up); } .reader-kicker .down { color: var(--down); }
+.reader-head h1 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: clamp(32px, 4.2vw, 46px); line-height: 1.06; letter-spacing: 0; margin: 0 0 16px; text-wrap: pretty; }
+.reader-deck { font-size: 20px; line-height: 30px; color: var(--body); margin: 0 0 14px; }
+.reader-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .01em; color: var(--muted); margin: 0 0 22px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.reader-meta a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong); }
+.reader-hero { margin: 0 0 24px; }
+.reader-hero img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--surface-2); }
+.reader-hero figcaption { margin-top: 6px; font-size: 12.5px; line-height: 17px; color: var(--muted); }
+.reader-glance { margin: 0 0 28px; padding: 18px 22px 20px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); }
+.reader-glance h2 { font-family: var(--font-body); font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.reader-glance ul { margin: 0; padding-left: 1.15em; display: grid; gap: 7px; font-size: 16px; line-height: 24px; color: var(--ink); }
+.reader-glance > p { margin: 0; font-size: 17px; line-height: 26px; font-weight: 500; color: var(--ink); }
+.reader-facts { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 20px; }
+.reader-facts > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.reader-facts dt { font-size: 12px; line-height: 16px; color: var(--muted); }
+.reader-facts dd { margin: 0; font-weight: 600; font-size: 15.5px; line-height: 20px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.reader-facts dd small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; line-height: 16px; }
+.reader-facts dd.up { color: var(--up); } .reader-facts dd.down { color: var(--down); }
+.reader-prose { font-size: 18px; line-height: 30px; color: var(--body); }
+.reader-prose p { margin: 0 0 1.15em; }
+.reader-prose p strong { color: var(--ink); }
+.reader-prose h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 28px; line-height: 32px; margin: 1.7em 0 .55em; color: var(--ink); }
+.reader-prose h3 { font-size: 20px; line-height: 28px; margin: 1.4em 0 .5em; }
+.reader-prose ul, .reader-prose ol { margin: 0 0 1.2em; padding-left: 1.3em; }
+.reader-prose li { margin: .3em 0; }
+.reader-prose table { font-size: 15px; line-height: 22px; }
+.reader-prose .table-wrap { margin: 1.2em 0; }
+.reader-prose h2#quellen { font-size: 20px; margin-top: 2em; }
+.reader-prose ul.sources { font-size: 14.5px; line-height: 21px; color: var(--muted); }
+.reader-chart { margin: 32px 0 0; padding-top: 24px; border-top: 1px solid var(--line); }
+.reader-chart h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 24px; line-height: 28px; margin: 0 0 12px; }
+.reader-foot { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); display: grid; gap: 24px; }
+.reader-related h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 22px; line-height: 26px; margin: 0 0 6px; }
+.reader-related ul { list-style: none; margin: 0; padding: 0; }
+.reader-related li { padding: 11px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 3px; }
+.reader-related li a { font-weight: 600; font-size: 16px; line-height: 23px; color: var(--ink); }
+.reader-related li a:hover { color: var(--link); text-decoration: none; }
+.reader-related-meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.reader .disclaimer { font-size: 12.5px; line-height: 18px; }
+@media (max-width: 700px) { .reader-prose { font-size: 17px; line-height: 28px; } .reader-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reader-deck { font-size: 18px; line-height: 27px; } .reader-head h1 { font-size: 30px; } }

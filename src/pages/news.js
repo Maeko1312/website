@@ -47,44 +47,27 @@ module.exports = function (ctx) {
     const main = insts[0];
     const related = content.articles.filter(x => x !== a && (x.category === a.category || (main && x.instruments && x.instruments.includes(main.slug)))).slice(0, 5);
     const listUrl = cat.kind === 'analysis' ? '/nachrichten' : '/nachrichten';
-    const body = html`<div class="container page">
-      ${c.breadcrumb([[cat.kind === 'analysis' ? 'Analysen' : 'Nachrichten', listUrl], [cat.name, c.catUrl(cat)], [a.title, c.articleUrl(a)]])}
-      <div class="layout">
-        <article class="article" data-article="${a.title}" data-article-cat="${cat.name}">
-          <header class="article-head">
-            <div class="story-top"><span class="tag"><a href="${c.catUrl(cat)}">${cat.name}</a></span>${a.kind === 'analysis' && a.direction ? html`<span class="badge ${a.direction === 'up' ? 'is-up' : 'is-down'}">${a.direction === 'up' ? 'Bullisch' : 'Bärisch'}</span>` : a.kind === 'analysis' ? html`<span class="badge">Neutral</span>` : ''}${a.generated ? html`<span class="badge" title="Aus offiziellen Kursdaten erzeugt und redaktionell geprüft">Datenbasiert</span>` : ''}</div>
-            <h1>${a.title}</h1>
-            <p class="deck">${a.deck}</p>
-            ${c.summaryBox(a.summary)}
-            <div class="article-meta">
-              <div class="author-line">${c.avatar(author)}<div><strong><a href="/redaktion#${author.slug}">${author.name}</a></strong><span>${author.role}</span></div></div>
-              <span class="spacer"></span>
-              <time datetime="${a.date.toISOString()}" translate="no">${dateLong(a.date)}, ${time(a.date)} Uhr</time>
-              <span>· ${a.readTime} Min. Lesezeit</span>
-              <button class="btn btn-ghost btn-sm" type="button" data-share><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Link teilen</button>
-            </div>
-          </header>
-          <figure class="article-hero">${c.thumb(a.slug, { label: main ? main.short || main.name : cat.name, image: a.image, alt: a.imageAlt || '' })}${a.imageCredit ? html`<figcaption class="img-credit">Foto: ${a.imageCredit}</figcaption>` : ''}</figure>${main && ctx.hist(main.slug) && ctx.hist(main.slug).points.length > 1 ? c.interactiveChart(main, ctx.quote(main.slug), ctx.hist(main.slug)) : ''}
-          ${main ? html`<div class="instrument-box"><div><a href="${c.url(main)}">${main.name}</a><span class="muted small block">${c.typeLabel(main)}${main.isin ? ' · ' + main.isin : ''} · ${layout.asOfLabel}</span></div><div class="vals"><strong>${c.priceCell(main, ctx.quote(main.slug) || {})}</strong>${c.delta((ctx.quote(main.slug) || {}).changePct, { pill: true })}${c.watchButton(main.slug, true)}</div></div>` : ''}
-          ${c.investorBox(a.investorContext)}
-          ${c.factsBox(a.facts)}
-          ${main ? c.instrumentCard(main, ctx.quote(main.slug)) : ''}
-          <div class="prose">${raw(c.injectAfterParagraph(c.wrapTables(a.body), c.nlInline(a.kind === 'analysis' ? 'Jeden Morgen die wichtigsten Marken – kostenlos' : undefined), 2))}</div>
-          <footer class="article-foot">
-            ${c.newsletterBox({ dark: true })}
-            ${insts.length ? html`<div class="related-tags"><span class="kicker" style="align-self:center">Werte in diesem Beitrag:</span>${insts.map(i => html`<a class="chip" href="${c.url(i)}">${i.name} ${c.delta((ctx.quote(i.slug) || {}).changePct)}</a>`)}</div>` : ''}
-            <div class="author-box">${c.avatar(author, true)}<div><strong>${author.name}</strong><span class="small muted">${author.role} · Schwerpunkt: ${author.focus}</span><p>${author.bio}</p></div></div>
-            ${c.disclaimer()}
-          </footer>
-        </article>
-        <aside>
-          ${c.featuredPromo()}
-          ${main ? c.sideCard(main.name, html`${c.miniQuotes([main])}${c.perfGrid(ctx.quote(main.slug))}<p style="margin-top:12px"><a class="btn btn-dark btn-block" href="${c.url(main)}">Zur Kursseite mit Chart</a></p>`) : ''}
-          ${related.length ? c.sideCard('Mehr zum Thema', c.storyList(related, { variant: 'is-compact' })) : ''}
-          ${c.sideLatest(5, a.slug)}
+    const srcCount = ((a.body.match(/<ul class="sources">[\s\S]*?<\/ul>/) || [''])[0].match(/<li>/g) || []).length;
+    const hasHist = !!(main && ctx.hist(main.slug) && ctx.hist(main.slug).points.length > 1);
+    const body = html`<div class="container page reader">
+      ${c.breadcrumb([['Nachrichten', '/nachrichten'], [cat.name, c.catUrl(cat)], [a.title, c.articleUrl(a)]])}
+      <article class="reader-article" data-article="${a.title}" data-article-cat="${cat.name}">
+        <header class="reader-head">
+          <p class="reader-kicker"><a href="${c.catUrl(cat)}">${cat.name}</a>${a.kind === 'analysis' && a.direction ? html` · <span class="${a.direction === 'up' ? 'up' : 'down'}">${a.direction === 'up' ? 'Bullisch' : 'Bärisch'}</span>` : ''}${a.featured ? html` <span class="badge is-accent">Im Fokus</span>` : ''}${a.sponsored ? html` <span class="badge">Anzeige</span>` : ''}</p>
+          <h1>${a.title}</h1>
+          <p class="reader-deck">${a.deck}</p>
+          <p class="reader-meta"><time datetime="${a.date.toISOString()}" translate="no">${dateLong(a.date)}, ${time(a.date)} Uhr</time><span>Lesezeit ${a.readTime} Min.</span>${srcCount ? html`<span><a href="#quellen">${srcCount} Quellen</a></span>` : ''}</p>
+        </header>
+        ${a.image ? html`<figure class="reader-hero"><img src="${a.image}" alt="${a.imageAlt || ''}" loading="eager" fetchpriority="high" decoding="async" width="1600" height="900">${a.imageCredit ? html`<figcaption>Foto: ${a.imageCredit}</figcaption>` : ''}</figure>` : ''}
+        ${(a.summary && a.summary.length) || (a.facts && a.facts.length) ? html`<aside class="reader-glance" aria-labelledby="h-glance"><h2 id="h-glance">Auf einen Blick</h2>${a.summary && a.summary.length ? html`<ul>${a.summary.map(x => html`<li>${x}</li>`)}</ul>` : ''}${a.facts && a.facts.length ? html`<dl class="reader-facts">${a.facts.slice(0, 6).map(([k, v, cls, sub]) => html`<div><dt>${k}</dt><dd class="${cls || ''}">${v}${sub ? html` <small>${sub}</small>` : ''}</dd></div>`)}</dl>` : ''}</aside>` : ''}
+        <div class="prose reader-prose">${raw(c.wrapTables(a.body).replace('<h2>Quellen</h2>', '<h2 id="quellen">Quellen</h2>'))}</div>
+        ${hasHist ? html`<section class="reader-chart" aria-labelledby="h-chart"><h2 id="h-chart">Kurs: ${main.name}</h2>${c.interactiveChart(main, ctx.quote(main.slug), ctx.hist(main.slug))}<p class="small muted">Mehr Kennzahlen und lange Historie auf der <a href="${c.url(main)}">Kursseite ${main.short || main.name}</a>.</p></section>` : ''}
+        <footer class="reader-foot">
+          ${related.length ? html`<section class="reader-related" aria-labelledby="h-related"><h2 id="h-related">Mehr zum Thema</h2><ul>${related.slice(0, 4).map(r => html`<li><a href="${c.articleUrl(r)}">${r.title}</a><span class="reader-related-meta"><time datetime="${r.date.toISOString()}" data-rel>${util.relTime(r.date, ctx.now)}</time> · ${r.categoryObj.name}</span></li>`)}</ul></section>` : ''}
           ${c.newsletterBox({ compact: true })}
-        </aside>
-      </div>
+          ${c.disclaimer()}
+        </footer>
+      </article>
     </div>`;
     const jsonLd = { '@context': 'https://schema.org', '@type': a.kind === 'analysis' ? 'AnalysisNewsArticle' : 'NewsArticle', headline: a.title, description: a.deck, datePublished: a.date.toISOString(), dateModified: a.date.toISOString(), author: { '@type': author.slug === 'redaktion' ? 'Organization' : 'Person', name: author.name }, publisher: { '@type': 'Organization', name: config.brand }, mainEntityOfPage: `${config.domain}${c.articleUrl(a)}`, articleSection: cat.name, inLanguage: 'de' };
     pages.push({ path: c.articleUrl(a), html: layout.page({ title: a.title, description: a.deck, path: c.articleUrl(a), body, section: cat.kind === 'analysis' ? 'analysen' : 'nachrichten', ogType: 'article', jsonLd, reading: true }) });
