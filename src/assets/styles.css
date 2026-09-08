@@ -1875,3 +1875,18 @@ body.is-fokus .nl-bar { display: none; }
 .reader-related-meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .reader .disclaimer { font-size: 12.5px; line-height: 18px; }
 @media (max-width: 700px) { .reader-prose { font-size: 17px; line-height: 28px; } .reader-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reader-deck { font-size: 18px; line-height: 27px; } .reader-head h1 { font-size: 30px; } }
+
+/* Leseseite: etwas breiter, Swiper mit verwandten Beiträgen am Ende */
+.reader { max-width: 880px; }
+.reader-prose { font-size: 18px; line-height: 30px; }
+.related-swiper { margin: 0; }
+.related-swiper .section-title h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 700; font-size: 24px; line-height: 28px; }
+.related-swiper .swipe-card { background: var(--surface); border: 1px solid var(--line); border-top: 1px solid var(--line); padding: 0 0 16px; gap: 12px; }
+.related-swiper .swipe-card:hover { border-color: var(--line-strong); }
+.related-swiper .swipe-body { padding: 0 16px; }
+.related-swiper .swipe-body .kicker { font-size: 11.5px; }
+.related-swiper .swipe-body h3 { font-size: 16px; line-height: 22px; }
+.related-swiper .swipe-body p { font-size: 14px; line-height: 20px; }
+.related-swiper .swiper-track { grid-auto-columns: calc((100% - 40px) / 3); }
+@media (max-width: 900px) { .related-swiper .swiper-track { grid-auto-columns: calc((100% - 20px) / 2); } }
+@media (max-width: 600px) { .related-swiper .swiper-track { grid-auto-columns: 86%; } }

@@ -45,7 +45,8 @@ module.exports = function (ctx) {
     const cat = a.categoryObj, author = c.authorOf(a);
     const insts = (a.instruments || []).map(s => instruments.bySlug[s]).filter(Boolean);
     const main = insts[0];
-    const related = content.articles.filter(x => x !== a && (x.category === a.category || (main && x.instruments && x.instruments.includes(main.slug)))).slice(0, 5);
+    const matches = content.articles.filter(x => x !== a && (x.category === a.category || (main && x.instruments && x.instruments.includes(main.slug))));
+    const related = [...matches, ...content.articles.filter(x => x !== a && !matches.includes(x))].slice(0, 8);
     const listUrl = cat.kind === 'analysis' ? '/nachrichten' : '/nachrichten';
     const srcCount = ((a.body.match(/<ul class="sources">[\s\S]*?<\/ul>/) || [''])[0].match(/<li>/g) || []).length;
     const hasHist = !!(main && ctx.hist(main.slug) && ctx.hist(main.slug).points.length > 1);
@@ -63,7 +64,7 @@ module.exports = function (ctx) {
         <div class="prose reader-prose">${raw(c.wrapTables(a.body).replace('<h2>Quellen</h2>', '<h2 id="quellen">Quellen</h2>'))}</div>
         ${hasHist ? html`<section class="reader-chart" aria-labelledby="h-chart"><h2 id="h-chart">Kurs: ${main.name}</h2>${c.interactiveChart(main, ctx.quote(main.slug), ctx.hist(main.slug))}<p class="small muted">Mehr Kennzahlen und lange Historie auf der <a href="${c.url(main)}">Kursseite ${main.short || main.name}</a>.</p></section>` : ''}
         <footer class="reader-foot">
-          ${related.length ? html`<section class="reader-related" aria-labelledby="h-related"><h2 id="h-related">Mehr zum Thema</h2><ul>${related.slice(0, 4).map(r => html`<li><a href="${c.articleUrl(r)}">${r.title}</a><span class="reader-related-meta"><time datetime="${r.date.toISOString()}" data-rel>${util.relTime(r.date, ctx.now)}</time> · ${r.categoryObj.name}</span></li>`)}</ul></section>` : ''}
+          ${c.relatedSwiper(related)}
           ${c.newsletterBox({ compact: true })}
           ${c.disclaimer()}
         </footer>

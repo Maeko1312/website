@@ -6,7 +6,7 @@ module.exports = function (ctx) {
   const { posts } = content.blog;
   for (const p of posts) {
     const author = content.authors.bySlug[p.author];
-    const related = posts.filter(x => x !== p && x.topic === p.topic).slice(0, 3).concat(posts.filter(x => x !== p && x.topic !== p.topic).slice(0, 3)).slice(0, 4);
+    const related = posts.filter(x => x !== p && x.topic === p.topic).concat(posts.filter(x => x !== p && x.topic !== p.topic)).slice(0, 8);
     const body = html`<div class="container page reader">
       ${c.breadcrumb([['Nachrichten', '/nachrichten'], ['Ratgeber', '/nachrichten/ratgeber'], [p.title, c.blogUrl(p)]])}
       <article class="reader-article" data-article="${p.title}" data-article-cat="Ratgeber">
@@ -20,7 +20,7 @@ module.exports = function (ctx) {
         ${p.takeaway ? html`<aside class="reader-glance" aria-labelledby="h-glance"><h2 id="h-glance">Das Wichtigste in einem Satz</h2><p>${p.takeaway}</p></aside>` : ''}
         <div class="prose reader-prose">${p.sections.map(sec => html`<h2 id="${util.slugify(sec.h)}">${sec.h}</h2>${raw(c.wrapTables(sec.html))}`)}</div>
         <footer class="reader-foot">
-          ${related.length ? html`<section class="reader-related" aria-labelledby="h-related"><h2 id="h-related">Mehr zum Thema</h2><ul>${related.slice(0, 4).map(r => html`<li><a href="${c.blogUrl(r)}">${r.title}</a><span class="reader-related-meta">Ratgeber · ${r.topicObj.name}</span></li>`)}</ul></section>` : ''}
+          ${c.relatedSwiper(related, { title: 'Mehr aus dem Ratgeber' })}
           ${c.newsletterBox({ compact: true })}
           ${c.disclaimer()}
         </footer>

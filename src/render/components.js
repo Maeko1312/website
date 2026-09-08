@@ -229,6 +229,13 @@ module.exports = function (ctx) {
       <ul class="ressort-list">${rows.map(a => html`<li class="${a.featured ? 'is-promoted' : ''}"><a href="${c.articleUrl(a)}">${a.title}</a></li>`)}</ul>
     </div>`;
   };
+  // Swiper „Mehr verwandte Nachrichten“ (Leseseite): Karten mit Foto, Ressort, Zeit, Titel, Teaser
+  c.relatedSwiper = (items, { title = 'Mehr verwandte Nachrichten', id = 'h-related' } = {}) => {
+    if (!items || !items.length) return '';
+    const card = (a) => { const isPost = !!a.topicObj; const url = isPost ? c.blogUrl(a) : c.articleUrl(a); const label = isPost ? a.topicObj.name : a.categoryObj.name;
+      return html`<article class="swipe-card"><a class="card-link" href="${url}" aria-label="${a.title}"></a>${c.thumb((isPost ? 'blog-' : '') + a.slug, { label, image: a.image })}<div class="swipe-body"><span class="kicker">${label} · <time datetime="${a.date.toISOString()}" data-rel>${relTime(a.date, now)}</time></span><h3>${a.title}</h3><p>${isPost ? a.lead : a.deck}</p><span class="read-more">Weiterlesen<span aria-hidden="true"> ›</span></span></div></article>`; };
+    return html`<section class="focus-swiper related-swiper" aria-labelledby="${id}" data-swiper><div class="section-title"><h2 id="${id}">${title}</h2><div class="swiper-nav"><button type="button" class="swiper-btn" data-swiper-prev aria-label="Zurück">‹</button><button type="button" class="swiper-btn" data-swiper-next aria-label="Weiter">›</button></div></div><div class="swiper-track" data-swiper-track tabindex="0" aria-label="Verwandte Beiträge, horizontal scrollbar">${items.map(card)}</div></section>`;
+  };
   c.storyCards = (arts) => html`<div class="story-cards">${arts.map(a => { const inst = instOf(a); const cat = catOf(a); return html`<article class="story-card"><a href="${c.articleUrl(a)}" aria-hidden="true" tabindex="-1">${c.thumb(a.slug, { label: inst ? inst.short || inst.name : cat.name, image: a.image })}</a>${c.storyTop(a)}<h3 class="story-title"><a href="${c.articleUrl(a)}">${a.title}</a></h3><p class="story-excerpt">${a.deck}</p></article>`; })}</div>`;
   c.byCategory = (slug, n) => ctx.content.articles.filter(a => a.category === slug).slice(0, n);
   c.byInstrument = (slug, n) => ctx.content.articles.filter(a => a.instruments && a.instruments.includes(slug)).slice(0, n);
